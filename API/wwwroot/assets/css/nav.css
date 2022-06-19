@@ -1,0 +1,47 @@
+nav{
+    position: relative;
+    height: 70px;
+    overflow: hidden;
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+nav #brand{
+    position: relative;
+    display: inherit;
+    font-size: 1.5rem;
+    font-weight: 900;
+    height: 100%;
+    align-items: center;
+    transition: color 300ms;
+}
+
+nav #brand:hover{
+    color: rgba(255,255,255,1);
+    
+}
+
+nav #brand img{
+    aspect-ratio: 1/1;
+    height: 3rem;
+    padding: 0 1rem;
+}
+
+nav #menu-button{
+    font-size: 1.5rem;
+    margin: 0 1rem;
+    aspect-ratio: 1/1;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    background-color: transparent;
+    transition: background-color 300ms, color 300ms;
+}
+nav #menu-button:hover{
+    background-color: var(--primary);
+    color: var(--primaryBG);
+    cursor: pointer;
+}
