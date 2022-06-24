@@ -7,15 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ChaseLabs.Configuration" Version="0.1.4" />
-    <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.1" />
     <PackageReference Include="CLPortmapper" Version="0.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\VIEWS\" />
-    <Folder Include="View\Shared\" />
-    <Folder Include="wwwroot\" />
+    <ProjectReference Include="..\Library\Library.csproj" />
   </ItemGroup>
 
 </Project>
