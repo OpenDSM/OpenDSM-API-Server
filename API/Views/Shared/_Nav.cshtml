@@ -1,0 +1,47 @@
+﻿@using OpenDSM.Lib.Auth
+@{
+    bool isLoggedIn = (bool)(ViewData["LoggedIn"] ??= false);
+    User user = null;
+    if (isLoggedIn)
+    {
+        user = (User)ViewData["User"];
+    }
+}
+
+<nav>
+    <a id="brand" href="/" title="Go Home" class="undecorated">
+        <img src="/assets/images/logo.svg" alt="">
+        OpenDSM
+    </a>
+    <span style="width: 100%;"></span>
+    <i class="fas fa-bars" id="menu-button"></i>
+    <div id="nav-items">
+        <div class="nav-item active" id="home-nav-item">
+            <i class="fa-solid fa-house"></i>
+            <p class="name">Home</p>
+        </div>
+        <div class="nav-item" id="search-nav-item">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p class="name">Search</p>
+        </div>
+        @if (isLoggedIn)
+        {
+            <div class="nav-item" id="profile-nav-item">
+                <div class="profile-icon" style="background-image: url('@user.ProfileImage');"></div>
+                <p class="name">Profile</p>
+            </div>
+
+            <div class="nav-item" id="profile-nav-item">
+                <i class="fas fa-plus"></i>
+                <p class="name">Create Project</p>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item" id="login-nav-item">
+                <i class="fa-solid fa-user"></i>
+                <p class="name">Login</p>
+            </div>
+        }
+    </div>
+</nav>

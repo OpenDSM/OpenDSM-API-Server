@@ -1,6 +1,6 @@
 ﻿@{
-    string username = ViewBag.Username;
-    bool isLoggedIn = ViewBag.IsLoggedIn;
+    bool isLoggedIn = (bool)(ViewData["LoggedIn"] ??= false);
+    string username = isLoggedIn ? (string)(ViewData["Username"] ??= "") : "";
 }
 
 <!DOCTYPE html>
@@ -20,24 +20,7 @@
 </head>
 
 <body>
-    <nav>
-        <a id="brand" href="/" title="Go Home">
-            <img src="/assets/images/logo.svg" alt="">
-            OpenDSM
-        </a>
-        <span style="width: 100%;"></span>
-        <div id="nav-items" class="list horizontal centered">
-            <a class="nav-item" href="/">Home</a>
-            @if (isLoggedIn)
-            {
-                <a class="nav-item" href="/auth/profile">@username</a>
-            }
-            else
-            {
-                <a class="nav-item" href="/auth/login">Login</a>
-            }
-        </div>
-    </nav>
+    @Html.PartialAsync("_Nav", ViewData)
     @RenderBody()
     <script src="/assets/js/elements.js"></script>
 </body>
