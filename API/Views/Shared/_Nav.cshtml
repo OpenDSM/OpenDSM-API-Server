@@ -1,11 +1,7 @@
 ﻿@using OpenDSM.Lib.Auth
 @{
-    bool isLoggedIn = (bool)(ViewData["LoggedIn"] ??= false);
-    User user = null;
-    if (isLoggedIn)
-    {
-        user = (User)ViewData["User"];
-    }
+    User user = (User)(ViewData["User"] ?? null);
+    bool IsLoggedIn = user != null;
 }
 
 <nav>
@@ -24,7 +20,7 @@
             <i class="fa-solid fa-magnifying-glass"></i>
             <p class="name">Search</p>
         </div>
-        @if (isLoggedIn)
+        @if (IsLoggedIn)
         {
             <div class="nav-item" id="profile-nav-item">
                 <div class="profile-icon" style="background-image: url('@user.ProfileImage');"></div>
