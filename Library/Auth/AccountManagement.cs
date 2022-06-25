@@ -17,7 +17,6 @@ public class AccountManagement
     protected AccountManagement()
     {
         _users = new();
-        LoadExistingUsers();
     }
 
     #endregion Protected Constructors
@@ -41,7 +40,7 @@ public class AccountManagement
         return _users[username];
     }
 
-    public void LoadExistingUsers()
+    public void Load()
     {
         string[] dirs = Directory.GetDirectories(UsersDirectory);
         Parallel.ForEach(dirs, dir =>
