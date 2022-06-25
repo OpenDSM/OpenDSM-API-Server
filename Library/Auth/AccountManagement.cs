@@ -1,6 +1,4 @@
-﻿using CLMath;
-
-namespace OpenDSM.Lib.Auth;
+﻿namespace OpenDSM.Lib.Auth;
 
 public class AccountManagement
 {

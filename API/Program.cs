@@ -1,6 +1,5 @@
 global using static OpenDSM.Lib.Data.Global;
 using CLPortmapper;
-using OpenDSM.Lib.Auth;
 
 namespace API;
 

@@ -1,5 +1,4 @@
-﻿using CLMath;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OpenDSM.Lib.Auth;
 
 namespace API.Controllers.API;

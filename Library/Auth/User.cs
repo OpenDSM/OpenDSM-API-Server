@@ -1,5 +1,4 @@
 ﻿using ChaseLabs.CLConfiguration.List;
-using OpenDSM.Lib.Objects;
 using CLMath;
 
 namespace OpenDSM.Lib.Auth;
