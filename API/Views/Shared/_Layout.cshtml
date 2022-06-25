@@ -19,7 +19,7 @@
 </head>
 
 <body>
-    @Html.PartialAsync("_Nav", ViewData)
+    @Html.PartialAsync("_Nav", ViewData).Result
     @RenderBody()
     <footer>
         <div class="row">
