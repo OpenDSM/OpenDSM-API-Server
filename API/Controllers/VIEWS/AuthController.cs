@@ -11,8 +11,8 @@ public class AuthController : Controller
     [Route("login")]
     public IActionResult Login()
     {
-        ViewBag.Username = "";
-        ViewBag.IsLoggedIn = false;
+        ViewData["Username"] = "";
+        ViewData["LoggedIn"] = false;
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
         if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(username))
@@ -28,8 +28,8 @@ public class AuthController : Controller
     [Route("register")]
     public IActionResult Register()
     {
-        ViewBag.Username = "";
-        ViewBag.IsLoggedIn = false;
+        ViewData["Username"] = "";
+        ViewData["LoggedIn"] = false;
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
         if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(username))

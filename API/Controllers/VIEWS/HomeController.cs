@@ -10,16 +10,16 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        ViewBag.Username = "";
-        ViewBag.IsLoggedIn = false;
+        ViewData["Username"] = "";
+        ViewData["LoggedIn"] = false;
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
         if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(username))
         {
             if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
             {
-                ViewBag.Username = user.Username;
-                ViewBag.IsLoggedIn = true;
+                ViewData["Username"] = user.Username;
+                ViewData["LoggedIn"] = true;
             }
         }
         return View();
@@ -31,16 +31,16 @@ public class HomeController : Controller
         ViewBag.Owner = Owner;
         ViewBag.Slug = Slug;
 
-        ViewBag.Username = "";
-        ViewBag.IsLoggedIn = false;
+        ViewData["Username"] = "";
+        ViewData["LoggedIn"] = false;
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
         if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(username))
         {
             if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
             {
-                ViewBag.Username = user.Username;
-                ViewBag.IsLoggedIn = true;
+                ViewData["Username"] = user.Username;
+                ViewData["LoggedIn"] = true;
             }
         }
 
