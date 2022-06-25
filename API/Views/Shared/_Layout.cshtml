@@ -1,6 +1,7 @@
-﻿@{
-    bool isLoggedIn = (bool)(ViewData["LoggedIn"] ??= false);
-    string username = isLoggedIn ? (string)(ViewData["Username"] ??= "") : "";
+﻿@using OpenDSM.Lib.Auth
+@{
+    User user = (User)(ViewData["User"] ?? null);
+    bool IsLoggedIn = user != null;
 }
 
 <!DOCTYPE html>
@@ -10,7 +11,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenDSM - The Open Digital Software Marketplace</title>
+    <title>@ViewData["Title"] - OpenDSM</title>
 
     <link rel="stylesheet" href="/assets/css/fonts.css">
     <link rel="stylesheet" href="/assets/css/main.css">
@@ -22,6 +23,15 @@
 <body>
     @Html.PartialAsync("_Nav", ViewData)
     @RenderBody()
+    <footer>
+        <div class="row">
+            <img src="/assets/images/logo.svg" alt="">
+            <div class="col">
+                <p class="name">Open DSM</p>
+                <p class="description">The Open Digital Software Marketplace</p>
+            </div>
+        </div>
+    </footer>
     <script src="/assets/js/elements.js"></script>
 </body>
 
