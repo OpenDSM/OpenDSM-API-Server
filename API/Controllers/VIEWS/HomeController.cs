@@ -10,7 +10,7 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        ViewData["Username"] = "";
+        ViewData["Title"] = "The Open Digital Software Marketplace";
         ViewData["LoggedIn"] = false;
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
@@ -18,7 +18,7 @@ public class HomeController : Controller
         {
             if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
             {
-                ViewData["Username"] = user.Username;
+                ViewData["User"] = user;
                 ViewData["LoggedIn"] = true;
             }
         }
@@ -28,10 +28,10 @@ public class HomeController : Controller
     [Route("/product/{Owner}/{Slug}")]
     public IActionResult Product(string Owner, string Slug)
     {
+        ViewData["Title"] = "Product";
         ViewBag.Owner = Owner;
         ViewBag.Slug = Slug;
 
-        ViewData["Username"] = "";
         ViewData["LoggedIn"] = false;
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
@@ -39,7 +39,7 @@ public class HomeController : Controller
         {
             if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
             {
-                ViewData["Username"] = user.Username;
+                ViewData["User"] = user;
                 ViewData["LoggedIn"] = true;
             }
         }
