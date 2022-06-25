@@ -16,30 +16,31 @@ public class Program
 
     private static void Main(string[] args)
     {
-        log.Info("Welcome to Kestrel Template");
-        log.Debug("All Rights Reserved - LFInteractive LLC. (c) 2020-2022");
         if (args.Length == 0)
         {
+            log.Info("Welcome to OpenDSM Server");
+            log.Debug($"All Rights Reserved - LFInteractive LLC. (c) 2020-{DateTime.Now.Year}");
             PortHandler.AddToFirewall();
             log.Warn($"Automatic Port Forwarding is Enabled");
             log.Debug($"Opening Port {port}");
             PortHandler.OpenPort(port);
-            _ = AccountManagement.Instance;
-            Host.CreateDefaultBuilder().ConfigureWebHostDefaults(builder =>
+            InitiateStartupProceedure().ContinueWith(t =>
             {
-                log.Info($"Starting server on port {port}");
-                builder.UseIISIntegration();
-                builder.UseContentRoot(Directory.GetCurrentDirectory());
-                builder.UseKestrel(options =>
+                Host.CreateDefaultBuilder().ConfigureWebHostDefaults(builder =>
                 {
-                    options.ListenAnyIP(port);
-                });
-                builder.UseStartup<Startup>();
-                log.Info("Server is now running!");
-            }).Build().Run();
-
-            log.Info("Shutting Down");
-            PortHandler.ClosePort(port);
+                    log.Info($"Starting server on port {port}");
+                    builder.UseIISIntegration();
+                    builder.UseContentRoot(Directory.GetCurrentDirectory());
+                    builder.UseKestrel(options =>
+                    {
+                        options.ListenAnyIP(port);
+                    });
+                    builder.UseStartup<Startup>();
+                    log.Info("Server is now running!");
+                }).Build().Run();
+                log.Info("Shutting Down");
+                PortHandler.ClosePort(port);
+            }).Wait();
         }
         else
         {
