@@ -1,61 +1,613 @@
-﻿<main>
+﻿<link rel="stylesheet" href="/assets/css/home.css">
+<main>
 
-    <div id="sidebar">
+    <div id="featured-banner">
+        <video src="/assets/images/testing/lego-brawls-trailer.mp4" autoplay class="bg" muted loop></video>
+        <!-- <iframe class="bg" src="https://www.youtube-nocookie.com/embed/Zu91WfFx00A?controls=0&autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media;" ></iframe> -->
         <div class="content">
-            <section>
-                <p class="name">Category</p>
-                <toggle name="Desktop" value="true"></toggle>
-                <toggle name="Games" value="false"></toggle>
-                <toggle name="Entertainment" value="false"></toggle>
-                <toggle name="OpenSource" value="false"></toggle>
-                <toggle name="Server" value="false"></toggle>
-                <toggle name="Utility" value="false"></toggle>
-                <toggle name="Owned" value="false"></toggle>
-            </section>
-            <section>
-                <p class="name">Pricing</p>
-                <toggle id="free-toggle" name="Free" value="false"></toggle>
-                <range id="price-range" min="0.00" max="99.99" type="$"></range>
-            </section>
-            <section>
-                <p class="name">Rating</p>
-                <toggle name="Include Not Rated" value="false"></toggle>
-                <stars id="sort-rating" value="3"></stars>
-            </section>
-            <section class="ad"></section>
+            <div class="name">LEGO Brawls</div>
+            <div class="description">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Id gravida tellus, lorem commodo tempus eget. Eget purus odio risus semper mauris cras eu rhoncus. Dignissim platea a arcu morbi pretium dictum turpis mi. Mi eu, aliquam ac vel duis. Proin euismod id sit a placerat id vitae. Libero risus, velit tincidunt vitae tellus. Molestie nisl orci adipiscing elit nam volutpat purus nunc. Donec mi volutpat vitae lacus fusce. Augue rhoncus sodales blandit libero diam, odio magna sollicitudin. Phasellus fames ut porttitor purus a accumsan vestibulum pellentesque elementum. Faucibus interdum blandit leo rutrum. Nunc mollis nunc, cursus lobortis. Enim elementum, vitae massa ornare malesuada euismod phasellus consequat rhoncus.
+                Mollis ultrices hendrerit at amet urna ornare enim urna volutpat.
+            </div>
+            <a class="btn md" href="/product.html">Check It Out </a>
+            <div class="social-icons">
+                <i class="fab fa-windows"></i>
+                <i class="fab fa-apple"></i>
+                <i class="fab fa-linux"></i>
+            </div>
         </div>
     </div>
-    <div id="search">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" name="search-box" id="search-box">
+
+    <div class="centered list horizontal">
+        <div class="product-item lg">
+            <div class="banner video" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');">
+                <i class="fas fa-play"></i>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                    <div class="social-icons">
+                        <i class="fab fa-windows"></i>
+                        <i class="fab fa-apple"></i>
+                        <i class="fab fa-linux"></i>
+                    </div>
+                    <div class="row rating">
+                        <i class="fas fa-star"></i>
+                        <p>3.2</p>
+                    </div>
+                    <div class="tag">Gaming</div>
+                </div>
+                <div class="col">
+                    <p class="name">LEGO Brawls</p>
+                    <p class="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget porttitor enim ac odio viverra sagittis, at. Nullam nam sit at blandit in sed eget fermentum. Eu quis eu vel eu, ornare sit eget condimentum. Mauris diam nulla sed sed ac nisl diam iaculis ac. Vitae sodales ornare.</p>
+                </div>
+            </div>
+        </div>
+        <div class="product-item lg">
+            <div class="banner video" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');">
+                <i class="fas fa-play"></i>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                    <div class="social-icons">
+                        <i class="fab fa-windows"></i>
+                        <i class="fab fa-apple"></i>
+                        <i class="fab fa-linux"></i>
+                    </div>
+                    <div class="row rating">
+                        <i class="fas fa-star"></i>
+                        <p>3.2</p>
+                    </div>
+                    <div class="tag">Gaming</div>
+                </div>
+                <div class="col">
+                    <p class="name">LEGO Brawls</p>
+                    <p class="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget porttitor enim ac odio viverra sagittis, at. Nullam nam sit at blandit in sed eget fermentum. Eu quis eu vel eu, ornare sit eget condimentum. Mauris diam nulla sed sed ac nisl diam iaculis ac. Vitae sodales ornare.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="list horizontal">
+    <div class="centered list horizontal">
+        <div class="featured-list">
+            <p class="name">Recently Added</p>
+            <div class="list">
 
-        @for (int i = 0; i < 50; i++)
-        {
-            <a class="product-item" href="/product/@i/@i">
-                <div class="icon" style="background-image: url('https://lfinteractive.net/assets/images/magic-dm-wallpaper.svg');"></div>
-                <div class="content">
-                    <p class="name">Test Item @i</p>
-                    <p class="description">Description</p>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="extra">
-                    <span>
-                        <i class="extra-icon fa-solid fa-dollar-sign"></i>
-                        <p class="extra-value">FREE</p>
-                    </span>
-                    <span>
-                        <i class="extra-icon fa-solid fa-download"></i>
-                        <p class="extra-value">25M</p>
-                    </span>
-                    <span>
-                        <i class="fa-solid fa-star extra-icon"></i>
-                        <p class="extra-value">4.5/5</p>
-                    </span>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </a>
-        }
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="featured-list">
+            <p class="name">Recently Added</p>
+            <div class="list">
+
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="featured-list">
+            <p class="name">Recently Added</p>
+            <div class="list">
+
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="featured-list">
+            <p class="name">Recently Added</p>
+            <div class="list">
+
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="ad"></div>
+
+    <div class="centered list horizontal">
+        <div class="product-item lg">
+            <div class="banner video" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');">
+                <i class="fas fa-play"></i>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                    <div class="social-icons">
+                        <i class="fab fa-windows"></i>
+                        <i class="fab fa-apple"></i>
+                        <i class="fab fa-linux"></i>
+                    </div>
+                    <div class="row rating">
+                        <i class="fas fa-star"></i>
+                        <p>3.2</p>
+                    </div>
+                    <div class="tag">Gaming</div>
+                </div>
+                <div class="col">
+                    <p class="name">LEGO Brawls</p>
+                    <p class="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget porttitor enim ac odio viverra sagittis, at. Nullam nam sit at blandit in sed eget fermentum. Eu quis eu vel eu, ornare sit eget condimentum. Mauris diam nulla sed sed ac nisl diam iaculis ac. Vitae sodales ornare.</p>
+                </div>
+            </div>
+        </div>
+        <div class="product-item lg">
+            <div class="banner video" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');">
+                <i class="fas fa-play"></i>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                    <div class="social-icons">
+                        <i class="fab fa-windows"></i>
+                        <i class="fab fa-apple"></i>
+                        <i class="fab fa-linux"></i>
+                    </div>
+                    <div class="row rating">
+                        <i class="fas fa-star"></i>
+                        <p>3.2</p>
+                    </div>
+                    <div class="tag">Gaming</div>
+                </div>
+                <div class="col">
+                    <p class="name">LEGO Brawls</p>
+                    <p class="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Eget porttitor enim ac odio viverra sagittis, at. Nullam nam sit at blandit in sed eget fermentum. Eu quis eu vel eu, ornare sit eget condimentum. Mauris diam nulla sed sed ac nisl diam iaculis ac. Vitae sodales ornare.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="centered list horizontal">
+        <div class="featured-list">
+            <p class="name">Recently Added</p>
+            <div class="list">
+
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="featured-list">
+            <p class="name">Recently Added</p>
+            <div class="list">
+
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="featured-list">
+            <p class="name">Recently Added</p>
+            <div class="list">
+
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="featured-list">
+            <p class="name">Recently Added</p>
+            <div class="list">
+
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="product-item sm">
+                    <div class="row">
+                        <div class="icon" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');"></div>
+                        <div class="col content">
+                            <p class="name">LEGO Brawls</p>
+                            <p class="description">Microsoft</p>
+                            <div class="social-icons">
+                                <i class="fab fa-windows"></i>
+                                <i class="fab fa-apple"></i>
+                                <i class="fab fa-linux"></i>
+                            </div>
+                            <div class="row rating">
+                                <i class="fas fa-star"></i>
+                                <p>3.2</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 
