@@ -1,0 +1,84 @@
+﻿<div id="page-nav">
+    <div class="page-nav-item active" page="login">Login</div>
+    <div class="page-nav-item" page="register">Register</div>
+</div>
+<div id="page-view">
+    <div id="login-page-view" class="page-view-item centered row social-form">
+        <section class="list centered">
+            <p class="name">Login</p>
+            <p class="error"></p>
+            <div class="form centered col">
+                <div class="row">
+                    <input type="text" id="login-email-input" placeholder="Username">
+                </div>
+                <div class="row">
+                    <input type="password" id="login-password-input" placeholder="Password">
+                </div>
+                <toggle name="Show Password" value="false"></toggle>
+                <toggle name="Remember Me?" value="false"></toggle>
+                <button type="submit" class="btn md" id="login-button">Login</button>
+            </div>
+        </section>
+        <div class="seperator vertical"></div>
+        <section class="centered list">
+            <p class="name">Social</p>
+            <div class="list" id="social-login-buttons">
+                <div class="social-button">
+                    <i class="fab fa-google"></i>
+                    Continue with Google
+                </div>
+                <div class="social-button">
+                    <i class="fab fa-windows"></i>
+                    Continue with Microsoft
+                </div>
+                <div class="social-button">
+                    <i class="fab fa-github"></i>
+                    Continue with Github
+                </div>
+                <div class="social-button">
+                    <i class="fab fa-apple"></i>
+                    Continue with Apple
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="register-page-view" class="page-view-item centered row social-form">
+        <section class="list centered">
+            <p class="name">Register</p>
+            <p class="error"></p>
+            <div class="form centered col">
+                <input type="email" id="register-email-input" placeholder="Email">
+                <input type="text" id="register-username-input" placeholder="Username">
+                <input type="password" name="password" id="register-password-input" placeholder="Password">
+                <input type="password" id="register-confirm-password-input" placeholder="Confirm Password">
+                <toggle name="Show Password" value="false"></toggle>
+                <toggle name="Remember Me?" value="false"></toggle>
+                <button type="submit" class="btn md" id="register-button">Register</button>
+            </div>
+        </section>
+        <div class="seperator vertical"></div>
+        <section class="centered list">
+            <p class="name">Social</p>
+            <div class="list" id="social-login-buttons">
+                <div class="social-button">
+                    <i class="fab fa-google"></i>
+                    Continue with Google
+                </div>
+                <div class="social-button">
+                    <i class="fab fa-windows"></i>
+                    Continue with Microsoft
+                </div>
+                <div class="social-button">
+                    <i class="fab fa-github"></i>
+                    Continue with Github
+                </div>
+                <div class="social-button">
+                    <i class="fab fa-apple"></i>
+                    Continue with Apple
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<script src="/assets/js/login-register.js"></script>
