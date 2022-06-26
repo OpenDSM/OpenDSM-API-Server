@@ -7,7 +7,7 @@ public class Products
     #region Fields
 
     public static Products Instance = Instance ??= new();
-    public Dictionary<long, Product> _products;
+    private Dictionary<long, Product> _products;
 
     #endregion Fields
 
@@ -46,6 +46,11 @@ public class Products
         return hadNull ? products.Where(i => i != null).ToArray() : products;
     }
 
+    public Product GetProduct(long id)
+    {
+        return _products[id];
+    }
+
     public void Load()
     {
         string[] files = Directory.GetFiles(ProductsDirectory, "*.json", SearchOption.TopDirectoryOnly);
@@ -57,6 +62,40 @@ public class Products
                 _products.Add(id, new(id));
             }
         });
+    }
+
+    public Product[] Search(string query, params string[] tags)
+    {
+        Dictionary<int, Product> products = new();
+        string[] keywords = query.Split(' ');
+        foreach ((long _, Product product) in _products)
+        {
+            int matches = 0;
+            bool hasMatchingTags = true;
+            foreach (string keyword in keywords)
+            {
+                if (product.Keywords.Contains(keyword))
+                {
+                    matches++;
+                }
+            }
+            if (matches != 0)
+            {
+                foreach (string tag in tags)
+                {
+                    if (!product.Tags.Contains(tag))
+                    {
+                        hasMatchingTags = false;
+                        break;
+                    }
+                }
+                if (hasMatchingTags)
+                {
+                    products.Add(matches, product);
+                }
+            }
+        }
+        return ((Dictionary<int, Product>)products.OrderBy(i => i.Key)).Values.ToArray();
     }
 
     #endregion Public Methods
