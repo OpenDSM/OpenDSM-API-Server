@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OpenDSM.Lib.Auth;
+using OpenDSM.Lib.Objects;
 
 namespace API.Controllers.VIEWS;
 
@@ -12,6 +13,7 @@ public class HomeController : Controller
     {
         ViewData["Title"] = "The Open Digital Software Marketplace";
         ViewData["LoggedIn"] = false;
+        ViewData["page"] = "home";
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
         if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(username))
@@ -25,14 +27,12 @@ public class HomeController : Controller
         return View();
     }
 
-    [Route("/product/{Owner}/{Slug}")]
-    public IActionResult Product(string Owner, string Slug)
+    [Route("/product/{id}")]
+    public IActionResult Product(long id)
     {
         ViewData["Title"] = "Product";
-        ViewBag.Owner = Owner;
-        ViewBag.Slug = Slug;
+        ViewData["page"] = "";
 
-        ViewData["LoggedIn"] = false;
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
         if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(username))
@@ -44,7 +44,13 @@ public class HomeController : Controller
             }
         }
 
-        return View();
+        return View(Products.Instance.GetProduct(id));
+    }
+
+    [Route("/search")]
+    public IActionResult Search(string? query)
+    {
+        return View(query);
     }
 
     #endregion Public Methods
