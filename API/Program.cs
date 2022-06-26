@@ -38,7 +38,8 @@ public class Program
                     log.Info("Server is now running!");
                 }).Build().Run();
                 log.Info("Shutting Down");
-                PortHandler.ClosePort(port);
+                PortHandler.ClosePort(port).Wait();
+                log.Info($"Closed Port: {port}");
             }).Wait();
         }
         else
