@@ -2,6 +2,7 @@
 @{
     User user = (User)(ViewData["User"] ?? null);
     bool IsLoggedIn = user != null;
+    string activePage = (string)(ViewData["page"] ?? "");
 }
 
 <nav>
@@ -12,32 +13,32 @@
     <span style="width: 100%;"></span>
     <i class="fas fa-bars" id="menu-button"></i>
     <div id="nav-items">
-        <div class="nav-item active" id="home-nav-item">
+        <a class="nav-item active undecorated @(activePage == "home" ? "active" : "")" id="home-nav-item" href="/">
             <i class="fa-solid fa-house"></i>
             <p class="name">Home</p>
-        </div>
-        <div class="nav-item" id="search-nav-item">
+        </a>
+        <a class="nav-item undecorated @(activePage == "search" ? "active" : "")" id="search-nav-item" href="/search">
             <i class="fa-solid fa-magnifying-glass"></i>
             <p class="name">Search</p>
-        </div>
+        </a>
         @if (IsLoggedIn)
         {
-            <div class="nav-item" id="profile-nav-item">
+            <a class="nav-item undecorated @(activePage == "profile" ? "active" : "")" id="profile-nav-item" href="/auth/">
                 <div class="profile-icon" style="background-image: url('@user.ProfileImage');"></div>
                 <p class="name">Profile</p>
-            </div>
+            </a>
 
-            <div class="nav-item" id="profile-nav-item">
+            <a class="nav-item undecorated @(activePage == "create-project" ? "active" : "")" id="profile-nav-item" href="/auth/create">
                 <i class="fas fa-plus"></i>
                 <p class="name">Create Project</p>
-            </div>
+            </a>
         }
         else
         {
-            <div class="nav-item" id="login-nav-item">
+            <a class="nav-item undecorated @(activePage == "login" ? "active" : "")" id="login-nav-item" href="/auth/">
                 <i class="fa-solid fa-user"></i>
                 <p class="name">Login</p>
-            </div>
+            </a>
         }
     </div>
 </nav>
