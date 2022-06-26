@@ -14,6 +14,8 @@ public static class Global
 
     public static ILog log = LogManager.Init().SetDumpMethod(DumpType.NoBuffer).SetLogDirectory(Path.Combine(Assembly.GetExecutingAssembly().Location));
 
+    private static string tos = "";
+
     #endregion Fields
 
     #region Properties
@@ -26,6 +28,16 @@ public static class Global
     #endregion Properties
 
     #region Public Methods
+
+    public static string GetTOS()
+    {
+        if (string.IsNullOrEmpty(tos))
+        {
+            using StreamReader reader = new(new FileStream(Path.Combine(RootDirectory, "tos.txt"), FileMode.OpenOrCreate, FileAccess.Read));
+            tos = reader.ReadToEnd();
+        }
+        return tos;
+    }
 
     public static Task InitiateStartupProceedure()
     {
