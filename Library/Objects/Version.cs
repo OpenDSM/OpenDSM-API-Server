@@ -21,7 +21,7 @@ public class Version
 {
     #region Public Constructors
 
-    public Version(int iD, string name, ReleaseType releaseType, params SupportedOS[] supportedOperatingSystems)
+    public Version(uint iD, string name, ReleaseType releaseType, params SupportedOS[] supportedOperatingSystems)
     {
         ID = iD;
         Name = name;
@@ -33,7 +33,8 @@ public class Version
 
     #region Properties
 
-    public int ID { get; set; }
+    public uint Downloads { get; set; }
+    public uint ID { get; set; }
     public string Name { get; set; }
     public ReleaseType ReleaseType { get; set; }
     public SupportedOS[] SupportedOperatingSystems { get; set; }
