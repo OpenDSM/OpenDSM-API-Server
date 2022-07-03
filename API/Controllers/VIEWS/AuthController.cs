@@ -17,14 +17,16 @@ public class AuthController : Controller
         {
             if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
             {
+                ViewData["Title"] = "Create Product";
                 ViewData["page"] = "profile";
+                ViewData["User"] = user;
                 return View(user);
             }
         }
         return RedirectToAction("Index");
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string? page = "")
     {
         string token = Request.Cookies["auth_token"] ?? "";
         string username = Request.Cookies["auth_username"] ?? "";
@@ -32,10 +34,20 @@ public class AuthController : Controller
         {
             if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
             {
-                ViewData["page"] = "profile";
-                return View("Profile", user);
+                if (string.IsNullOrEmpty(page))
+                {
+                    ViewData["Title"] = "Profile";
+                    ViewData["page"] = "profile";
+                    ViewData["User"] = user;
+                    return View("Profile", user);
+                }
+                else
+                {
+                    return View($"Profile/{page}", user);
+                }
             }
         }
+        ViewData["Title"] = "Login/Register";
         ViewData["page"] = "login";
         return View("LoginRegister");
     }
