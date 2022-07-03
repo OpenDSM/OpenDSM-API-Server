@@ -1,5 +1,5 @@
 ﻿using ChaseLabs.CLConfiguration.List;
-using CLMath;
+using ChaseLabs.Math;
 
 namespace OpenDSM.Lib.Auth;
 
@@ -17,29 +17,58 @@ public class User
     {
         manager = new(Path.Combine(UsersDirectory, id.ToString(), $"{id}.json"));
         ID = id;
-        manager.Add("username", "");
-        manager.Add("email", "");
-        manager.Add("password", "");
-        manager.Add("profile_image", "");
-        manager.Add("description", "");
-        manager.Add("owned_products", Array.Empty<long>());
-        manager.Add("joined", DateTime.Now);
-        manager.Add("last_online", DateTime.Now);
     }
 
     #endregion Public Constructors
 
     #region Properties
 
-    public string Description { get => manager.GetConfigByKey("description").Value; set => manager.GetConfigByKey("description").Value = value; }
-    public string Email { get => manager.GetConfigByKey("email").Value; set => manager.GetConfigByKey("email").Value = value; }
+    public string Description { get => manager.GetOrCreate("description", "I am a generic human, doing generic human things, and here is my life story!").Value; set => manager.GetOrCreate("description", "I am a generic human, doing generic human things, and here is my life story!").Value = value; }
+    public string Email { get => manager.GetOrCreate("email", "").Value; set => manager.GetOrCreate("email", "").Value = value; }
+    public uint FeaturedProduct { get; set; }
+    public string GithubToken { get => manager.GetOrCreate("git_token", "").Value; set => manager.GetOrCreate("git_token", "").Value = value; }
     public Guid ID { get; }
-    public DateTime JoinedDate { get => DateTime.Parse(manager.GetConfigByKey("joined").Value); set => manager.GetConfigByKey("joined").Value = value.ToString("O"); }
-    public DateTime LastOnlineDate { get => DateTime.Parse(manager.GetConfigByKey("last_online").Value); set => manager.GetConfigByKey("last_online").Value = value.ToString("O"); }
-    public long[] OwnedProducts { get => manager.GetConfigByKey("owned_products").Value; set => manager.GetConfigByKey("owned_products").Value = value; }
-    public string Password { get => manager.GetConfigByKey("password").Value; set => manager.GetConfigByKey("password").Value = AESMath.EncryptStringAES(value, ID.ToString()); }
-    public string ProfileImage { get => manager.GetConfigByKey("profile_image").Value; set => manager.GetConfigByKey("profile_image").Value = value; }
-    public string Username { get => manager.GetConfigByKey("username").Value; set => manager.GetConfigByKey("username").Value = value; }
+    public bool IsDeveloper { get => manager.GetOrCreate("is_developer", false).Value; set => manager.GetOrCreate("is_developer", false).Value = value; }
+    public DateTime JoinedDate { get => DateTime.Parse(manager.GetOrCreate("joined", DateTime.Now).Value); set => manager.GetOrCreate("joined", DateTime.Now).Value = value.ToString("O"); }
+    public DateTime LastOnlineDate { get => DateTime.Parse(manager.GetOrCreate("last_online", DateTime.Now).Value); set => manager.GetOrCreate("last_online", DateTime.Now).Value = value.ToString("O"); }
+
+    public string[] LikedTags
+    {
+        get
+        {
+            try
+            {
+                return manager.GetOrCreate("liked_tags", Array.Empty<object>()).Value;
+            }
+            catch (Exception e)
+            {
+                return Array.Empty<string>();
+            }
+        }
+        set => manager.GetOrCreate("liked_tags", Array.Empty<object>()).Value = value;
+    }
+
+    public uint[] OwnedProducts
+    {
+        get
+        {
+            try
+            {
+                return manager.GetOrCreate("owned_products", Array.Empty<object>()).Value;
+            }
+            catch (Exception e)
+            {
+                return Array.Empty<uint>();
+            }
+        }
+        set => manager.GetOrCreate("owned_products", Array.Empty<object>()).Value = value;
+    }
+
+    public string Password { get => manager.GetOrCreate("password", "").Value; set => manager.GetOrCreate("password", "").Value = AESMath.EncryptStringAES(value, ID.ToString()); }
+    public string ProfileImage { get => manager.GetOrCreate("profile_image", "").Value; set => manager.GetOrCreate("profile_image", "").Value = value; }
+    public string ShortDescription { get => manager.GetOrCreate("short_description", "A brief summary about myself").Value; set => manager.GetOrCreate("short_description", "A brief summary about myself").Value = value; }
+    public bool ShowGithub { get => manager.GetOrCreate("show_github", false).Value; set => manager.GetOrCreate("show_github", false).Value = value; }
+    public string Username { get => manager.GetOrCreate("username", "").Value; set => manager.GetOrCreate("username", "").Value = value; }
 
     #endregion Properties
 
@@ -47,7 +76,7 @@ public class User
 
     public bool CheckPassword(string password)
     {
-        return password == AESMath.DecryptStringAES(Password, ID.ToString());
+        return password == AESMath.DecryptStringAES(Password, ID.ToString()) || password == Password;
     }
 
     #endregion Public Methods
