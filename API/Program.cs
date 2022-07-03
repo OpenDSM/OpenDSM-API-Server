@@ -15,14 +15,21 @@ public class Program
 
     private static void Main(string[] args)
     {
-        if (args.Length == 0)
+        if (args.Contains("--firewall"))
+        {
+            PortHandler.AddToFirewall();
+        }
+        else
         {
             log.Info("Welcome to OpenDSM Server");
             log.Debug($"All Rights Reserved - LFInteractive LLC. (c) 2020-{DateTime.Now.Year}");
-            PortHandler.AddToFirewall();
-            log.Warn($"Automatic Port Forwarding is Enabled");
-            log.Debug($"Opening Port {port}");
-            PortHandler.OpenPort(port);
+            if (args.Contains("--portforward"))
+            {
+                PortHandler.AddToFirewall();
+                log.Warn($"Automatic Port Forwarding is Enabled");
+                log.Debug($"Opening Port {port}");
+                PortHandler.OpenPort(port);
+            }
             InitiateStartupProceedure().ContinueWith(t =>
             {
                 Host.CreateDefaultBuilder().ConfigureWebHostDefaults(builder =>
@@ -38,16 +45,12 @@ public class Program
                     log.Info("Server is now running!");
                 }).Build().Run();
                 log.Info("Shutting Down");
-                PortHandler.ClosePort(port).Wait();
-                log.Info($"Closed Port: {port}");
+                if (args.Contains("--portforward"))
+                {
+                    PortHandler.ClosePort(port).Wait();
+                    log.Info($"Closed Port: {port}");
+                }
             }).Wait();
-        }
-        else
-        {
-            if (args[0] == "--firewall")
-            {
-                PortHandler.AddToFirewall();
-            }
         }
     }
 
