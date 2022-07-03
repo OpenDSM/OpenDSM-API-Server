@@ -12,7 +12,7 @@ public static class Global
 {
     #region Fields
 
-    public static ILog log = LogManager.Init().SetDumpMethod(DumpType.NoBuffer).SetLogDirectory(Path.Combine(Assembly.GetExecutingAssembly().Location));
+    public static ILog log = LogManager.Init().SetDumpMethod(3000).SetMinimumLogType(Lists.LogTypes.All).SetLogDirectory(LogDirectory);
 
     private static string tos = "";
 
@@ -21,6 +21,7 @@ public static class Global
     #region Properties
 
     public static string ConfigDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "config")).FullName;
+    public static string LogDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "logs")).FullName;
     public static string ProductsDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "products")).FullName;
     public static string RootDirectory => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LFInteractive", "OpenDSM")).FullName;
     public static string UsersDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "users")).FullName;
