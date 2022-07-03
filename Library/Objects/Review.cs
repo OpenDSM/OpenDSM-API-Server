@@ -33,7 +33,7 @@ public class Review
 
     public DateTime PostDate { get; set; }
 
-    public long ProductID { get; set; }
+    public uint ProductID { get; set; }
 
     public string ShortDescription { get; set; }
 
