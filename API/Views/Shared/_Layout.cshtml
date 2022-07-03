@@ -3,35 +3,3 @@
     User user = (User)(ViewData["User"] ?? null);
     bool IsLoggedIn = user != null;
 }
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - OpenDSM</title>
-
-    <link rel="stylesheet" href="/assets/css/main.min.css">
-    <link rel="stylesheet" href="/assets/lib/fontawesome/css/all.min.css">
-    <script src="/assets/lib/jquery.js"></script>
-    <link rel="shortcut icon" href="/assets/images/logo.svg" type="image/x-icon">
-</head>
-
-<body>
-    @Html.PartialAsync("_Nav", ViewData).Result
-    @RenderBody()
-    <footer>
-        <div class="row">
-            <img src="/assets/images/logo.svg" alt="">
-            <div class="col">
-                <p class="name">Open DSM</p>
-                <p class="description">The Open Digital Software Marketplace</p>
-            </div>
-        </div>
-    </footer>
-    <script src="/assets/js/elements.min.js"></script>
-</body>
-
-</html>
