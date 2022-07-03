@@ -1,4 +1,7 @@
-﻿namespace OpenDSM.Lib.Auth;
+﻿using System.Net;
+using System.Net.Mail;
+
+namespace OpenDSM.Lib.Auth;
 
 public class AccountManagement
 {
@@ -49,18 +52,64 @@ public class AccountManagement
         }
         else
         {
-            user = new(Guid.NewGuid())
+            Guid id = Guid.NewGuid();
+            user = new(id)
             {
                 Email = email,
                 Username = username,
-                Password = password
+                Password = password,
+                Confirmed = false,
             };
             _users.Add(username, user);
             _users.Add(email, user);
+            _users.Add(id.ToString(), user);
+            SendConfirmationEmail(id, email, username);
             return true;
         }
         log.Warn($"Account creation failed because \"{reason}\"");
         return false;
+    }
+
+    public bool ConfirmUser(Guid id, out string reason)
+    {
+        if (_users.ContainsKey(id.ToString()))
+        {
+            User user = _users[id.ToString()];
+            if (user.Confirmed)
+            {
+                reason = "User already confirmed";
+            }
+            else
+            {
+                reason = "User confirmed";
+                user.Confirmed = true;
+            }
+            return true;
+        }
+        reason = "No such user exists";
+        return false;
+
+    }
+
+    private static void SendConfirmationEmail(Guid id, string email, string username)
+    {
+        MailAddress from = new("no-reply@opendsm.net");
+        MailAddress to = new(email);
+        MailMessage message = new(from, to)
+        {
+            Subject = $"OpenDSM Account Activation",
+            Body = ""
+        };
+        using SmtpClient client = new()
+        {
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            UseDefaultCredentials = false,
+            EnableSsl = true,
+            Host = "smtp.gmail.com",
+            Port = 587,
+            Credentials = new NetworkCredential(from.User, ""),
+        };
+        client.Send(message);
     }
 
     public User? GetUser(string username)

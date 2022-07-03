@@ -31,7 +31,7 @@ public class User
     public bool IsDeveloper { get => manager.GetOrCreate("is_developer", false).Value; set => manager.GetOrCreate("is_developer", false).Value = value; }
     public DateTime JoinedDate { get => DateTime.Parse(manager.GetOrCreate("joined", DateTime.Now).Value); set => manager.GetOrCreate("joined", DateTime.Now).Value = value.ToString("O"); }
     public DateTime LastOnlineDate { get => DateTime.Parse(manager.GetOrCreate("last_online", DateTime.Now).Value); set => manager.GetOrCreate("last_online", DateTime.Now).Value = value.ToString("O"); }
-
+    public bool Confirmed { get => manager.GetOrCreate("confirmed", false).Value; set => manager.GetOrCreate("confirmed", false).Value = value; }
     public string[] LikedTags
     {
         get
@@ -40,7 +40,7 @@ public class User
             {
                 return manager.GetOrCreate("liked_tags", Array.Empty<object>()).Value;
             }
-            catch (Exception e)
+            catch
             {
                 return Array.Empty<string>();
             }
