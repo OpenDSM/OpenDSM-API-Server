@@ -21,16 +21,16 @@ public class HomeController : Controller
             if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
             {
                 ViewData["User"] = user;
-                ViewData["LoggedIn"] = true;
             }
         }
         return View();
     }
 
     [Route("/product/{id}")]
-    public IActionResult Product(long id)
+    public IActionResult Product(uint id)
     {
-        ViewData["Title"] = "Product";
+        Product product = Products.Instance.GetProduct(id);
+        ViewData["Title"] = product.Name;
         ViewData["page"] = "";
 
         string token = Request.Cookies["auth_token"] ?? "";
@@ -40,16 +40,27 @@ public class HomeController : Controller
             if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
             {
                 ViewData["User"] = user;
-                ViewData["LoggedIn"] = true;
             }
         }
 
-        return View(Products.Instance.GetProduct(id));
+        return View(product);
     }
 
     [Route("/search")]
     public IActionResult Search(string? query)
     {
+        ViewData["Title"] = "Search";
+        ViewData["page"] = "search";
+
+        string token = Request.Cookies["auth_token"] ?? "";
+        string username = Request.Cookies["auth_username"] ?? "";
+        if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(username))
+        {
+            if (AccountManagement.Instance.TryAttemptLogin(username, token, out User user))
+            {
+                ViewData["User"] = user;
+            }
+        }
         return View(query);
     }
 
