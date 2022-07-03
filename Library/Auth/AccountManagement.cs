@@ -88,7 +88,6 @@ public class AccountManagement
         }
         reason = "No such user exists";
         return false;
-
     }
 
     private static void SendConfirmationEmail(Guid id, string email, string username)

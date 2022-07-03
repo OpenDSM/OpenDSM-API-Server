@@ -32,6 +32,7 @@ public class User
     public DateTime JoinedDate { get => DateTime.Parse(manager.GetOrCreate("joined", DateTime.Now).Value); set => manager.GetOrCreate("joined", DateTime.Now).Value = value.ToString("O"); }
     public DateTime LastOnlineDate { get => DateTime.Parse(manager.GetOrCreate("last_online", DateTime.Now).Value); set => manager.GetOrCreate("last_online", DateTime.Now).Value = value.ToString("O"); }
     public bool Confirmed { get => manager.GetOrCreate("confirmed", false).Value; set => manager.GetOrCreate("confirmed", false).Value = value; }
+
     public string[] LikedTags
     {
         get
