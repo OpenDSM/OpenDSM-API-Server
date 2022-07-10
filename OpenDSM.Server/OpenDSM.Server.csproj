@@ -4,21 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>a7e9c228-c44d-4aee-a55c-69957627f504</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ChaseLabs.Configuration" Version="0.1.4" />
+    <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.1" />
     <PackageReference Include="CLPortmapper" Version="0.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Library\Library.csproj" />
+    <Folder Include="Controllers\VIEWS\" />
+    <Folder Include="View\Shared\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Auth\" />
-    <Folder Include="Views\Home\" />
-    <Folder Include="wwwroot\assets\" />
+    <ProjectReference Include="..\OpenDSM.Core\OpenDSM.Core.csproj" />
   </ItemGroup>
 
 </Project>

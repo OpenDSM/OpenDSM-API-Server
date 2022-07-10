@@ -4,13 +4,19 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>OpenDSM.Lib</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ChaseLabs.Configuration" Version="0.1.8" />
     <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.2" />
-    <PackageReference Include="CLMath" Version="0.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenDSM.SQL\OpenDSM.SQL.csproj" />
   </ItemGroup>
 
 </Project>
