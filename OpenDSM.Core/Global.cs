@@ -13,7 +13,7 @@ public static class Global
     public static ILog log_sales = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(SalesLogsDirectory);
     public static string ApplicationName => "OpenDSM";
     public static string CompanyName => "LFInteractive";
-    public static string Copywrite => $"All Rights Reserved - {CompanyName} LLC. ©️ 2021-{DateTime.Now.Year}";
+    public static string Copywrite => $"All Rights Reserved - {CompanyName} LLC. (c) 2021-{DateTime.Now.Year}";
     public static string RootDirectory => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), CompanyName, ApplicationName)).FullName;
     public static string LogsDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "Logs")).FullName;
     public static string UserLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Users")).FullName;
