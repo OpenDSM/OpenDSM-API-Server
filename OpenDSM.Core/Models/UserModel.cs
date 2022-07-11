@@ -27,6 +27,14 @@ public class UserModel
         OwnedProducts = ownedProducts;
         CreatedProducts = createdProducts;
     }
+    public static UserModel? GetByID(int id)
+    {
+        if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out int[] products))
+        {
+            return new(id, username, email, "", type, products, Array.Empty<int>());
+        }
+        return null;
+    }
     public static bool TryGetUser(string username, string password, out UserModel? user)
     {
         return TryGetUser(username, password, out user, out FailedReason _);
