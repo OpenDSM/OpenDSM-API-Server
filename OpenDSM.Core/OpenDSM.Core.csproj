@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ChaseLabs.Configuration" Version="0.1.8" />
-    <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.2" />
+    <PackageReference Include="ChaseLabs.Configuration" Version="0.1.9" />
+    <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.3" />
   </ItemGroup>
 
   <ItemGroup>
