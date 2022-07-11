@@ -9,7 +9,7 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         ViewData["Title"] = "The Open Digital Software Marketplace";
-        if(AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
         {
             ViewData["User"] = user;
         }

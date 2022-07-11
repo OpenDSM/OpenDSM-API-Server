@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OpenDSM.Core.Models;
+﻿namespace OpenDSM.Core.Models;
 
 public class ProductModel
 {
@@ -28,6 +22,7 @@ public class ProductModel
         User = user;
         Price = price;
     }
+
     public static ProductModel? GetByID(int id)
     {
         return null;

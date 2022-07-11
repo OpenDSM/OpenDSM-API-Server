@@ -4,7 +4,6 @@ class Popup {
         this.name = name;
     }
 
-
     async open() {
         if ($("#popup .content")[0].innerHTML.trim() != "") {
             await new Promise(r => setTimeout(r, 700))
@@ -16,7 +15,6 @@ class Popup {
         $("#popup-close-btn, #popup-bg").on('click', () => {
             this.close()
         })
-
 
         return $("#popup .content")[0]
     }
@@ -48,7 +46,6 @@ class VideoPopup extends Popup {
         this.player.pause();
         super.close();
     }
-
 }
 
 class GalleryPopup extends Popup {
@@ -67,7 +64,6 @@ class GalleryPopup extends Popup {
         super.close();
         $("#popup .content")[0].style.backgroundImage = "";
     }
-
 }
 class PurchasePopup extends Popup {
     author;
@@ -115,7 +111,6 @@ class ChangelogPopup extends Popup {
     close() {
         super.close();
     }
-
 }
 
 class DownloadPopup extends Popup {
@@ -150,5 +145,4 @@ class DownloadPopup extends Popup {
     close() {
         super.close();
     }
-
 }

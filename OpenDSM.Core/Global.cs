@@ -1,7 +1,6 @@
-﻿global using static OpenDSM.Core.Global;
-
-using ChaseLabs.CLLogger;
+﻿using ChaseLabs.CLLogger;
 using ChaseLabs.CLLogger.Interfaces;
+
 namespace OpenDSM.Core;
 
 public static class Global
@@ -20,5 +19,4 @@ public static class Global
     public static string AccessLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Access")).FullName;
     public static string AdminLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Admin")).FullName;
     public static string SalesLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Sales")).FullName;
-
 }

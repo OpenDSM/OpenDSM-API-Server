@@ -11,7 +11,6 @@ $("#minimum-price-search-filter, #maximum-price-search-filter").on('keyup', e =>
     }
 })
 
-
 $("#minimum-price-search-filter, #maximum-price-search-filter").on('focusin', e => {
     e.target.select()
 })
@@ -33,8 +32,6 @@ $(".carousel-nav-item.fas.fa-chevron-right").on('click', e => {
     carousel.scrollBy(x, 0)
 })
 
-
-
 $(".search-dropdown .dropdown-body .dropdown-item").on('click', e => {
     let value = e.target.innerText;
     let input = e.target.parentElement.parentElement.querySelector('input')
@@ -53,7 +50,7 @@ $(".search-dropdown").on("focusin", e => {
     })
 })
 $(".search-dropdown").on("focusout", e => {
-    setTimeout(()=>{
+    setTimeout(() => {
         e.target.parentElement.classList.remove('active')
     }, 100)
 })

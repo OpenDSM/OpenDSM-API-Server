@@ -1,9 +1,4 @@
 ﻿using OpenDSM.SQL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenDSM.Core.Models;
 
@@ -27,6 +22,7 @@ public class UserModel
         OwnedProducts = ownedProducts;
         CreatedProducts = createdProducts;
     }
+
     public static UserModel? GetByID(int id)
     {
         if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out int[] products))
@@ -35,15 +31,18 @@ public class UserModel
         }
         return null;
     }
+
     public static bool TryGetUser(string username, string password, out UserModel? user)
     {
         return TryGetUser(username, password, out user, out FailedReason _);
     }
+
     public static bool TryGetUser(string username, string password, out UserModel? user, out FailedReason reason)
     {
         user = GetUser(username, password, out reason);
         return user != null;
     }
+
     public static UserModel? GetUser(string username, string password, out FailedReason reason)
     {
         if (Authoriztaion.Login(username, password, out reason, out AccountType type, out int id, out string email, out string uname, out string token, out int[] products))

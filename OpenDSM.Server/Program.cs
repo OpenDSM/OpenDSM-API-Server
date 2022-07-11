@@ -1,10 +1,5 @@
 global using static OpenDSM.Core.Global;
-using ChaseLabs.CLLogger;
-using ChaseLabs.CLLogger.Interfaces;
 using CLPortmapper;
-using System.Diagnostics;
-using System.Reflection;
-
 
 namespace OpenDSM.Server;
 

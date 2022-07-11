@@ -12,7 +12,6 @@ $("#signup-button").on('click', () => {
     let password = $("#signup-form #password")[0].value;
 
     Signup(email, username, password)
-
 })
 
 $("#signup-form input").on('keyup', e => {
@@ -49,7 +48,6 @@ $("#signup-form input#confirm-password").on('keyup', e => {
         error("Passwords must match")
     }
 })
-
 
 function CheckUsername() {
     return $("#username")[0].value.length > 6

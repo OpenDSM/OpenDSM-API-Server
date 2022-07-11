@@ -13,7 +13,6 @@ $("#login-button").on('click', () => {
     } else {
         error("Fields can NOT be left blank")
     }
-
 })
 $("#login-form input").on('keyup', e => {
     error("")
@@ -33,7 +32,6 @@ async function Login(username, password) {
     try {
         let response = await fetch('/api/auth/login', { method: "POST", body: data })
         if (response.ok) {
-
             let json = await response.json();
             if (!json.success) {
                 error(json.message)

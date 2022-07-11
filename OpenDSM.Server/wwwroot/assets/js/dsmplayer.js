@@ -64,8 +64,8 @@ class DSMPlayer {
         let percentage = (this.player.currentTime / this.player.duration) * 100;
         console.log(percentage);
         $(this.element).find('.timeline .fill')[0].style.maxWidth = `${percentage}%`
-        if(this.player.currentTime == this.player.duration){
-            if(this.isFullscreen){
+        if (this.player.currentTime == this.player.duration) {
+            if (this.isFullscreen) {
                 document.exitFullscreen();
             }
         }
