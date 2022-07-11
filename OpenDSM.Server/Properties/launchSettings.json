@@ -1,4 +1,4 @@
-﻿{
+{
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
@@ -8,21 +8,32 @@
     }
   },
   "profiles": {
-    "OpenDSM.Server": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "commandLineArgs": "--iis",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7100;http://localhost:5100",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "IIS Express": {
-      "commandName": "IISExpress",
+    "Kestrel": {
+      "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://localhost:7100;http://localhost:5100",
+      "dotnetRunMessages": true
+    },
+    "Kestrel w/Portforwarding": {
+      "commandName": "Project",
+      "commandLineArgs": "--portforward",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:7100;http://localhost:5100",
+      "dotnetRunMessages": true
     }
   }
 }

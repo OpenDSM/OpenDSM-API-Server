@@ -12,7 +12,7 @@ public class Program
 {
     #region Fields
 
-    private static int port = 8256;
+    private static int port = 8080;
 
     #endregion Fields
 
@@ -20,45 +20,56 @@ public class Program
 
     private static void Main(string[] args)
     {
-        log.Info("Welcome to Kestrel Template");
-        log.Debug("All Rights Reserved - LFInteractive LLC. (c) 2020-2022");
-        if (args.Length == 0)
+        log.Info($"Welcome to {ApplicationName} Server");
+        log.Debug(Copywrite);
+        bool useKestrel = true;
+        bool portForward = false;
+        foreach (string arg in args)
+        {
+            if (arg.Equals("--iis"))
+            {
+                useKestrel = false;
+            }
+            else if (arg.Equals("--firewall"))
+            {
+                PortHandler.AddToFirewall();
+                Environment.Exit(0);
+            }
+            else if (arg.Equals("--portforward"))
+            {
+                portForward = true;
+            }
+        }
+        if (portForward)
         {
             PortHandler.AddToFirewall();
             log.Warn($"Automatic Port Forwarding is Enabled");
             log.Debug($"Opening Port {port}");
             PortHandler.OpenPort(port);
-            Host.CreateDefaultBuilder().ConfigureWebHostDefaults(builder =>
-            {
-                log.Info($"Starting server on port {port}");
-                builder.UseIISIntegration();
-                builder.UseContentRoot(Directory.GetCurrentDirectory());
-                builder.UseKestrel(options =>
-                {
-                    options.ListenAnyIP(port);
-                });
-                builder.UseStartup<Startup>();
-                log.Info("Server is now running!");
-                new Process()
-                {
-                    StartInfo = new()
-                    {
-                        FileName = $"http://127.0.0.1:{port}/api/template",
-                        UseShellExecute = true,
-                    }
-                }.Start();
-            }).Build().Run();
-
-            log.Info("Shutting Down");
-            PortHandler.ClosePort(port);
         }
-        else
+        Host.CreateDefaultBuilder().ConfigureWebHostDefaults(builder =>
         {
-            if (args[0] == "--firewall")
+            builder.UseContentRoot(Directory.GetCurrentDirectory());
+            if (useKestrel)
             {
-                PortHandler.AddToFirewall();
+                log.Debug($"Starting server on port {port}");
+                builder.UseIISIntegration();
+                builder.UseKestrel(options =>
+                    {
+                        options.ListenAnyIP(port);
+                    });
             }
-        }
+            else
+            {
+                builder.UseIIS();
+            }
+            builder.UseStartup<Startup>();
+            log.Info("Server is now running!");
+        }).Build().Run();
+
+        log.Warn("Shutting Down...");
+        if (portForward)
+            PortHandler.ClosePort(port);
     }
 
     #endregion Private Methods
@@ -68,8 +79,13 @@ internal class Startup
 {
     #region Public Methods
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment evn)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+        app.UseStatusCodePagesWithReExecute("/Error/{0}");
         app.UseForwardedHeaders();
         app.UseMvc();
         app.UseRouting();
