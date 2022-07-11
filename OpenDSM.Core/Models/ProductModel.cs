@@ -8,10 +8,11 @@ namespace OpenDSM.Core.Models;
 
 public class ProductModel
 {
-    public int Id { get; set; }
-    public int UserID { get; set; }
-    public string Name { get; set; }
-    public string About { get; set; }
-    public int TotalDownloads { get; set; }
-    public string VideoURL { get; set; }
+    public int Id { get; private set; }
+    public int UserID { get; private set; }
+    public string Name { get; private set; }
+    public string About { get; private set; }
+    public int TotalDownloads { get; private set; }
+    public string VideoURL { get; private set; }
+    public UserModel User { get; private set; }
 }
