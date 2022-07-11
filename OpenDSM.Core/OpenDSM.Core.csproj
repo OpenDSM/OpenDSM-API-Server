@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="ChaseLabs.Configuration" Version="0.1.8" />
     <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.2" />
   </ItemGroup>
