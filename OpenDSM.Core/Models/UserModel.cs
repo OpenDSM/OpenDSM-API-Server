@@ -8,6 +8,7 @@ public class UserModel
     public string Username { get; private set; }
     public string Email { get; private set; }
     public string Token { get; private set; }
+    public string GitToken { get; private set; }
     public AccountType Type { get; private set; }
     public int[] OwnedProducts { get; private set; }
     public int[] CreatedProducts { get; private set; }
@@ -23,6 +24,11 @@ public class UserModel
         CreatedProducts = createdProducts;
     }
 
+    public void UpdateSetting(string name, dynamic value)
+    {
+        Authoriztaion.UpdateProperty(Token, name, value);
+    }
+
     public static UserModel? GetByID(int id)
     {
         if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out int[] products))
@@ -31,7 +37,16 @@ public class UserModel
         }
         return null;
     }
-
+    public static bool TryGetUserWithToken(string email, string password, out UserModel? user)
+    {
+        user = null;
+        if (Authoriztaion.LoginWithToken(email, password, out var reason, out AccountType type, out int id, out string r_email, out string uname, out string token, out int[] products))
+        {
+            user = new(id, uname, email, token, type, products, Array.Empty<int>());
+            return true;
+        }
+        return false;
+    }
     public static bool TryGetUser(string username, string password, out UserModel? user)
     {
         return TryGetUser(username, password, out user, out FailedReason _);
