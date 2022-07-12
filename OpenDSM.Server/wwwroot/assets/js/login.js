@@ -1,15 +1,15 @@
 $("#show-password-toggle").on('click', e => {
     try {
         let value = $(e.target).attr('value');
-        $("#password")[0].type = value == "true" ? "text" : "password"
-        $("#confirm-password")[0].type = value == "true" ? "text" : "password"
+        $("#password")[0].type = value != "true" ? "text" : "password"
+        $("#confirm-password")[0].type = value != "true" ? "text" : "password"
     } catch { }
 })
 $("#login-button").on('click', () => {
     let username = $("#username")[0].value;
     let password = $("#password")[0].value;
     if (username.length > 0 && password.length > 0) {
-        Login()
+        Login(username, password)
     } else {
         error("Fields can NOT be left blank")
     }
@@ -37,8 +37,11 @@ async function Login(username, password) {
                 error(json.message)
             } else {
                 if ($("#remember-me-toggle").attr('value') == "true") {
-                    document.cookie = `auth_token=${json.token}; expires=${new Date("3000").toUTCString()};path=/`
-                    document.cookie = `auth_username=${json.username}; expires=${new Date("3000").toUTCString()};path=/`
+                    document.cookie = `auth_email=${json.user.email}; expires=${new Date("3000").toUTCString()};path=/`
+                    document.cookie = `auth_token=${json.user.token}; expires=${new Date("3000").toUTCString()};path=/`
+                } else {
+                    document.cookie = `auth_email=${json.user.email}; path=/`
+                    document.cookie = `auth_token=${json.user.token}; path=/`
                 }
                 window.location.href = "/";
             }
