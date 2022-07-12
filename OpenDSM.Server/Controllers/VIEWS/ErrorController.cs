@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.VIEWS;
 
@@ -9,6 +10,11 @@ public class ErrorController : Controller
     public IActionResult Index(int code)
     {
         ViewData["Title"] = $"{code}";
+
+        if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
+        {
+            ViewData["User"] = user;
+        }
         return View(code);
     }
 }
