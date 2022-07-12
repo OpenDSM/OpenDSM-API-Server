@@ -1,18 +1,158 @@
-﻿
-<section id="landing" class="product xl">
+﻿<section id="landing" class="product xl">
     <video class="poster" src="/assets/images/testing/lego-brawls-trailer.mp4" muted autoplay loop controls></video>
-    <span class="content">
-        <h2 class="name">Product Name</h2>
+    <idv class="content">
+        <h2 class="name" onclick="window.location.href='/product/0'">Product Name</h2>
         <a href="/profile/name" class="author paragraph-1">Author Name</a>
         <p class="description paragraph-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Elementum metus, dictum euismod morbi montes. Nisi, mattis vitae morbi ac nunc, lacinia purus mauris vestibulum. Netus vitae leo nulla nisl egestas eget in amet curabitur. Purus, laoreet scelerisque sit nec odio consequat fermentum, facilisi fermentum. Quis tortor, eleifend libero maecenas. Ut purus faucibus tempor in pretium. </p>
-        <span class="buttons">
+        <div class="buttons">
             <a href="/products/author/id" class="btn">View</a>
             <div class="btn secondary" onclick=" new VideoPopup(`/assets/images/testing/lego-brawls-trailer.mp4`).open()">Watch Trailer</div>
-        </span>
+        </div>
         <span class="platforms">
             <i class="fab fa-windows"></i>
             <i class="fab fa-apple"></i>
             <i class="fab fa-linux"></i>
         </span>
-    </span>
+    </idv>
 </section>
+
+<div class="list vertical content raised centered">
+
+    <section id="popular-products" class="carousel">
+        <h3>Popular</h3>
+        <div class="navigation">
+            <div class="carousel-nav-item fas fa-chevron-left"></div>
+            <div class="carousel-nav-item fas fa-chevron-right"></div>
+        </div>
+        <div class="list horizontal">
+            @for (int i = 0; i < 20; i++)
+            {
+                @*Html.PartialAsync("LargeProductItem", null).Result@*@
+            }
+        </div>
+    </section>
+    <section id="popular-products" class="carousel">
+        <h3>Recommended</h3>
+        <div class="navigation">
+            <div class="carousel-nav-item fas fa-chevron-left"></div>
+            <div class="carousel-nav-item fas fa-chevron-right"></div>
+        </div>
+        <div class="list horizontal">
+            @for (int i = 0; i < 20; i++)
+            {
+                @*Html.PartialAsync("LargeProductItem", null).Result*@
+            }
+        </div>
+    </section>
+    <section class="ad"></section>
+    <section class="search">
+        <div class="list horizontal">
+            <div class="list vertical search-categories">
+                <h4>Categories</h4>
+                <toggle id="desktop-category-search-filter" value="true">Desktop</toggle>
+                <toggle id="gaming-category-search-filter" value="false">Games</toggle>
+                <toggle id="opensource-category-search-filter" value="false">Open Source</toggle>
+                <toggle id="server-category-search-filter" value="false">Server</toggle>
+                <toggle id="utilities-category-search-filter" value="false">Utilities</toggle>
+                <toggle id="entertainment-category-search-filter" value="false">Entertainment</toggle>
+                <toggle id="dev-tools-category-search-filter" value="false">Dev Tools</toggle>
+                <h4>Pricing</h4>
+                <toggle id="free-pricing-search-filter" value="false">FREE</toggle>
+                <div class="input" title="Minimum price search filter">
+                    <label for="minimum-price-search-filter">Min</label>
+                    <input id="minimum-price-search-filter" type="number" value="0.00">
+                </div>
+                <div class="input" title="Maximum price search filter">
+                    <label for="maximum-price-search-filter">Max</label>
+                    <input id="maximum-price-search-filter" type="number" value="99.99">
+                </div>
+            </div>
+            <div class="list vertical search-view">
+                <div class="input icon">
+                    <label for="search-box" class="fas fa-magnifying-glass"></label>
+                    <input type="text" id="search-box" autocomplete="false" placeholder="Search">
+                </div>
+                <div class="list horizontal grid search-result">
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="list horizontal grid">
+        @for (int j = 0; j <= 1; j++)
+        {
+            <div class="list vertical">
+                <h3>Title</h3>
+                <div class="list vertical">
+                    @for (int i = 0; i <= 3; i++)
+                    {
+                        <div class="product md">
+                            <img src="/assets/images/testing/lego-brawls-icon.png" alt="" onclick="window.location.href='/product/@i'">
+                            <div class="content">
+                                <h4 class="name" onclick="window.location.href='/product/@i'">Product #@i</h4>
+                                <a href="/profile/@i" class="author paragraph-4">Author #@i</a>
+                                <p class="description paragraph-4">Category #@i</p>
+                                <span class="platforms">
+                                    <i class="fab fa-windows"></i>
+                                    <i class="fab fa-apple"></i>
+                                    <i class="fab fa-linux"></i>
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </section>
+
+    <section id="popular-products" class="carousel">
+        <h3>Desktop</h3>
+        <div class="navigation">
+            <div class="carousel-nav-item fas fa-chevron-left"></div>
+            <div class="carousel-nav-item fas fa-chevron-right"></div>
+        </div>
+        <div class="list horizontal">
+            @for (int i = 0; i < 20; i++)
+            {
+                <div class="product lg">
+                    <img src="/assets/images/testing/lego-brawls-banner.jpg" alt="" onclick="window.location.href='/product/@i'">
+                    <div class="content">
+                        <h4 class="name" onclick="window.location.href='/product/@i'">Product #@i</h4>
+                        <a href="/profile/@i" class="author paragraph-4">Author #@i</a>
+                        <p class="description paragraph-4">Category #@i</p>
+                        <span class="platforms">
+                            <i class="fab fa-windows"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-linux"></i>
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+    <section id="popular-products" class="carousel">
+        <h3>Utilities</h3>
+        <div class="navigation">
+            <div class="carousel-nav-item fas fa-chevron-left"></div>
+            <div class="carousel-nav-item fas fa-chevron-right"></div>
+        </div>
+        <div class="list horizontal">
+            @for (int i = 0; i < 20; i++)
+            {
+                <div class="product lg">
+                    <img src="/assets/images/testing/lego-brawls-banner.jpg" alt="" onclick="window.location.href='/product/@i'">
+                    <div class="content">
+                        <h4 class="name" onclick="window.location.href='/product/@i'">Product #@i</h4>
+                        <a href="/profile/@i" class="author paragraph-4">Author #@i</a>
+                        <p class="description paragraph-4">Category #@i</p>
+                        <span class="platforms">
+                            <i class="fab fa-windows"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-linux"></i>
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+</div>
