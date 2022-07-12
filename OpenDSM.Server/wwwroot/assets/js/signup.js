@@ -1,8 +1,8 @@
 $("#show-password-toggle").on('click', e => {
     try {
         let value = $(e.target).attr('value');
-        $("#password")[0].type = value == "true" ? "text" : "password"
-        $("#confirm-password")[0].type = value == "true" ? "text" : "password"
+        $("#password")[0].type = value != "true" ? "text" : "password"
+        $("#confirm-password")[0].type = value != "true" ? "text" : "password"
     } catch { }
 })
 
@@ -82,14 +82,17 @@ async function Signup(email, username, password) {
     data.append('email', email);
     data.append('password', password);
     try {
-        let response = await fetch('/api/auth/register', { method: "POST", body: data })
+        let response = await fetch('/api/auth/signup', { method: "POST", body: data })
         if (response.ok) {
             let json = await response.json();
             if (!json.success) {
                 error(json.message)
             } else {
                 let popup = new Popup("verify-account");
-                // popup.open();
+                popup.open();
+
+                document.cookie = `auth_email=${json.user.email}; path=/`
+                document.cookie = `auth_token=${json.user.token}; path=/`
             }
         } else
             error("Unknown Server Error")
