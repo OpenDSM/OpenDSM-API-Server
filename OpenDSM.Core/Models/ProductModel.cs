@@ -8,6 +8,8 @@ public class ProductModel
     public int UserID { get; private set; }
     public string Name { get; private set; }
     public string About { get; private set; }
+
+
     public int TotalDownloads { get; private set; }
     public string VideoURL { get; private set; }
     public string IconUrl { get; set; }
@@ -34,5 +36,12 @@ public class ProductModel
     public static ProductModel? GetByID(int id)
     {
         return null;
+    }
+
+
+    public static bool TryGetByID(int id, out ProductModel? model)
+    {
+        model = GetByID(id);
+        return model != null;
     }
 }
