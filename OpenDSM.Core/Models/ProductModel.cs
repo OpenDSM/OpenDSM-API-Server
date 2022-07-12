@@ -1,4 +1,6 @@
-﻿namespace OpenDSM.Core.Models;
+﻿using OpenDSM.SQL;
+
+namespace OpenDSM.Core.Models;
 
 public class ProductModel
 {
@@ -8,7 +10,13 @@ public class ProductModel
     public string About { get; private set; }
     public int TotalDownloads { get; private set; }
     public string VideoURL { get; private set; }
+    public string IconUrl { get; set; }
+    public string BannerUrl { get; set; }
+    public string[] GalleryImages { get; set; }
     public uint Price { get; private set; }
+    public string[] Keywords { get; set; }
+    public int[] Tags { get; set; }
+    public Platform[] Platforms { get; set; }
     public UserModel User { get; private set; }
 
     protected ProductModel(int id, int userID, string name, string about, int totalDownloads, string videoURL, UserModel user, uint price)
