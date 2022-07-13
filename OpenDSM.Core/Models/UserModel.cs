@@ -8,6 +8,7 @@ public class UserModel
     public string Username { get; private set; }
     public string Email { get; private set; }
     public string Token { get; private set; }
+    public string About { get; set; }
     public string GitToken { get; private set; }
     public AccountType Type { get; private set; }
     public int[] OwnedProducts { get; private set; }
