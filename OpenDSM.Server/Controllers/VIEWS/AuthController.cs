@@ -27,30 +27,31 @@ public class AuthController : Controller
         return View();
     }
 
-    [Route("profile")]
-    public IActionResult GetProfile()
+    [Route("/profile/{id?}")]
+    public IActionResult Profile(int? id)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
-        {
-            ViewData["Title"] = $"{user?.Username}'s Profile";
-            ViewData["User"] = user;
-            return View(user);
-        }
-        return RedirectToAction("Index", "Home");
-    }
-
-    [Route("profile/{id}")]
-    public IActionResult GetUsersProfile(int id)
-    {
+        ViewData["is_personal"] = false;
         if (IsLoggedIn(Request.Cookies, out UserModel? loggedin))
         {
             ViewData["User"] = loggedin;
         }
-        UserModel? user = UserModel.GetByID(id);
-        if (user == null)
-            return RedirectToAction("Index", "Error", new { code = 404 });
-        return View(user);
+        if (id.HasValue)
+        {
+            UserModel? user = UserModel.GetByID(id.Value);
+            if (user == null)
+                return RedirectToAction("Index", "Error", new { code = 404 });
+            ViewData["Title"] = $"{user?.Username}'s Profile";
+            return View(user);
+        }
+        if (loggedin != null)
+        {
+            ViewData["is_personal"] = true;
+            ViewData["Title"] = $"Your Profile";
+            return View(loggedin);
+        }
+        return RedirectToAction("Index", "Home");
     }
+
 
     public static bool IsLoggedIn(IRequestCookieCollection cookies, out UserModel? user)
     {
