@@ -1,5 +1,8 @@
-﻿@{
+﻿@using OpenDSM.Core.Models
+@{
     bool isLoggedIn = (bool)(ViewData["IsLoggedIn"] ?? false);
+
+    UserModel user = isLoggedIn ? (UserModel)ViewData["User"] : null;
 }
 <nav>
     <a class="brand" href="/">
@@ -12,7 +15,7 @@
         {
             <a href="/product/create/" class="btn secondary">Create Product</a>
             <span class="separator vertical"></span>
-            <a href="/profile/" class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></a>
+            <a href="/profile/" class="profile-image" style="background-image: url('/api/auth/image/profile?id=@user.Id');"></a>
         }
         else
         {
