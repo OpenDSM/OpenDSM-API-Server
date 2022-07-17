@@ -13,6 +13,9 @@ public class UserModel
     public AccountType Type { get; private set; }
     public int[] OwnedProducts { get; private set; }
     public int[] CreatedProducts { get; private set; }
+    public string ProfileImage { get; set; }
+    public string ProfileBannerImage { get; set; }
+
 
     protected UserModel(int id, string username, string email, string token, AccountType type, int[] ownedProducts, int[] createdProducts)
     {
@@ -23,6 +26,37 @@ public class UserModel
         Type = type;
         OwnedProducts = ownedProducts;
         CreatedProducts = createdProducts;
+        ProfileImage = Path.Combine(GetUsersProfileDirectory(Id), "profile.jpg");
+        ProfileBannerImage = Path.Combine(GetUsersProfileDirectory(Id), "banner.jpg");
+
+    }
+
+    public async Task UploadImage(string base64, bool isProfile)
+    {
+
+        byte[] buffer;
+        try
+        {
+            buffer = Convert.FromBase64String(base64);
+        }
+        catch (FormatException e)
+        {
+            log_user.Error($"Unable to convert base64 string to byte array: {base64}", e);
+            return;
+        }
+        using (MemoryStream memStream = new(buffer))
+        {
+            using FileStream fs = new(isProfile ? ProfileImage : ProfileBannerImage, FileMode.OpenOrCreate, FileAccess.Write);
+            await memStream.CopyToAsync(fs);
+        }
+        if (isProfile)
+        {
+            await FFmpeg.Instance.Resize(300, ProfileImage);
+        }
+        else
+        {
+            await FFmpeg.Instance.Resize(1280, ProfileBannerImage);
+        }
     }
 
     public void UpdateSetting(string name, dynamic value)

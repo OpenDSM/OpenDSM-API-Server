@@ -4,10 +4,10 @@
     bool is_personal = (bool)ViewData["is_personal"];
 }
 
-<section id="landing" class="profile" style="background-image: url('/assets/images/testing/Flexx-Banner.jpg');">
+<section id="landing" class="profile" style="background-image: url('/api/auth/image/banner?id=@Model.Id');">
     <span class="content">
         <span class="list horizontal centered">
-            <div class="profile-image large" style="background-image:url('/assets/images/testing/profile-image.jpg')"></div>
+            <div class="profile-image large" style="background-image:url('/api/auth/image/profile?id=@Model.Id')"></div>
             <h1 class="name">Drew Chase</h1>
         </span>
     </span>
@@ -46,13 +46,13 @@
             <div class="list horizontal">
                 <div class="list vertical" style="width: 300px;min-width: 300px;">
                     <h4>Profile Image</h4>
-                    <div class="file-upload">
+                    <div id="upload-profile-image" class="file-upload">
                         <div class="content">
                             <i class="fas fa-plus"></i>
                         </div>
                     </div>
                     <h4>Banner Image</h4>
-                    <div class="file-upload">
+                    <div id="upload-profile-banner" class="file-upload">
                         <div class="content">
                             <i class="fas fa-plus"></i>
                         </div>
@@ -264,3 +264,9 @@
 
     </div>
 </section>
+
+@if (is_personal)
+{
+    <script src="/assets/lib/CropperJS/cropper.min.js"></script>
+    <script src="/assets/lib/CropperJS/jquery-cropper.min.js"></script>
+}
