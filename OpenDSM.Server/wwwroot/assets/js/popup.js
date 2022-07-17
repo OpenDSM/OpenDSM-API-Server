@@ -146,3 +146,100 @@ class DownloadPopup extends Popup {
         super.close();
     }
 }
+
+class ProfileImagePopup extends Popup {
+    file;
+    constructor(file) {
+        super("image-cropper")
+        this.file = file;
+    }
+
+    async open() {
+        await super.open();
+        $(".image-container")[0].classList.add('rounded');
+        let reader = new FileReader();
+        let image = $("#cropper-image-canvas")[0];
+        reader.onload = e => {
+            $(image).attr("src", e.target.result)
+        }
+        reader.readAsDataURL(this.file)
+        setTimeout(() => {
+            $(image).cropper({
+                aspectRatio: 1 / 1,
+                dragMode: "none",
+                movable: false,
+                zoomable: false,
+            })
+        }, 1000)
+        $("#upload-cropped-image").on('click', async () => {
+            let imageUrl = $(image).data('cropper').getCroppedCanvas().toDataURL().split('base64,')[1];
+            let data = new FormData();
+            data.append("base64", imageUrl);
+            let email, token;
+
+            Array.from(document.cookie.split(';')).forEach(item => {
+                let key = item.split("=")[0].trim()
+                if (key == "auth_email") {
+                    email = item.replace(key + "=", "");
+                }
+                if (key == "auth_token") {
+                    token = item.replace(key + "=", "");
+                }
+            })
+            data.append("email", email);
+            data.append("token", token);
+            await fetch('/api/auth/image/profile', { method: "POST", body: data })
+
+            window.location.reload();
+        })
+    }
+
+}
+
+class ProfileBannerPopup extends Popup {
+    file;
+    constructor(file) {
+        super("image-cropper")
+        this.file = file;
+    }
+
+    async open() {
+        await super.open();
+        let reader = new FileReader();
+        let image = $("#cropper-image-canvas")[0];
+        reader.onload = e => {
+            $(image).attr("src", e.target.result)
+        }
+        reader.readAsDataURL(this.file)
+        setTimeout(() => {
+            $(image).cropper({
+                aspectRatio: 16 / 3.6667,
+                dragMode: "none",
+                movable: false,
+                zoomable: false,
+            })
+        }, 1000)
+        $("#upload-cropped-image").on('click', async () => {
+            let email, token;
+            Array.from(document.cookie.split(';')).forEach(item => {
+                let key = item.split("=")[0].trim()
+                if (key == "auth_email") {
+                    email = item.replace(key + "=", "");
+                }
+                if (key == "auth_token") {
+                    token = item.replace(key + "=", "");
+                }
+            })
+
+            let imageUrl = $(image).data('cropper').getCroppedCanvas().toDataURL().split('base64,')[1];
+            let data = new FormData();
+            data.append("base64", imageUrl);
+
+            data.append("email", email);
+            data.append("token", token);
+            await fetch('/api/auth/image/banner', { method: "POST", body: data })
+            window.location.reload();
+        })
+    }
+
+}

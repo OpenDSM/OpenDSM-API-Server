@@ -1182,3 +1182,27 @@ body::-webkit-scrollbar-track {
 }
 
 /*#endregion Scrollbar */
+
+
+/*#region Cropper */
+
+.image-container {
+    max-height: 80vh;
+    min-height: 80vh;
+    overflow: hidden;
+}
+
+    .image-container.rounded .cropper-crop-box, .image-container.rounded .cropper-view-box {
+        border-radius: 50%;
+    }
+
+.cropper-view-box {
+    box-shadow: 0 0 0 1px var(--primary);
+    outline-color: var(--primary);
+}
+
+.cropper-point, .cropper-line {
+    background-color: var(--primary);
+}
+
+/*#endregion Cropper */

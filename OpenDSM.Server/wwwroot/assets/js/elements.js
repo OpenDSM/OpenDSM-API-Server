@@ -65,3 +65,28 @@ $(".search-dropdown").on("keyup", e => {
         }
     })
 })
+
+
+$("#upload-profile-image.file-upload").on('click', e => {
+    let input = document.createElement('input');
+    input.type = "file"
+    input.accept = "image/*";
+    $(input).on('change', l => {
+        let file = l.currentTarget.files[0];
+        let popup = new ProfileImagePopup(file);
+        popup.open();
+    })
+    input.click();
+})
+
+$("#upload-profile-banner.file-upload").on('click', e => {
+    let input = document.createElement('input');
+    input.type = "file"
+    input.accept = "image/*";
+    $(input).on('change', l => {
+        let file = l.currentTarget.files[0];
+        let popup = new ProfileBannerPopup(file);
+        popup.open();
+    })
+    input.click();
+})
