@@ -9,7 +9,8 @@
   <ItemGroup>
     <PackageReference Include="ChaseLabs.Configuration" Version="0.2.0" />
     <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.3" />
-    <PackageReference Include="CLMath" Version="0.0.8" />
+    <PackageReference Include="CLMath" Version="0.0.9" />
+    <PackageReference Include="Xabe.FFmpeg.Downloader" Version="5.2.0" />
   </ItemGroup>
 
   <ItemGroup>
