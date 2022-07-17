@@ -6,7 +6,7 @@ public class UserModel
 {
     #region Protected Constructors
 
-    protected UserModel(int id, string username, string email, string token, AccountType type, int[] ownedProducts, int[] createdProducts)
+    protected UserModel(int id, string username, string email, string token, AccountType type, int[] ownedProducts)
     {
         Id = id;
         Username = username;
@@ -14,7 +14,7 @@ public class UserModel
         Token = token;
         Type = type;
         OwnedProducts = ownedProducts;
-        CreatedProducts = createdProducts;
+        CreatedProducts = Products.GetProductsByOwner(id);
         ProfileImage = Path.Combine(GetUsersProfileDirectory(Id), "profile.jpg");
         ProfileBannerImage = Path.Combine(GetUsersProfileDirectory(Id), "banner.jpg");
     }
@@ -43,7 +43,7 @@ public class UserModel
     {
         if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out int[] products))
         {
-            return new(id, username, email, "", type, products, Array.Empty<int>());
+            return new(id, username, email, "", type, Array.Empty<int>());
         }
         return null;
     }
@@ -52,7 +52,7 @@ public class UserModel
     {
         if (Authoriztaion.Login(username, password, out reason, out AccountType type, out int id, out string email, out string uname, out string token, out int[] products))
         {
-            return new(id, uname, email, token, type, products, Array.Empty<int>());
+            return new(id, uname, email, token, type, products);
         }
         return null;
     }
@@ -73,7 +73,7 @@ public class UserModel
         user = null;
         if (Authoriztaion.LoginWithToken(email, password, out var reason, out AccountType type, out int id, out string r_email, out string uname, out string token, out int[] products))
         {
-            user = new(id, uname, email, token, type, products, Array.Empty<int>());
+            user = new(id, uname, email, token, type, products);
             return true;
         }
         return false;
