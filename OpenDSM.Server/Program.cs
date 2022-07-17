@@ -5,11 +5,11 @@ namespace OpenDSM.Server;
 
 public class Program
 {
-    #region Fields
+    #region Private Fields
 
     private static int port = 8080;
 
-    #endregion Fields
+    #endregion Private Fields
 
     #region Private Methods
 

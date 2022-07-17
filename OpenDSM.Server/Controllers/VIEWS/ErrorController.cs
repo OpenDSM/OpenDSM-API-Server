@@ -6,6 +6,8 @@ namespace OpenDSM.Server.Controllers.VIEWS;
 [Route("Error")]
 public class ErrorController : Controller
 {
+    #region Public Methods
+
     [Route("{code}")]
     public IActionResult Index(int code)
     {
@@ -17,4 +19,6 @@ public class ErrorController : Controller
         }
         return View(code);
     }
+
+    #endregion Public Methods
 }

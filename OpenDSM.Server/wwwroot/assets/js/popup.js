@@ -193,7 +193,6 @@ class ProfileImagePopup extends Popup {
             window.location.reload();
         })
     }
-
 }
 
 class ProfileBannerPopup extends Popup {
@@ -241,5 +240,4 @@ class ProfileBannerPopup extends Popup {
             window.location.reload();
         })
     }
-
 }

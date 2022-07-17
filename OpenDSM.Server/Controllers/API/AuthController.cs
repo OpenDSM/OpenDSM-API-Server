@@ -8,6 +8,39 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("/api/auth")]
 public class AuthController : ControllerBase
 {
+    #region Public Methods
+
+    [HttpGet("image/{type}")]
+    public IActionResult GetProfileImage(string type, int id)
+    {
+        UserModel? user = UserModel.GetByID(id);
+        if (user != null)
+        {
+            string path = type switch
+            {
+                "profile" => user.ProfileImage,
+                "banner" => user.ProfileBannerImage,
+                _ => user.ProfileImage
+            };
+            if (System.IO.File.Exists(path))
+            {
+                return new FileStreamResult(new FileStream(path, FileMode.Open, FileAccess.Read), "image/png");
+            }
+        }
+        if (type == "profile")
+        {
+            return Redirect("/assets/images/missing-profile-image.svg");
+        }
+        else if (type == "banner")
+        {
+            return Redirect("/assets/images/missing-banner.jpg");
+        }
+        return NotFound(new
+        {
+            message = $"Image type not found: {type}"
+        });
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> TryLogin([FromForm] string username, [FromForm] string password)
     {
@@ -54,10 +87,10 @@ public class AuthController : ControllerBase
             });
         });
     }
+
     [HttpPost("image/{type}")]
     public async Task<IActionResult> UploadImage(string type, [FromForm] string base64, [FromForm] string email, [FromForm] string token)
     {
-
         if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
         {
             await user.UploadImage(base64, type == "profile");
@@ -71,34 +104,6 @@ public class AuthController : ControllerBase
             message = "User not found"
         });
     }
-    [HttpGet("image/{type}")]
-    public IActionResult GetProfileImage(string type, int id)
-    {
-        UserModel? user = UserModel.GetByID(id);
-        if (user != null)
-        {
-            string path = type switch
-            {
-                "profile" => user.ProfileImage,
-                "banner" => user.ProfileBannerImage,
-                _ => user.ProfileImage
-            };
-            if (System.IO.File.Exists(path))
-            {
-                return new FileStreamResult(new FileStream(path, FileMode.Open, FileAccess.Read), "image/png");
-            }
-        }
-        if (type == "profile")
-        {
-            return Redirect("/assets/images/missing-profile-image.svg");
-        }
-        else if (type == "banner")
-        {
-            return Redirect("/assets/images/missing-banner.jpg");
-        }
-        return NotFound(new
-        {
-            message = $"Image type not found: {type}"
-        });
-    }
+
+    #endregion Public Methods
 }

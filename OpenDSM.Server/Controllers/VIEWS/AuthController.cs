@@ -6,21 +6,26 @@ namespace OpenDSM.Server.Controllers.VIEWS;
 [Route("/auth")]
 public class AuthController : Controller
 {
+    #region Public Methods
+
+    public static bool IsLoggedIn(IRequestCookieCollection cookies, out UserModel? user)
+    {
+        user = null;
+        string email = cookies["auth_email"] ?? "";
+        string token = cookies["auth_token"] ?? "";
+        if (!string.IsNullOrEmpty(email) && !string.IsNullOrWhiteSpace(token))
+        {
+            return UserModel.TryGetUserWithToken(email, token, out user);
+        }
+
+        return false;
+    }
+
     [Route("login")]
     public IActionResult Login()
     {
         ViewData["Title"] = "Login";
         if (IsLoggedIn(Request.Cookies, out UserModel? user))
-        {
-            return RedirectToAction("Index", "Home");
-        }
-        return View();
-    }
-    [Route("signup")]
-    public IActionResult Signup()
-    {
-        ViewData["Title"] = "Signup";
-        if (IsLoggedIn(Request.Cookies, out UserModel? _))
         {
             return RedirectToAction("Index", "Home");
         }
@@ -52,17 +57,16 @@ public class AuthController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-
-    public static bool IsLoggedIn(IRequestCookieCollection cookies, out UserModel? user)
+    [Route("signup")]
+    public IActionResult Signup()
     {
-        user = null;
-        string email = cookies["auth_email"] ?? "";
-        string token = cookies["auth_token"] ?? "";
-        if (!string.IsNullOrEmpty(email) && !string.IsNullOrWhiteSpace(token))
+        ViewData["Title"] = "Signup";
+        if (IsLoggedIn(Request.Cookies, out UserModel? _))
         {
-            return UserModel.TryGetUserWithToken(email, token, out user);
+            return RedirectToAction("Index", "Home");
         }
-
-        return false;
+        return View();
     }
+
+    #endregion Public Methods
 }

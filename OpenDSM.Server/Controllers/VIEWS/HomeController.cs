@@ -6,6 +6,8 @@ namespace OpenDSM.Server.Controllers.VIEWS;
 [Route("/")]
 public class HomeController : Controller
 {
+    #region Public Methods
+
     public IActionResult Index()
     {
         ViewData["Title"] = "The Open Digital Software Marketplace";
@@ -15,4 +17,6 @@ public class HomeController : Controller
         }
         return View();
     }
+
+    #endregion Public Methods
 }

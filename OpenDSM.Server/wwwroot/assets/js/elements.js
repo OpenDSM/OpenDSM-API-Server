@@ -66,7 +66,6 @@ $(".search-dropdown").on("keyup", e => {
     })
 })
 
-
 $("#upload-profile-image.file-upload").on('click', e => {
     let input = document.createElement('input');
     input.type = "file"
