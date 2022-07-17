@@ -14,4 +14,18 @@
     <ProjectReference Include="..\OpenDSM.Core\OpenDSM.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\assets\html\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Popup\changelog.cshtml" />
+    <None Include="Views\Popup\download.cshtml" />
+    <None Include="Views\Popup\image-cropper.cshtml" />
+    <None Include="Views\Popup\purchase.cshtml" />
+    <None Include="Views\Popup\subscription.cshtml" />
+    <None Include="Views\Popup\verify-account.cshtml" />
+    <None Include="Views\Popup\video.cshtml" />
+  </ItemGroup>
+
 </Project>

@@ -8,7 +8,7 @@ class Popup {
         if ($("#popup .content")[0].innerHTML.trim() != "") {
             await new Promise(r => setTimeout(r, 700))
         }
-        let html = await $.get(`/assets/html/${this.name}.html`);
+        let html = await $.get(`/popup/${this.name}`);
         $("#popup .content")[0].innerHTML = html;
         $("#popup")[0].classList.add('active')
         $("body")[0].style.overflow = "hidden"
