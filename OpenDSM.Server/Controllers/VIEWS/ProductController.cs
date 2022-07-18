@@ -15,7 +15,14 @@ public class ProductController : Controller
         {
             ViewData["Title"] = "Create Product";
             ViewData["User"] = user;
-            return View(user);
+            if (user.IsDeveloperAccount)
+            {
+                return View(user);
+            }
+            else
+            {
+                return RedirectToAction("Profile", "Auth");
+            }
         }
         return RedirectToAction("Index", "Error", new { code = 401 });
     }
