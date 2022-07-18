@@ -101,9 +101,61 @@ public class AuthController : ControllerBase
         }
         return BadRequest(new
         {
-            message = "User not found"
+            message = "Invalid Credentials"
         });
     }
+
+    [HttpPatch("settings")]
+    public IActionResult UpdateSettings([FromForm] string email, [FromForm] string token, [FromForm] string name, [FromForm] string value)
+    {
+
+        if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
+        {
+            switch (name)
+            {
+                case "about":
+                    user.UpdateAbout(value);
+                    break;
+                default:
+                    if (!string.IsNullOrWhiteSpace(value))
+                        user.UpdateSetting(name, value);
+                    break;
+            }
+            return Ok(new
+            {
+                message = $"\"{name}\" has been updated"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "Invalid Credentials"
+        });
+    }
+
+    [HttpPost("activate-dev-account")]
+    public IActionResult ActivateDevAccount([FromForm] string email, [FromForm] string token, [FromForm] string git_username, [FromForm] string git_token)
+    {
+
+        if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
+        {
+            user.GitUsername = git_username;
+            user.GitToken = git_token;
+            if (user.IsDeveloperAccount)
+            {
+                user.UpdateSetting("git_username", user.GitUsername);
+                user.UpdateSetting("git_token", user.GitToken);
+                return Ok(new
+                {
+                    message = $"Account activated successfully"
+                });
+            }
+        }
+        return BadRequest(new
+        {
+            message = "Invalid Credentials"
+        });
+    }
+
 
     #endregion Public Methods
 }
