@@ -10,6 +10,29 @@ public class AuthController : ControllerBase
 {
     #region Public Methods
 
+    [HttpPost("activate-dev-account")]
+    public IActionResult ActivateDevAccount([FromForm] string email, [FromForm] string token, [FromForm] string git_username, [FromForm] string git_token)
+    {
+        if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
+        {
+            user.GitUsername = git_username;
+            user.GitToken = git_token;
+            if (user.IsDeveloperAccount)
+            {
+                user.UpdateSetting("git_username", user.GitUsername);
+                user.UpdateSetting("git_token", user.GitToken);
+                return Ok(new
+                {
+                    message = $"Account activated successfully"
+                });
+            }
+        }
+        return BadRequest(new
+        {
+            message = "Invalid Credentials"
+        });
+    }
+
     [HttpGet("image/{type}")]
     public IActionResult GetProfileImage(string type, int id)
     {
@@ -88,27 +111,9 @@ public class AuthController : ControllerBase
         });
     }
 
-    [HttpPost("image/{type}")]
-    public async Task<IActionResult> UploadImage(string type, [FromForm] string base64, [FromForm] string email, [FromForm] string token)
-    {
-        if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
-        {
-            await user.UploadImage(base64, type == "profile");
-            return Ok(new
-            {
-                message = "Image was uploaded"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "Invalid Credentials"
-        });
-    }
-
     [HttpPatch("settings")]
     public IActionResult UpdateSettings([FromForm] string email, [FromForm] string token, [FromForm] string name, [FromForm] string value)
     {
-
         if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
         {
             switch (name)
@@ -116,6 +121,7 @@ public class AuthController : ControllerBase
                 case "about":
                     user.UpdateAbout(value);
                     break;
+
                 default:
                     if (!string.IsNullOrWhiteSpace(value))
                         user.UpdateSetting(name, value);
@@ -132,30 +138,22 @@ public class AuthController : ControllerBase
         });
     }
 
-    [HttpPost("activate-dev-account")]
-    public IActionResult ActivateDevAccount([FromForm] string email, [FromForm] string token, [FromForm] string git_username, [FromForm] string git_token)
+    [HttpPost("image/{type}")]
+    public async Task<IActionResult> UploadImage(string type, [FromForm] string base64, [FromForm] string email, [FromForm] string token)
     {
-
         if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
         {
-            user.GitUsername = git_username;
-            user.GitToken = git_token;
-            if (user.IsDeveloperAccount)
+            await user.UploadImage(base64, type == "profile");
+            return Ok(new
             {
-                user.UpdateSetting("git_username", user.GitUsername);
-                user.UpdateSetting("git_token", user.GitToken);
-                return Ok(new
-                {
-                    message = $"Account activated successfully"
-                });
-            }
+                message = "Image was uploaded"
+            });
         }
         return BadRequest(new
         {
             message = "Invalid Credentials"
         });
     }
-
 
     #endregion Public Methods
 }

@@ -4,6 +4,7 @@ using OpenDSM.SQL;
 namespace OpenDSM.Core.Models;
 
 public record GitRepository(int ID, string Name);
+
 public class UserModel
 {
     #region Protected Constructors
@@ -38,12 +39,6 @@ public class UserModel
     public string GitToken { get; set; }
     public string GitUsername { get; set; }
     public int Id { get; private set; }
-    public int[] OwnedProducts { get; private set; }
-    public string ProfileBannerImage { get; set; }
-    public string ProfileImage { get; set; }
-    public string Token { get; private set; }
-    public AccountType Type { get; private set; }
-    public string Username { get; private set; }
 
     public bool IsDeveloperAccount
     {
@@ -66,6 +61,10 @@ public class UserModel
             return false;
         }
     }
+
+    public int[] OwnedProducts { get; private set; }
+    public string ProfileBannerImage { get; set; }
+    public string ProfileImage { get; set; }
 
     public GitRepository[] Repositories
     {
@@ -97,6 +96,10 @@ public class UserModel
             return repos.ToArray();
         }
     }
+
+    public string Token { get; private set; }
+    public AccountType Type { get; private set; }
+    public string Username { get; private set; }
 
     #endregion Public Properties
 
@@ -150,10 +153,6 @@ public class UserModel
         return false;
     }
 
-    public void UpdateSetting(string name, dynamic value)
-    {
-        Authoriztaion.UpdateProperty(Id, Token, name, value);
-    }
     public void UpdateAbout(string markdown)
     {
         if (About != markdown)
@@ -166,6 +165,11 @@ public class UserModel
             }
             About = markdown;
         }
+    }
+
+    public void UpdateSetting(string name, dynamic value)
+    {
+        Authoriztaion.UpdateProperty(Id, Token, name, value);
     }
 
     public async Task UploadImage(string base64, bool isProfile)

@@ -7,15 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\assets\html\**" />
+    <Content Remove="wwwroot\assets\html\**" />
+    <EmbeddedResource Remove="wwwroot\assets\html\**" />
+    <None Remove="wwwroot\assets\html\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CLPortmapper" Version="0.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OpenDSM.Core\OpenDSM.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\assets\html\" />
   </ItemGroup>
 
   <ItemGroup>

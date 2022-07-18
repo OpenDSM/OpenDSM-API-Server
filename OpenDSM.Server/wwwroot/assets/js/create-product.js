@@ -3,8 +3,6 @@
     $('#about-input')[0].style.display = value ? '' : 'none'
 })
 
-
-
 $("#upload-icon.file-upload").on('click', e => {
     let input = document.createElement('input');
     input.type = "file"
