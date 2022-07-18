@@ -13,7 +13,6 @@
         <a href="/" class="btn secondary">Home</a>
         @if (isLoggedIn)
         {
-            <a href="/product/create/" class="btn secondary">Create Product</a>
             <span class="separator vertical"></span>
             <a href="/profile/" class="profile-image" style="background-image: url('/api/auth/image/profile?id=@user.Id');"></a>
         }
