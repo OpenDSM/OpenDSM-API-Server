@@ -158,10 +158,12 @@ public class UserModel
         if (About != markdown)
         {
             string aboutPath = Path.Combine(GetUsersProfileDirectory(Id), "about.md");
+            File.Delete(aboutPath);
             using (FileStream fs = new(aboutPath, FileMode.OpenOrCreate, FileAccess.Write))
             {
-                using StreamWriter writer = new(fs);
+                using StreamWriter writer = new(fs, System.Text.Encoding.UTF8);
                 writer.Write(markdown);
+                writer.Flush();
             }
             About = markdown;
         }
