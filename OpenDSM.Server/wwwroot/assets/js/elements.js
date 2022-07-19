@@ -1,3 +1,15 @@
+var email;
+var token;
+Array.from(document.cookie.split(';')).forEach(item => {
+    let key = item.split("=")[0].trim()
+    if (key == "auth_email") {
+        email = item.replace(key + "=", "").trim();
+    }
+    if (key == "auth_token") {
+        token = item.replace(key + "=", "").trim();
+    }
+})
+
 $("toggle").on('click', e => $(e.target).attr('value', $(e.target).attr('value') == "false"));
 
 $("#minimum-price-search-filter, #maximum-price-search-filter").on('keyup', e => {
