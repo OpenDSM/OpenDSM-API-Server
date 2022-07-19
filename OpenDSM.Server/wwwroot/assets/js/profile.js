@@ -6,18 +6,6 @@ $("#logout-btn").on('click', () => {
 
 $("#save-profile-btn").on('click', async () => {
     $("#save-profile-btn")[0].disabled = true;
-    let email;
-    let token;
-
-    Array.from(document.cookie.split(';')).forEach(item => {
-        let key = item.split("=")[0].trim()
-        if (key == "auth_email") {
-            email = item.replace(key + "=", "");
-        }
-        if (key == "auth_token") {
-            token = item.replace(key + "=", "");
-        }
-    })
     Array.from($("[setting][modified]")).forEach(async e => {
         let name = $(e).attr('setting');
         let value = e.value;
@@ -53,14 +41,15 @@ $("#upload-profile-image.file-upload").on('click', e => {
     input.accept = "image/*";
     $(input).on('change', l => {
         let file = l.currentTarget.files[0];
-        let popup = new ImagePopup(file, 1 / 1, true, async () => {
+        let popup = new ImagePopup(e.currentTarget, file, 1 / 1, true, async base => {
             let data = new FormData();
-            data.append("base64", $(this.image).data('cropper').getCroppedCanvas().toDataURL().split('base64,')[1]);
-            data.append("email", this.email);
-            data.append("token", this.token);
+            data.append("base64", base);
+            data.append("email", email);
+            data.append("token", token);
             await fetch('/api/auth/image/profile', { method: "POST", body: data })
-
-            window.location.reload();
+            Array.from($(".profile-image")).forEach(item => {
+                item.style.backgroundImage = `url("data:image/png;base64,${base}")`
+            })
         });
         popup.open();
     })
@@ -73,14 +62,13 @@ $("#upload-profile-banner.file-upload").on('click', e => {
     input.accept = "image/*";
     $(input).on('change', l => {
         let file = l.currentTarget.files[0];
-        let popup = new ImagePopup(file, 16 / 3.6667, false, async () => {
+        let popup = new ImagePopup(e.currentTarget, file, 16 / 3.6667, false, async base => {
             let data = new FormData();
-            data.append("base64", $(this.image).data('cropper').getCroppedCanvas().toDataURL().split('base64,')[1]);
-
-            data.append("email", this.email);
-            data.append("token", this.token);
+            data.append("base64", base);
+            data.append("email", email);
+            data.append("token", token);
             await fetch('/api/auth/image/banner', { method: "POST", body: data })
-            window.location.reload();
+            $(".profile#landing")[0].style.backgroundImage = `url("data:image/png;base64,${base}")`
         });
         popup.open();
     })
