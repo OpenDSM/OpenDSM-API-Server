@@ -148,6 +148,7 @@ class DownloadPopup extends Popup {
 }
 
 class ImagePopup extends Popup {
+    button;
     file;
     aspectRatio;
     rounded;
@@ -155,15 +156,20 @@ class ImagePopup extends Popup {
     token;
     onupload;
     image;
-    constructor(file, aspectRatio, rounded, onupload = () => { }) {
+    constructor(button, file, aspectRatio, rounded, onupload = base => { }) {
         super("image-cropper")
+        this.button = button;
         this.file = file;
         this.aspectRatio = aspectRatio;
         this.rounded = rounded;
         this.onupload = onupload;
     }
 
-    async open() {
+    async open() { 
+        if (this.file.size > (Math.pow(2, 20) * 4)) {
+            alert("File size cannot exceed 4MB")
+            return;
+        }
         await super.open();
         if (this.rounded) {
             $(".image-container")[0].classList.add('rounded');
@@ -174,15 +180,6 @@ class ImagePopup extends Popup {
             $(this.image).attr("src", e.target.result)
         }
         reader.readAsDataURL(this.file)
-        Array.from(document.cookie.split(';')).forEach(item => {
-            let key = item.split("=")[0].trim()
-            if (key == "auth_email") {
-                this.email = item.replace(key + "=", "");
-            }
-            if (key == "auth_token") {
-                this.token = item.replace(key + "=", "");
-            }
-        })
         setTimeout(() => {
             $(this.image).cropper({
                 aspectRatio: this.aspectRatio,
@@ -192,7 +189,13 @@ class ImagePopup extends Popup {
             })
         }, 1000)
 
-        $("#upload-cropped-image").on('click', this.onupload)
+        $("#upload-cropped-image").on('click', e => {
+            e.currentTarget.disabled = true;
+            let base = $(this.image).data('cropper').getCroppedCanvas().toDataURL();
+            (this.onupload).call(null, base.split('base64,')[1]);
+            this.button.style.backgroundImage = `url('${base}')`
+            this.close();
+        })
     }
 }
 
