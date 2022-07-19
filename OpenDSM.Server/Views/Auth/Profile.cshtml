@@ -2,6 +2,8 @@
 @model UserModel
 @{
     bool is_personal = (bool)ViewData["is_personal"];
+    bool hasProfileImage = File.Exists(Model.ProfileImage);
+    bool hasBannerImage = File.Exists(Model.ProfileBannerImage);
 }
 
 <section id="landing" class="profile" style="background-image: url('/api/auth/image/banner?id=@Model.Id');">
@@ -48,13 +50,13 @@
             <div class="list horizontal">
                 <div class="list vertical" style="width: 300px;min-width: 300px;">
                     <h4>Profile Image</h4>
-                    <div id="upload-profile-image" class="file-upload">
+                    <div id="upload-profile-image" class="file-upload" style="@(hasProfileImage?$"background-image: url('/api/auth/image/profile?id={Model.Id}')":"")">
                         <div class="content">
                             <i class="fas fa-plus"></i>
                         </div>
                     </div>
                     <h4>Banner Image</h4>
-                    <div id="upload-profile-banner" class="file-upload">
+                    <div id="upload-profile-banner" class="file-upload" style="@(hasBannerImage?$"background-image: url('/api/auth/image/banner?id={Model.Id}')":"")">
                         <div class="content">
                             <i class="fas fa-plus"></i>
                         </div>
