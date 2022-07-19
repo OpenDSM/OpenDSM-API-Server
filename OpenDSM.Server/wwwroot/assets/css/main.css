@@ -315,6 +315,9 @@ input[type=number] {
     border: 1px solid transparent;
     transition: background 400ms, border 400ms, border-radius 400ms;
     margin: 1rem;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
     .file-upload:hover {
@@ -341,6 +344,13 @@ input[type=number] {
         color: var(--background);
         border-radius: 20px;
     }
+
+h4.file-upload-title {
+    max-width: 200px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
 
 .input.dropdown {
     overflow: visible;
@@ -1196,12 +1206,12 @@ body::-webkit-scrollbar-track {
     }
 
 .cropper-view-box {
-    box-shadow: 0 0 0 1px var(--primary);
-    outline-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary) !important;
+    outline-color: var(--primary) !important;
 }
 
 .cropper-point, .cropper-line {
-    background-color: var(--primary);
+    background-color: var(--primary) !important;
 }
 
 /*#endregion Cropper */
