@@ -16,11 +16,14 @@ public class Tags
     private Tags()
     {
         Dictionary<int, string> TagDictionary = SQL.Tags.GetTags();
-        tags = new Tag[TagDictionary.Count];
-        for (int i = 0; i < tags.Length; i++)
+        List<Tag> list = new();
+
+        foreach (var (id, name) in TagDictionary)
         {
-            tags[i] = new Tag(i, TagDictionary[i]);
+            list.Add(new(id, name));
         }
+
+        tags = list.ToArray();
     }
 
     #endregion Private Constructors
