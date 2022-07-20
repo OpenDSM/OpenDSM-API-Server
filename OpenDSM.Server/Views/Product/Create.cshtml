@@ -27,16 +27,14 @@
                 <input type="text" id="project-name-box" autocomplete="false">
             </div>
 
-            <div class="input search-dropdown dropdown" title="The projects tags">
+            <div class="input dropdown" title="The projects tags">
                 <label for="tags-search-box">Tags</label>
-                <input type="text" id="tags-search-box" autocomplete="false" placeholder="Desktop; Games; Server;">
+                <input type="text" id="tags-search-box" autocomplete="false" placeholder="Desktop; Games; Server;" readonly>
                 <div class="dropdown-body">
-                    <div class="dropdown-item">Desktop</div>
-                    <div class="dropdown-item">Games</div>
-                    <div class="dropdown-item">Open Source</div>
-                    <div class="dropdown-item">Server</div>
-                    <div class="dropdown-item">Utilities</div>
-                    <div class="dropdown-item">Dev Tools</div>
+                    @foreach (Tag tag in Tags.GetTags())
+                    {
+                        <div class="dropdown-item">@tag.name</div>
+                    }
                 </div>
             </div>
 
@@ -49,10 +47,9 @@
                 <input type="text" id="yt-key-box" autocomplete="false" placeholder="dQw4w9WgXcQ">
             </div>
 
-
-            <div class="input search-dropdown dropdown" value='Free - With Ads'>
+            <div class="input dropdown">
                 <label for="payment-type-box">Payment Type</label>
-                <input type="text" id="payment-type-box" autocomplete="false">
+                <input type="text" id="payment-type-box" autocomplete="false" readonly>
                 <div class="dropdown-body">
                     <div class="dropdown-item" onclick="$('#payment-price-input')[0].style.display='none'">Free - With Ads</div>
                     <div class="dropdown-item" onclick="$('#payment-price-input')[0].style.display=''">Paid</div>
@@ -110,7 +107,7 @@
             </div>
         </div>
     </section>
-    
+
     <section>
         <h2>Please Read and Accept our Terms of Service</h2>
         <div id="tos">
