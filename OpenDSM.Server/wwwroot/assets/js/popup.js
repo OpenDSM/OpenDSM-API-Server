@@ -29,6 +29,39 @@ class Popup {
     }
 }
 
+class CenteredPopup extends Popup {
+    constructor(name) {
+        super(name);
+    }
+    async open() {
+        await super.open();
+        $("#popup-content .content")[0].style.display = "flex"
+        $("#popup-content .content")[0].style.justifyContent = "center"
+        $("#popup-content .content")[0].style.alignItems = "center"
+    }
+    async close() {
+        $("#popup-content .content")[0].style.display = ""
+        $("#popup-content .content")[0].style.justifyContent = ""
+        $("#popup-content .content")[0].style.alignItems = ""
+        await super.close();
+    }
+}
+
+class ErrorPopup extends CenteredPopup {
+    message;
+    title;
+    constructor(title, message) {
+        super('error')
+        this.title = title;
+        this.message = message;
+    }
+    async open() {
+        await super.open();
+        $("#error-title")[0].innerText = this.title;
+        $("#error-body")[0].innerHTML = this.message;
+    }
+}
+
 class VideoPopup extends Popup {
     url;
     player;
@@ -165,7 +198,7 @@ class ImagePopup extends Popup {
         this.onupload = onupload;
     }
 
-    async open() { 
+    async open() {
         if (this.file.size > (Math.pow(2, 20) * 4)) {
             alert("File size cannot exceed 4MB")
             return;
@@ -194,6 +227,7 @@ class ImagePopup extends Popup {
             let base = $(this.image).data('cropper').getCroppedCanvas().toDataURL();
             (this.onupload).call(null, base.split('base64,')[1]);
             this.button.style.backgroundImage = `url('${base}')`
+            $(this.button).attr("value", base)
             this.close();
         })
     }
