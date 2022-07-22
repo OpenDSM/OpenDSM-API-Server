@@ -1,9 +1,5 @@
-﻿using OpenDSM.SQL;
-using YoutubeExplode;
-using System.Linq;
-using YoutubeExplode.Videos;
-using YoutubeExplode.Videos.Streams;
-using Newtonsoft.Json.Linq;
+﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using OpenDSM.SQL;
 
 namespace OpenDSM.Core.Models;
 
@@ -29,8 +25,7 @@ public class ProductModel
     #endregion Protected Constructors
 
     #region Public Properties
-    public string GitRepositoryName { get; private set; }
-    public bool UseGitReadME { get; }
+
     public string About
     {
         get
@@ -50,6 +45,7 @@ public class ProductModel
             writer.Write(value);
         }
     }
+
     public string BannerImage
     {
         get
@@ -75,6 +71,7 @@ public class ProductModel
             FFmpeg.Instance.Resize(1280, file);
         }
     }
+
     public string[] GalleryImages
     {
         get
@@ -104,6 +101,10 @@ public class ProductModel
             }
         }
     }
+
+    public string GitRepositoryName { get; private set; }
+    public bool HasYoutubeVideo => !string.IsNullOrEmpty(YoutubeKey) && !string.IsNullOrWhiteSpace(GetYoutubeDirectURL(YoutubeKey));
+
     public string IconUrl
     {
         get
@@ -129,6 +130,7 @@ public class ProductModel
             FFmpeg.Instance.Resize(128, file);
         }
     }
+
     public int Id { get; private set; }
     public string[] Keywords { get; set; }
     public string Name { get; private set; }
@@ -137,10 +139,10 @@ public class ProductModel
     public int[] Tags { get; set; }
     public int TotalDownloads { get; private set; }
     public int TotalWeeklyDownloads { get; private set; }
+    public bool UseGitReadME { get; }
     public UserModel User { get; private set; }
     public int UserID { get; private set; }
     public string YoutubeKey { get; private set; }
-    public bool HasYoutubeVideo => !string.IsNullOrEmpty(YoutubeKey) && !string.IsNullOrWhiteSpace(GetYoutubeDirectURL(YoutubeKey));
 
     #endregion Public Properties
 
@@ -158,18 +160,17 @@ public class ProductModel
         return null;
     }
 
-    public static bool TryGetByID(int id, out ProductModel? model)
-    {
-        model = GetByID(id);
-        return model != null;
-    }
-
     public static bool TryCreateProduct(string gitRepoName, UserModel user, string name, string yt_key, PaymentType type, int price, string[] keywords, int[] tags, out ProductModel model)
     {
         model = null;
         return Products.Create(user.Id, gitRepoName, name, yt_key, type, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model);
     }
 
+    public static bool TryGetByID(int id, out ProductModel? model)
+    {
+        model = GetByID(id);
+        return model != null;
+    }
 
     #endregion Public Methods
 }

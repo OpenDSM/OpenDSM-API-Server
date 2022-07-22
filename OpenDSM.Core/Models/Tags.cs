@@ -1,4 +1,5 @@
-﻿namespace OpenDSM.Core.Models;
+﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+namespace OpenDSM.Core.Models;
 
 public record Tag(int id, string name);
 

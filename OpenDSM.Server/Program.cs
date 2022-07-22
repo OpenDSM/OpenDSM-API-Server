@@ -1,3 +1,4 @@
+// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 global using static OpenDSM.Core.Global;
 using CLPortmapper;
 

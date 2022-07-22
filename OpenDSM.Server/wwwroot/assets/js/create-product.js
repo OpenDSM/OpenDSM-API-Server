@@ -66,12 +66,10 @@ $("#submit-btn").on('click', async () => {
         let keywords = $("#")
 
         let data = new FormData();
-
     }
 });
 
 function UploadGalleryImage(target) {
-
     let input = document.createElement('input');
     input.type = "file"
     input.accept = "image/*";

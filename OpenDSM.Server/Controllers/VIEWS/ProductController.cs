@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using Microsoft.AspNetCore.Mvc;
 using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.VIEWS;
@@ -27,17 +28,18 @@ public class ProductController : Controller
         return RedirectToAction("Index", "Error", new { code = 401 });
     }
 
-    [Route("{id}")]
-    public IActionResult Index(int id)
+    [HttpGet("{id}/images/{name}")]
+    public IActionResult GetImage(int id, string name)
     {
-        if (ProductModel.TryGetByID(id, out ProductModel? model))
+        ProductModel model = ProductModel.GetByID(id);
+        if (model != null)
         {
-            ViewData["Title"] = model.Name;
-            return View(model);
+            string path = Path.Combine(GetProductDirectory(id), $"{name}.jpg");
+            FileStream fs = new(path, FileMode.Open, FileAccess.Read);
+            return new FileStreamResult(fs, "image/jpg");
         }
-        return RedirectToAction("Index", "Error", new { code = 404 });
+        return BadRequest();
     }
-
 
     [HttpGet("video/{yt_id}")]
     public IActionResult GetVideo(string yt_id)
@@ -52,17 +54,15 @@ public class ProductController : Controller
         });
     }
 
-    [HttpGet("{id}/images/{name}")]
-    public IActionResult GetImage(int id, string name)
+    [Route("{id}")]
+    public IActionResult Index(int id)
     {
-        ProductModel model = ProductModel.GetByID(id);
-        if (model != null)
+        if (ProductModel.TryGetByID(id, out ProductModel? model))
         {
-            string path = Path.Combine(GetProductDirectory(id), $"{name}.jpg");
-            FileStream fs = new(path, FileMode.Open, FileAccess.Read);
-            return new FileStreamResult(fs, "image/jpg");
+            ViewData["Title"] = model.Name;
+            return View(model);
         }
-        return BadRequest();
+        return RedirectToAction("Index", "Error", new { code = 404 });
     }
 
     #endregion Public Methods

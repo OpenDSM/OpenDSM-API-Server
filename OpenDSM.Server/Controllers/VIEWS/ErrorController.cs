@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using Microsoft.AspNetCore.Mvc;
 using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.VIEWS;

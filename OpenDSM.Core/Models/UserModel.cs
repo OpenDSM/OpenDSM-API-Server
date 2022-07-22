@@ -1,8 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using OpenDSM.SQL;
 
 namespace OpenDSM.Core.Models;
-
 
 public class UserModel
 {

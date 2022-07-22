@@ -1,16 +1,56 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using Newtonsoft.Json.Linq;
 
 namespace OpenDSM.Core;
 
 public record GitRepository(int ID, string Name);
 public record GitCredentials(string Username, string Token);
+
 public static class GitHandler
 {
+    #region Public Methods
+
+    public static bool CheckCredentials(GitCredentials credentials)
+    {
+        if (!string.IsNullOrWhiteSpace(credentials.Token) && !string.IsNullOrWhiteSpace(credentials.Username))
+        {
+            using HttpClient client = GetClient(credentials);
+            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/users/{credentials.Username}/repos").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                return response.Content != null;
+            }
+        }
+        return false;
+    }
+
+    public static GitRepository[] GetRepositories(GitCredentials credentials)
+    {
+        List<GitRepository> repos = new();
+        if (CheckCredentials(credentials))
+        {
+            using HttpClient client = GetClient(credentials);
+            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/users/{credentials.Username}/repos").Result;
+            if (response.IsSuccessStatusCode)
+            {
+                if (response.Content != null)
+                {
+                    JArray jArray = JArray.Parse(response.Content.ReadAsStringAsync().Result);
+                    foreach (JToken token in jArray)
+                    {
+                        JObject jObject = JObject.FromObject(token);
+                        if (int.TryParse(jObject["id"].ToString(), out int id))
+                        {
+                            repos.Add(new(id, jObject["name"].ToString()));
+                        }
+                    }
+                }
+            }
+        }
+
+        return repos.ToArray();
+    }
+
     public static bool HasReadME(string RepositoryName, GitCredentials credentials, out string ReadMe)
     {
         if (CheckCredentials(credentials))
@@ -41,54 +81,15 @@ public static class GitHandler
                         }
                     }
                 }
-
             }
         }
         ReadMe = "";
         return false;
     }
 
-    public static GitRepository[] GetRepositories(GitCredentials credentials)
-    {
-        List<GitRepository> repos = new();
-        if (CheckCredentials(credentials))
-        {
-            using HttpClient client = GetClient(credentials);
-            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/users/{credentials.Username}/repos").Result;
-            if (response.IsSuccessStatusCode)
-            {
-                if (response.Content != null)
-                {
-                    JArray jArray = JArray.Parse(response.Content.ReadAsStringAsync().Result);
-                    foreach (JToken token in jArray)
-                    {
-                        JObject jObject = JObject.FromObject(token);
-                        if (int.TryParse(jObject["id"].ToString(), out int id))
-                        {
-                            repos.Add(new(id, jObject["name"].ToString()));
-                        }
-                    }
-                }
-            }
-        }
+    #endregion Public Methods
 
-        return repos.ToArray();
-
-    }
-
-    public static bool CheckCredentials(GitCredentials credentials)
-    {
-        if (!string.IsNullOrWhiteSpace(credentials.Token) && !string.IsNullOrWhiteSpace(credentials.Username))
-        {
-            using HttpClient client = GetClient(credentials);
-            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/users/{credentials.Username}/repos").Result;
-            if (response.IsSuccessStatusCode)
-            {
-                return response.Content != null;
-            }
-        }
-        return false;
-    }
+    #region Private Methods
 
     private static HttpClient GetClient(GitCredentials credentials)
     {
@@ -97,4 +98,6 @@ public static class GitHandler
         client.DefaultRequestHeaders.Add("Authorization", $"token {credentials.Token}");
         return client;
     }
+
+    #endregion Private Methods
 }

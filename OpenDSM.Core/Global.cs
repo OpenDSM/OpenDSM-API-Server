@@ -1,7 +1,7 @@
-﻿global using static OpenDSM.Core.Global;
+﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+global using static OpenDSM.Core.Global;
 using ChaseLabs.CLLogger;
 using ChaseLabs.CLLogger.Interfaces;
-using System;
 using YoutubeExplode;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
@@ -22,7 +22,6 @@ public static class Global
 
     #region Public Properties
 
-    public static string RootDirectory => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), CompanyName, ApplicationName)).FullName;
     public static string AccessLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Access")).FullName;
     public static string AdminLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Admin")).FullName;
     public static string ApplicationName => "OpenDSM";
@@ -30,8 +29,9 @@ public static class Global
     public static string Copywrite => $"All Rights Reserved - {CompanyName} LLC. (c) 2021-{DateTime.Now.Year}";
     public static string FFMpegDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "FFMpeg")).FullName;
     public static string LogsDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "Logs")).FullName;
-    public static string ProfileDataDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "ProfileData")).FullName;
     public static string ProductDataDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "ProductData")).FullName;
+    public static string ProfileDataDirectory => Directory.CreateDirectory(Path.Combine(RootDirectory, "ProfileData")).FullName;
+    public static string RootDirectory => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), CompanyName, ApplicationName)).FullName;
     public static string SalesLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Sales")).FullName;
     public static string UserLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Users")).FullName;
 
@@ -39,19 +39,10 @@ public static class Global
 
     #region Public Methods
 
-    public static string GetUsersProfileDirectory(int id) => Directory.CreateDirectory(Path.Combine(ProfileDataDirectory, id.ToString())).FullName;
     public static string GetProductDirectory(int id) => Directory.CreateDirectory(Path.Combine(ProductDataDirectory, id.ToString())).FullName;
-    public static bool TryBetYoutubeDirectURL(string id, out Uri url)
-    {
-        string urlString = GetYoutubeDirectURL(id);
-        if (!string.IsNullOrEmpty(urlString))
-        {
-            url = new(urlString);
-            return true;
-        }
-        url = null;
-        return false;
-    }
+
+    public static string GetUsersProfileDirectory(int id) => Directory.CreateDirectory(Path.Combine(ProfileDataDirectory, id.ToString())).FullName;
+
     public static string GetYoutubeDirectURL(string id)
     {
         try
@@ -77,6 +68,18 @@ public static class Global
         {
             return "";
         }
+    }
+
+    public static bool TryBetYoutubeDirectURL(string id, out Uri url)
+    {
+        string urlString = GetYoutubeDirectURL(id);
+        if (!string.IsNullOrEmpty(urlString))
+        {
+            url = new(urlString);
+            return true;
+        }
+        url = null;
+        return false;
     }
 
     #endregion Public Methods

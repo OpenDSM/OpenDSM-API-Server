@@ -44,7 +44,6 @@ $(".carousel-nav-item.fas.fa-chevron-right").on('click', e => {
     carousel.scrollBy(x, 0)
 })
 
-
 $(".dropdown:not(.multiselect) .dropdown-body .dropdown-item").on('click', e => {
     e.target.parentElement.parentElement.querySelector('input').value = e.target.innerText
     Array.from(e.currentTarget.parentElement.querySelectorAll('.dropdown-item.selected')).forEach(item => {
@@ -66,7 +65,6 @@ $(".dropdown.multiselect .dropdown-body .dropdown-item").on('click', e => {
     } else {
         input.value += `${item.innerText}; `
         item.classList.add('selected');
-
     }
 })
 
