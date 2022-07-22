@@ -44,27 +44,39 @@ $(".carousel-nav-item.fas.fa-chevron-right").on('click', e => {
     carousel.scrollBy(x, 0)
 })
 
-$(".search-dropdown .dropdown-body .dropdown-item").on('click', e => {
-    let value = e.target.innerText;
-    let input = e.target.parentElement.parentElement.querySelector('input')
-    input.value = value;
-})
-$(".search-dropdown").on("focusin", e => {
-    e.target.parentElement.classList.add('active')
-    let body = e.target.parentElement.querySelector('.dropdown-body')
-    let value = e.target.value;
-    Array.from(body.children).forEach(e => {
-        if (e.innerText.toLowerCase().includes(value.toLowerCase())) {
-            e.style.display = "";
-        } else {
-            e.style.display = "none";
-        }
+
+$(".dropdown:not(.multiselect) .dropdown-body .dropdown-item").on('click', e => {
+    e.target.parentElement.parentElement.querySelector('input').value = e.target.innerText
+    Array.from(e.currentTarget.parentElement.querySelectorAll('.dropdown-item.selected')).forEach(item => {
+        item.classList.remove('selected');
     })
+    e.currentTarget.classList.add('selected');
+    e.target.parentElement.classList.remove('active')
 })
-$(".search-dropdown").on("focusout", e => {
+
+$(".dropdown.multiselect .dropdown-body .dropdown-item").on('click', e => {
+    let item = e.currentTarget;
+    let dropdown = item.parentElement.parentElement;
+    let input = dropdown.querySelector('input');
+    if (e.currentTarget.classList.contains('selected')) {
+        input.value = input.value.replace(`${e.target.innerText}; `, "");
+        item.classList.remove('selected');
+        dropdown.dataset.selected = parseInt(dropdown.dataset.selected) - 1;
+        dropdown.querySelectorAll(".dropdown-item:not(.selected)").style.display = "";
+    } else {
+        input.value += `${item.innerText}; `
+        item.classList.add('selected');
+
+    }
+})
+
+$(".dropdown").on("focusin", e => {
+    e.target.parentElement.classList.add('active')
+})
+$(".dropdown").on("focusout", e => {
     setTimeout(() => {
         e.target.parentElement.classList.remove('active')
-    }, 100)
+    }, 200)
 })
 $(".search-dropdown").on("keyup", e => {
     let body = e.target.parentElement.querySelector('.dropdown-body')
