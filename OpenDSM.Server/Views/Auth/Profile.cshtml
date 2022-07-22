@@ -14,31 +14,6 @@
         </span>
     </span>
 </section>
-<section>
-    <div id="about-rendering" class="paragraph-1">@Model.About</div>
-</section>
-@if (Model.CreatedProducts.Any())
-{
-    <section class="ad"></section>
-    <section id="popular-products" class="carousel">
-        <h3>Popular</h3>
-        <span class="navigation">
-            <div class="carousel-nav-item fas fa-chevron-left"></div>
-            <div class="carousel-nav-item fas fa-chevron-right"></div>
-        </span>
-        <div class="list horizontal">
-        </div>
-    </section>
-    <section id="popular-products" class="carousel">
-        <h3>Latest</h3>
-        <span class="navigation">
-            <div class="carousel-nav-item fas fa-chevron-left"></div>
-            <div class="carousel-nav-item fas fa-chevron-right"></div>
-        </span>
-        <div class="list horizontal">
-        </div>
-    </section>
-}
 
 
 @if (is_personal)
@@ -72,18 +47,18 @@
                         <p class="paragraph-2">This is using markdown language.  For more information view our <a href="#">profile docs</a></p>
                         <textarea type="text" id="about-box" autocomplete="false" setting="about">@Model.About</textarea>
                     </div>
-                    @if (Model.IsDeveloperAccount)
-                    {
-                        <a href="/product/create/" class="btn">Create Product</a>
-                    }
-                    else
-                    {
-                        <div class="btn" onclick="new ActivateDeveloperAccountPopup().open()">Activate Developer Account</div>
-                    }
+                    <button class="btn" id="save-profile-btn" disabled>Save</button>
                 </div>
             </div>
             <div class="list horizontal centered" style="width: 100%; justify-content: center;">
-                <button class="btn" style="width: 20%;" id="save-profile-btn" disabled>Save</button>
+                @if (Model.IsDeveloperAccount)
+                {
+                    <a href="/product/create/" class="btn" style="width: 20%;">Create Product</a>
+                }
+                else
+                {
+                    <div class="btn" onclick="new ActivateDeveloperAccountPopup().open()" style="width: 20%;">Activate Developer Account</div>
+                }
                 <div class="btn secondary" style="width: 20%;" id="logout-btn">Logout</div>
             </div>
         </div>
@@ -120,6 +95,34 @@
         </section>
     }
 }
+
+<section>
+    <div id="about-rendering" class="paragraph-1">@Model.About</div>
+</section>
+@if (Model.CreatedProducts.Any())
+{
+    <section class="ad"></section>
+    <section id="popular-products" class="carousel">
+        <h3>Popular</h3>
+        <span class="navigation">
+            <div class="carousel-nav-item fas fa-chevron-left"></div>
+            <div class="carousel-nav-item fas fa-chevron-right"></div>
+        </span>
+        <div class="list horizontal">
+        </div>
+    </section>
+    <section id="popular-products" class="carousel">
+        <h3>Latest</h3>
+        <span class="navigation">
+            <div class="carousel-nav-item fas fa-chevron-left"></div>
+            <div class="carousel-nav-item fas fa-chevron-right"></div>
+        </span>
+        <div class="list horizontal">
+        </div>
+    </section>
+}
+
+
 @if (Model.CreatedProducts.Any())
 {
     <section class=" ad"></section>
