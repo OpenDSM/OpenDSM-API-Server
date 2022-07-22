@@ -1,4 +1,5 @@
-﻿@using OpenDSM.Core.Models;
+﻿@using OpenDSM.Core
+@using OpenDSM.Core.Models;
 @model UserModel;
 
 <div style="margin-top: 8rem;">
@@ -13,8 +14,8 @@
         <h2>Overview</h2>
         <div class="list vertical" style="width: 100%;">
             <div class="input search-dropdown dropdown" title="The Github Repository">
-                <label for="github-repository-search-box">Repository</label>
-                <input type="text" id="github-repository-search-box" autocomplete="false">
+                <label for="github-repository-search-box">Repository*</label>
+                <input type="text" id="github-repository-search-box" autocomplete="false" required>
                 <div class="dropdown-body">
                     @foreach (GitRepository repo in Model.Repositories)
                     {
@@ -23,13 +24,13 @@
                 </div>
             </div>
             <div class="input" title="the name of the project">
-                <label for="project-name-box">Project Name</label>
-                <input type="text" id="project-name-box" autocomplete="false">
+                <label for="project-name-box">Project Name*</label>
+                <input type="text" id="project-name-box" autocomplete="false" required>
             </div>
 
-            <div class="input dropdown" title="The projects tags">
-                <label for="tags-search-box">Tags</label>
-                <input type="text" id="tags-search-box" autocomplete="false" placeholder="Desktop; Games; Server;" readonly>
+            <div class="input dropdown multiselect" title="The projects tags" max="3">
+                <label for="tags-search-box">Tags*</label>
+                <input type="text" id="tags-search-box" autocomplete="false" placeholder="Desktop; Games; Server;" readonly required>
                 <div class="dropdown-body">
                     @foreach (Tag tag in Tags.GetTags())
                     {
@@ -39,17 +40,18 @@
             </div>
 
             <div class="input" title="Used for searching">
-                <label for="keywords-box">Keywords</label>
-                <input type="text" id="keywords-box" autocomplete="false" placeholder="Open; Open DSM; DSM;">
+                <label for="keywords-box">Keywords*</label>
+                <input type="text" id="keywords-box" autocomplete="false" placeholder="Open; Open DSM; DSM;" required>
             </div>
             <div class="input" title="The part of the youtube video after https://youtube.com/watch?v={KEY}">
                 <label for="yt-key-box">Youtube Video Key</label>
                 <input type="text" id="yt-key-box" autocomplete="false" placeholder="dQw4w9WgXcQ">
+                <div class="btn" id="test-video-btn" style="margin: 0;" title="Tests the video key"><i class="fa-solid fa-vial"></i></div>
             </div>
 
             <div class="input dropdown">
                 <label for="payment-type-box">Payment Type</label>
-                <input type="text" id="payment-type-box" autocomplete="false" readonly>
+                <input type="text" id="payment-type-box" autocomplete="false" readonly value="Free - With Ads">
                 <div class="dropdown-body">
                     <div class="dropdown-item" onclick="$('#payment-price-input')[0].style.display='none'">Free - With Ads</div>
                     <div class="dropdown-item" onclick="$('#payment-price-input')[0].style.display=''">Paid</div>
@@ -64,7 +66,7 @@
             <toggle id="use-readme-toggle" value="true">Use Github ReadMe?</toggle>
             <div class="large-input list vertical" id="about-input" title="An overview of the project and how to use it." style="display:none">
                 <h4>About</h4>
-                <p class="paragraph-2">This is using markdown language.  For more information view our documentation on <a href="#">product creation</a></p>
+                <p class="paragraph-2">This is using markdown language.</p>
                 <textarea type="text" id="about-box" autocomplete="false" setting="about"></textarea>
             </div>
             <p class="paragraph-2">For more information view our documentation on <a href="#">product creation</a></p>
@@ -79,16 +81,16 @@
         <div class="list vertical">
             <div class="list horizontal">
                 <div class="list vertical">
-                    <h4 class="file-upload-title">Icon</h4>
-                    <div id="upload-icon" class="file-upload">
+                    <label for="upload-icon" class="file-upload-title">Icon*</label>
+                    <div id="upload-icon" class="file-upload" required>
                         <div class="content">
                             <i class="fas fa-plus"></i>
                         </div>
                     </div>
                 </div>
                 <div class="list vertical">
-                    <h4 class="file-upload-title">Banner</h4>
-                    <div id="upload-banner" class="file-upload">
+                    <label for="upload-banner" class="file-upload-title">Banner*</label>
+                    <div id="upload-banner" class="file-upload" required>
                         <div class="content">
                             <i class="fas fa-plus"></i>
                         </div>
@@ -114,8 +116,9 @@
             @Html.PartialAsync("TOS").Result
         </div>
         <div class="list vertical centered" style="margin-top:4rem ;">
-            <toggle value="false">I Accept</toggle>
-            <button disabled class="btn" style="max-width: 300px; min-width: 300px;">Submit</button>
+            <p class="paragraph-1"><i><b><u>* required fields</u></b></i></p>
+            <toggle id="accept-tos-toggle" value="false">I Accept</toggle>
+            <button id="submit-btn" disabled class="btn" style="max-width: 300px; min-width: 300px;">Submit</button>
         </div>
     </section>
 </div>
