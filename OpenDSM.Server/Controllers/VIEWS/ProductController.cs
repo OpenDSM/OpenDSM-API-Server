@@ -38,5 +38,32 @@ public class ProductController : Controller
         return RedirectToAction("Index", "Error", new { code = 404 });
     }
 
+
+    [HttpGet("video/{yt_id}")]
+    public IActionResult GetVideo(string yt_id)
+    {
+        if (TryBetYoutubeDirectURL(yt_id, out Uri url))
+        {
+            return Redirect(url.AbsoluteUri);
+        }
+        return BadRequest(new
+        {
+            message = "Unable to parse youtube url"
+        });
+    }
+
+    [HttpGet("{id}/images/{name}")]
+    public IActionResult GetImage(int id, string name)
+    {
+        ProductModel model = ProductModel.GetByID(id);
+        if (model != null)
+        {
+            string path = Path.Combine(GetProductDirectory(id), $"{name}.jpg");
+            FileStream fs = new(path, FileMode.Open, FileAccess.Read);
+            return new FileStreamResult(fs, "image/jpg");
+        }
+        return BadRequest();
+    }
+
     #endregion Public Methods
 }
