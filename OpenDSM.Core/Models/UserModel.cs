@@ -3,7 +3,6 @@ using OpenDSM.SQL;
 
 namespace OpenDSM.Core.Models;
 
-public record GitRepository(int ID, string Name);
 
 public class UserModel
 {
@@ -40,62 +39,13 @@ public class UserModel
     public string GitUsername { get; set; }
     public int Id { get; private set; }
 
-    public bool IsDeveloperAccount
-    {
-        get
-        {
-            if (!string.IsNullOrWhiteSpace(GitToken) && !string.IsNullOrWhiteSpace(GitUsername))
-            {
-                HttpClient client = new();
-                client.DefaultRequestHeaders.Add("Authorization", $"token {GitToken}");
-                client.DefaultRequestHeaders.Add("User-Agent", $"OpenDSM");
-                HttpResponseMessage response = client.GetAsync($"https://api.github.com/users/{GitUsername}/repos").Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    if (response.Content != null)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-    }
+    public bool IsDeveloperAccount => GitHandler.CheckCredentials(new(GitUsername, GitToken));
 
     public int[] OwnedProducts { get; private set; }
     public string ProfileBannerImage { get; set; }
     public string ProfileImage { get; set; }
 
-    public GitRepository[] Repositories
-    {
-        get
-        {
-            List<GitRepository> repos = new();
-            if (!string.IsNullOrWhiteSpace(GitToken) && !string.IsNullOrWhiteSpace(GitUsername))
-            {
-                HttpClient client = new();
-                client.DefaultRequestHeaders.Add("Authorization", $"token {GitToken}");
-                client.DefaultRequestHeaders.Add("User-Agent", $"OpenDSM");
-                HttpResponseMessage response = client.GetAsync($"https://api.github.com/users/{GitUsername}/repos").Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    if (response.Content != null)
-                    {
-                        JArray jArray = JArray.Parse(response.Content.ReadAsStringAsync().Result);
-                        foreach (JToken token in jArray)
-                        {
-                            JObject jObject = JObject.FromObject(token);
-                            if (int.TryParse(jObject["id"].ToString(), out int id))
-                            {
-                                repos.Add(new(id, jObject["name"].ToString()));
-                            }
-                        }
-                    }
-                }
-            }
-            return repos.ToArray();
-        }
-    }
+    public GitRepository[] Repositories => GitHandler.GetRepositories(new(GitUsername, GitToken));
 
     public string Token { get; private set; }
     public AccountType Type { get; private set; }
