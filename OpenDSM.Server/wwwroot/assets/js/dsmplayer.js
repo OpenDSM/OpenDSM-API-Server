@@ -5,14 +5,13 @@ class DSMPlayer {
     isPlaying = false;
     isFullscreen = false;
     updateInterval
-    constructor(id, src = "", autoplay = true) {
+    constructor(id, yt_key = "", autoplay = true) {
         this.element = $(`#${id}`)[0]
         this.player = document.createElement('video');
         this.player.controls = false;
         this.player.autoplay = autoplay;
-        this.player.src = src;
         this.element.prepend(this.player)
-        this.setSource(src);
+        this.setSource(yt_key);
         $(this.player).contextmenu(e => {
             e.preventDefault()
         })
@@ -36,8 +35,12 @@ class DSMPlayer {
             }
         })
     }
-    setSource(src) {
-        this.player.src = src;
+    async setSource(yt_key) {
+        if ((await (await fetch(`/product/video/${yt_key}`, { mode: 'no-cors' }))).status == 0) {
+            this.player.src = `/product/video/${yt_key}`;
+        } else {
+            new ErrorPopup("Video Error", `Unable to parse youtube key...<br />Check to make sure that the video is correct...<br />Link provided was <a href='https://youtube.com/watch?v=${yt_key}' target='_blank'>youtube.com/watch?v=${yt_key}</a>`).open()
+        }
     }
     togglePlay() {
         if (this.isPlaying) {
@@ -62,7 +65,6 @@ class DSMPlayer {
     }
     update() {
         let percentage = (this.player.currentTime / this.player.duration) * 100;
-        console.log(percentage);
         $(this.element).find('.timeline .fill')[0].style.maxWidth = `${percentage}%`
         if (this.player.currentTime == this.player.duration) {
             if (this.isFullscreen) {
