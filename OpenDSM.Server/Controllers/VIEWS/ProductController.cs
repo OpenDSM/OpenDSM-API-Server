@@ -1,7 +1,8 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
-using OpenDSM.Core;
+using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
+using UAParser;
 
 namespace OpenDSM.Server.Controllers.VIEWS;
 
@@ -60,7 +61,11 @@ public class ProductController : Controller
     {
         if (ProductModel.TryGetByID(id, out ProductModel? model))
         {
+            if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
+                ViewData["User"] = user;
             ViewData["Title"] = model.Name;
+            ClientInfo info = Parser.GetDefault().Parse(Request.Headers["User-Agent"]);
+            ViewData["OS"] = info.OS.Family;
             return View(model);
         }
         return RedirectToAction("Index", "Error", new { code = 404 });
