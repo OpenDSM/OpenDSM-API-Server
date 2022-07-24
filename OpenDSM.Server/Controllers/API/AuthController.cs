@@ -144,7 +144,15 @@ public class AuthController : ControllerBase
     {
         if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
         {
-            await user.UploadImage(base64, type == "profile");
+            if (type == "profile")
+            {
+
+                user.ProfileImage = base64;
+            }
+            else if (type == "banner")
+            {
+                user.ProfileBannerImage = base64;
+            }
             return Ok(new
             {
                 message = "Image was uploaded"
