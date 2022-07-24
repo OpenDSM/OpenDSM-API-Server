@@ -3,7 +3,7 @@ using YoutubeExplode;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
-namespace OpenDSM.Core;
+namespace OpenDSM.Core.Handlers;
 
 public static class YTHandler
 {

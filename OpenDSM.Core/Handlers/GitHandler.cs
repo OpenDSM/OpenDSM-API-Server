@@ -1,7 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Newtonsoft.Json.Linq;
 
-namespace OpenDSM.Core;
+namespace OpenDSM.Core.Handlers;
 
 public record GitRepository(int ID, string Name);
 public record GitCredentials(string Username, string Token);

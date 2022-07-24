@@ -1,13 +1,13 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using System.Diagnostics;
 
-namespace OpenDSM.Core;
+namespace OpenDSM.Core.Handlers;
 
-internal class FFmpeg
+internal class FFmpegHandler
 {
     #region Public Fields
 
-    public static FFmpeg Instance = Instance ??= new();
+    public static FFmpegHandler Instance = Instance ??= new();
 
     #endregion Public Fields
 
@@ -19,7 +19,7 @@ internal class FFmpeg
 
     #region Protected Constructors
 
-    protected FFmpeg()
+    protected FFmpegHandler()
     {
         if (!Directory.GetFiles(FFMpegDirectory, "*ffmpeg*", SearchOption.AllDirectories).Any())
         {
@@ -32,7 +32,7 @@ internal class FFmpeg
 
     #region Public Methods
 
-    public Task Resize(int size, string file) => Task.Run(() =>
+    public Task Resize(int width, int height, string file) => Task.Run(() =>
         {
             FileInfo info = new(file);
             string tmp_file = Path.Combine(Directory.GetParent(file).FullName, $"{info.Name.Replace(info.Extension, "")}_tmp{info.Extension}");
@@ -41,13 +41,20 @@ internal class FFmpeg
                 StartInfo = new()
                 {
                     FileName = ffmpeg_exe,
-                    Arguments = $"-y -i \"{file}\" -loglevel quiet -vf scale={size}:-1 \"{tmp_file}\""
+                    Arguments = $"-y -i \"{file}\" -loglevel quiet -vf scale={width}:{height} \"{tmp_file}\""
                 }
             };
             process.Start();
             process.WaitForExit();
-            Thread.Sleep(500);
-            File.Move(tmp_file, file, true);
+            if (process.ExitCode == 0)
+            {
+                Thread.Sleep(500);
+                File.Move(tmp_file, file, true);
+            }
+            else
+            {
+                log.Error($"FFmpeg exited with code {process.ExitCode}");
+            }
         });
 
     #endregion Public Methods
