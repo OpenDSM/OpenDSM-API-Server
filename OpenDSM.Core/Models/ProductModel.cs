@@ -7,7 +7,7 @@ public class ProductModel
 {
     #region Protected Constructors
 
-    protected ProductModel(int id, int userID, string gitRepoName, string name, bool useGitReademe, int totalDownloads, int totalWeeklyDownloads, string videoKey, uint price, int[] tags, string[] keywords, PaymentType type)
+    protected ProductModel(int id, int userID, string gitRepoName, string name, bool useGitReademe, int totalDownloads, int totalWeeklyDownloads, string videoKey, uint price, int[] tags, string[] keywords, bool subscription)
     {
         Id = id;
         Name = name;
@@ -20,6 +20,7 @@ public class ProductModel
         Tags = tags;
         Keywords = keywords;
         GitRepositoryName = gitRepoName;
+        Subscription = subscription;
     }
 
     #endregion Protected Constructors
@@ -101,9 +102,9 @@ public class ProductModel
             }
         }
     }
-
+    public bool Subscription { get; private set; }
     public string GitRepositoryName { get; private set; }
-    public bool HasYoutubeVideo => !string.IsNullOrEmpty(YoutubeKey) && !string.IsNullOrWhiteSpace(GetYoutubeDirectURL(YoutubeKey));
+    public bool HasYoutubeVideo => YTHandler.IsValidYoutubeKey(YoutubeKey);
 
     public string IconUrl
     {
@@ -152,18 +153,18 @@ public class ProductModel
     {
         if (Products.CheckProductExists(id))
         {
-            if (Products.GetProductFromID(id, out string name, out string gitRepoName, out bool useGitReadme, out PaymentType type, out int[] tags, out string[] keywords, out int price, out int total_downloads, out int weekly_downloads, out string yt_key, out int owner_id))
+            if (Products.GetProductFromID(id, out string name, out string gitRepoName, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out int total_downloads, out int weekly_downloads, out string yt_key, out int owner_id))
             {
-                return new(id, owner_id, name, gitRepoName, useGitReadme, total_downloads, weekly_downloads, yt_key, (uint)price, tags, keywords, type);
+                return new(id, owner_id, name, gitRepoName, useGitReadme, total_downloads, weekly_downloads, yt_key, (uint)price, tags, keywords, subscription);
             }
         }
         return null;
     }
 
-    public static bool TryCreateProduct(string gitRepoName, UserModel user, string name, string yt_key, PaymentType type, int price, string[] keywords, int[] tags, out ProductModel model)
+    public static bool TryCreateProduct(string gitRepoName, UserModel user, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out ProductModel model)
     {
         model = null;
-        return Products.Create(user.Id, gitRepoName, name, yt_key, type, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model);
+        return Products.Create(user.Id, gitRepoName, name, yt_key, subscription, use_git_readme, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model);
     }
 
     public static bool TryGetByID(int id, out ProductModel? model)
