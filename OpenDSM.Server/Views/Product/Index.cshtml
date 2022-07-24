@@ -1,1 +1,387 @@
-﻿
+﻿@model OpenDSM.Core.Models.ProductModel
+
+
+<section id="landing" class="product xl">
+    <video class="poster" src="/assets/images/testing/lego-brawls-trailer.mp4" muted autoplay loop controls></video>
+    <div class="content">
+        <h2 class="name">@Model.Name</h2>
+        <a href="/profile/name" class="author paragraph-1">Author Name</a>
+        <p class="description paragraph-1">@Model.About</p>
+        <div class="buttons">
+            @if (Model.Price == 0)
+            {
+
+            }
+            else
+            {
+                <div class="btn" onclick="new PurchasePopup('@Model.Id', false).open()">BUY - $9.99</div>
+            }
+
+            <!-- <div class="btn" disabled onclick="new PurchasePopup('author', 'id', true).open()">$9.99/month</div> -->
+            <div class="btn secondary" onclick=" new VideoPopup(`/assets/images/testing/lego-brawls-trailer.mp4`).open()">Watch Trailer</div>
+        </div>
+        <span class="platforms">
+            <i class="fab fa-windows"></i>
+            <i class="fab fa-apple"></i>
+            <i class="fab fa-linux"></i>
+        </span>
+    </div>
+</section>
+<div class="list vertical content raised centered">
+    <section id="gallery-carousel" class="carousel">
+        <h3>Gallery</h3>
+        <div class="navigation">
+            <div class="carousel-nav-item fas fa-chevron-left"></div>
+            <div class="carousel-nav-item fas fa-chevron-right"></div>
+        </div>
+        <div class="list horizontal">
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Banner</p>
+            </div>
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Icon</p>
+            </div>
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/Flexx-Banner.jpg');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Unrelated</p>
+            </div>
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Banner</p>
+            </div>
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Icon</p>
+            </div>
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/Flexx-Banner.jpg');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Unrelated</p>
+            </div>
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Banner</p>
+            </div>
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Icon</p>
+            </div>
+            <div class="gallery-image" style="background-image: url('/assets/images/testing/Flexx-Banner.jpg');" onclick=" new GalleryPopup(this).open()">
+                <p class="name">Unrelated</p>
+            </div>
+        </div>
+    </section>
+    <section id="product-page-overview">
+        <div>
+            <h2>Overview</h2>
+            <p class="paragraph-1">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Risus convallis platea a, in quam elit sed in diam. Sed felis aliquam tempus venenatis integer morbi in donec. Eleifend vel dictum quam aliquam vitae quisque. Mi tellus, volutpat pharetra egestas viverra suscipit. Faucibus eleifend viverra quis et potenti sodales vestibulum accumsan, quam. Purus id nunc sit lorem accumsan. Pretium aliquam semper quam congue non. Suscipit mi commodo elit feugiat est dis est. Vestibulum faucibus orci, pharetra, in bibendum risus at. Aenean varius scelerisque elementum amet tellus morbi vel urna nam. Vulputate egestas lacus id pretium, pellentesque turpis. Eu netus in proin gravida. Eu eu, ut nam sodales nulla.
+                Eu sagittis, sollicitudin rhoncus eget odio lectus non. Est urna porttitor tempus convallis mauris, convallis nibh. Facilisis non pretium in neque, aliquam nec integer dui ultricies. Diam nascetur natoque tincidunt elit, sit ullamcorper. Vitae pulvinar sagittis, nec vitae, lectus. Mattis id morbi risus fermentum, mus.
+            </p>
+        </div>
+        <div>
+
+            <h3>Uses</h3>
+            <p class="paragraph-2">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Risus convallis platea a, in quam elit sed in diam. Sed felis aliquam tempus venenatis integer morbi in donec. Eleifend vel dictum quam aliquam vitae quisque. Mi tellus, volutpat pharetra egestas viverra suscipit. Faucibus eleifend viverra quis et potenti sodales vestibulum accumsan, quam. Purus id nunc sit lorem accumsan. Pretium aliquam semper quam congue non. Suscipit mi commodo elit feugiat est dis est. Vestibulum faucibus orci, pharetra, in bibendum risus at. Aenean varius scelerisque elementum amet tellus morbi vel urna nam. Vulputate egestas lacus id pretium, pellentesque turpis. Eu netus in proin gravida. Eu eu, ut nam sodales nulla.
+                Eu sagittis, sollicitudin rhoncus eget odio lectus non. Est urna porttitor tempus convallis mauris, convallis nibh. Facilisis non pretium in neque, aliquam nec integer dui ultricies. Diam nascetur natoque tincidunt elit, sit ullamcorper. Vitae pulvinar sagittis, nec vitae, lectus. Mattis id morbi risus fermentum, mus.
+            </p>
+        </div>
+        <div>
+            <h3>Commands</h3>
+            <p class="paragraph-2">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Risus convallis platea a, in quam elit sed in diam. Sed felis aliquam tempus venenatis integer morbi in donec. Eleifend vel dictum quam aliquam vitae quisque. Mi tellus, volutpat pharetra egestas viverra suscipit. Faucibus eleifend viverra quis et potenti sodales vestibulum accumsan, quam. Purus id nunc sit lorem accumsan. Pretium aliquam semper quam congue non. Suscipit mi commodo elit feugiat est dis est. Vestibulum faucibus orci, pharetra, in bibendum risus at. Aenean varius scelerisque elementum amet tellus morbi vel urna nam. Vulputate egestas lacus id pretium, pellentesque turpis. Eu netus in proin gravida. Eu eu, ut nam sodales nulla.
+                Eu sagittis, sollicitudin rhoncus eget odio lectus non. Est urna porttitor tempus convallis mauris, convallis nibh. Facilisis non pretium in neque, aliquam nec integer dui ultricies. Diam nascetur natoque tincidunt elit, sit ullamcorper. Vitae pulvinar sagittis, nec vitae, lectus. Mattis id morbi risus fermentum, mus.
+            </p>
+        </div>
+    </section>
+    <section class="ad"></section>
+    <section>
+        <h2>Versions</h2>
+        <div class="list vertical versions-list">
+            <div class="version-item">
+                <div class="list horizontal">
+                    <div class="list vertical">
+                        <h4 class="name">0.0.0</h4>
+                        <p class="paragraph-1" release-type="release">Release</p>
+                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
+                        <span class="platforms">
+                            <i class="fab fa-windows"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-linux"></i>
+                        </span>
+                    </div>
+                    <div class="list vertical">
+                        <button class="btn download" onclick="new DownloadPopup('author', 'id', 'version_id').open()">Download</button>
+                        <button class="btn secondary changelog" onclick="new ChangelogPopup('author', 'id', 'version_id').open()">Changelog</button>
+                    </div>
+                </div>
+            </div>
+            <div class="version-item">
+                <div class="list horizontal">
+                    <div class="list vertical">
+                        <h4 class="name">0.0.0</h4>
+                        <p class="paragraph-1" release-type="beta">Beta</p>
+                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
+
+                        <span class="platforms">
+                            <i class="fab fa-windows"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-linux"></i>
+                        </span>
+                    </div>
+                    <div class="list vertical">
+                        <button class="btn download">Download</button>
+                        <button class="btn secondary changelog">Changelog</button>
+                    </div>
+                </div>
+            </div>
+            <div class="version-item">
+                <div class="list horizontal">
+                    <div class="list vertical">
+                        <h4 class="name">0.0.0</h4>
+                        <p class="paragraph-1" release-type="alpha">Alpha</p>
+                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
+
+                        <span class="platforms">
+                            <i class="fab fa-windows"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-linux"></i>
+                        </span>
+                    </div>
+                    <div class="list vertical">
+                        <button class="btn download">Download</button>
+                        <button class="btn secondary changelog">Changelog</button>
+                    </div>
+                </div>
+            </div>
+            <div class="version-item">
+                <div class="list horizontal">
+                    <div class="list vertical">
+                        <h4 class="name">0.0.0</h4>
+                        <p class="paragraph-1" release-type="release">Release</p>
+                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
+                        <span class="platforms">
+                            <i class="fab fa-windows"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-linux"></i>
+                        </span>
+                    </div>
+                    <div class="list vertical">
+                        <button class="btn download">Download</button>
+                        <button class="btn secondary changelog">Changelog</button>
+                    </div>
+                </div>
+            </div>
+            <div class="version-item">
+                <div class="list horizontal">
+                    <div class="list vertical">
+                        <h4 class="name">0.0.0</h4>
+                        <p class="paragraph-1" release-type="beta">Beta</p>
+                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
+
+                        <span class="platforms">
+                            <i class="fab fa-windows"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-linux"></i>
+                        </span>
+                    </div>
+                    <div class="list vertical">
+                        <button class="btn download">Download</button>
+                        <button class="btn secondary changelog">Changelog</button>
+                    </div>
+                </div>
+            </div>
+            <div class="version-item">
+                <div class="list horizontal">
+                    <div class="list vertical">
+                        <h4 class="name">0.0.0</h4>
+                        <p class="paragraph-1" release-type="alpha">Alpha</p>
+                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
+
+                        <span class="platforms">
+                            <i class="fab fa-windows"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-linux"></i>
+                        </span>
+                    </div>
+                    <div class="list vertical">
+                        <button class="btn download">Download</button>
+                        <button class="btn secondary changelog">Changelog</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Max Char length = 1000  -->
+    <section class="reviews">
+        <h2>Ratings and reviews</h2>
+        <div class="list vertical">
+            <div class="list horizontal">
+                <div class="list vertical rating">
+                    <h1>4.3</h1>
+                    <p class="paragraph-2">6.63K reviews</p>
+                </div>
+                <div class="list vertical bars">
+                    <div class="list horizontal">
+                        <p class="paragraph-1">5</p>
+                        <div class="progress-bar">
+                            <div class="fill" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                    <div class="list horizontal">
+                        <p class="paragraph-1">4</p>
+                        <div class="progress-bar">
+                            <div class="fill" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                    <div class="list horizontal">
+                        <p class="paragraph-1">3</p>
+                        <div class="progress-bar">
+                            <div class="fill" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                    <div class="list horizontal">
+                        <p class="paragraph-1">2</p>
+                        <div class="progress-bar">
+                            <div class="fill" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                    <div class="list horizontal">
+                        <p class="paragraph-1">1</p>
+                        <div class="progress-bar">
+                            <div class="fill" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list vertical testimonials">
+                <div class="testimonial">
+                    <div class="list vertical">
+                        <div class="list horizontal profile-info">
+                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                            <h4 class="name">Drew Chase</h4>
+                        </div>
+                        <div class="list vertical testimonial-details">
+                            <div class="list horizontal">
+                                <span class="title">Rating</span>
+                                <span class="value">3.5 Stars</span>
+                            </div>
+                            <div class="list horizontal">
+                                <span class="title">Date</span>
+                                <span class="value">Oct. 15, 2014</span>
+                            </div>
+                            <div class="list horizontal">
+                                <span class="title">Time Used</span>
+                                <span class="value">12 Hours</span>
+                            </div>
+                        </div>
+                        <p class="paragraph-1 testimonial-description">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur unde aliquam voluptatibus alias laudantium! Repellendus consectetur fugit eum ab dolor quia, pariatur nulla molestiae tenetur praesentium est nam. Tempora odit harum facilis natus, a, eius aperiam similique inventore veritatis fuga corporis impedit temporibus ipsam assumenda rerum omnis facere quidem labore.
+                        </p>
+                    </div>
+                    <button class="btn secondary reply-button">Reply</button>
+                </div>
+                <div class="testimonial">
+                    <div class="list vertical">
+                        <div class="list horizontal profile-info">
+                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                            <h4 class="name">Drew Chase</h4>
+                        </div>
+                        <div class="list vertical testimonial-details">
+                            <div class="list horizontal">
+                                <span class="title">Rating</span>
+                                <span class="value">3.5 Stars</span>
+                            </div>
+                            <div class="list horizontal">
+                                <span class="title">Date</span>
+                                <span class="value">Oct. 15, 2014</span>
+                            </div>
+                            <div class="list horizontal">
+                                <span class="title">Time Used</span>
+                                <span class="value">12 Hours</span>
+                            </div>
+                        </div>
+                        <p class="paragraph-1 testimonial-description">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. At dolorum obcaecati sit repellendus suscipit nisi voluptas? Vel error necessitatibus est non eius dolor illum. Incidunt, in aperiam possimus ab quia delectus distinctio maiores vero excepturi earum nemo, quisquam nobis suscipit, dicta quaerat. Consequuntur corrupti nam vitae, voluptatibus nisi accusantium temporibus tempora aperiam laborum sed voluptatem quis explicabo eos neque ab quasi corporis! Nisi ipsum eos voluptates distinctio nobis similique dolore, harum, sapiente recusandae veniam voluptate doloribus sunt quis voluptas vero dignissimos repellendus ipsa, dolor dolorem. Aliquam magni, quasi tenetur veritatis, officiis autem eligendi molestias sed ipsum laudantium, fuga cupiditate illo!
+                        </p>
+                    </div>
+                    <button class="btn secondary reply-button">Reply</button>
+                </div>
+                <div class="testimonial">
+                    <div class="list vertical">
+                        <div class="list horizontal profile-info">
+                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                            <h4 class="name">Drew Chase</h4>
+                        </div>
+                        <div class="list vertical testimonial-details">
+                            <div class="list horizontal">
+                                <span class="title">Rating</span>
+                                <span class="value">3.5 Stars</span>
+                            </div>
+                            <div class="list horizontal">
+                                <span class="title">Date</span>
+                                <span class="value">Oct. 15, 2014</span>
+                            </div>
+                            <div class="list horizontal">
+                                <span class="title">Time Used</span>
+                                <span class="value">12 Hours</span>
+                            </div>
+                        </div>
+                        <p class="paragraph-1 testimonial-description">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil, numquam accusantium. Fugiat dolore sapiente quae ea, cupiditate ipsa saepe perferendis aliquid adipisci inventore nemo tempore omnis incidunt maxime, ratione eligendi dolorum earum? Deleniti et autem dolore, expedita officiis aliquid. Reiciendis omnis deserunt sit atque hic doloribus sint a, accusantium optio dicta. In vero qui, cupiditate totam quae iste labore aliquam ab perferendis, quo iusto! Vero vel iusto cupiditate? Inventore possimus voluptates voluptatem ratione nisi quasi dolorem, at illo quos, commodi asperiores blanditiis rerum et magni quo ipsam. Explicabo, ipsam. Consequatur, quasi ad! Autem officiis ducimus alias quos, magni, molestias, iusto porro ea deleniti aperiam sint accusantium. Culpa non facere magnam ipsa? Laudantium, consequuntur reiciendis molestiae ducimus, eaque similique impedit totam doloremque sunt, ipsam quam accusantium minus voluptas possimus saepe veniam quis libero laborum magnam quisquam! Labore odit nam rem possimus magnam pariatur deleniti quos, minima inventore ratione quam asperiores iste!
+                        </p>
+                    </div>
+                    <button class="btn secondary reply-button">Reply</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="ad"></section>
+
+    <section id="similar-products" class="carousel">
+        <h3>Similar Products</h3>
+        <span class="navigation">
+            <div class="carousel-nav-item fas fa-chevron-left"></div>
+            <div class="carousel-nav-item fas fa-chevron-right"></div>
+        </span>
+        <div class="list horizontal">
+            <div class="product lg">
+                <img src="/assets/images/testing/lego-brawls-banner.jpg" alt="">
+                <span class="content">
+                    <h4 class="name">Product Name</h4>
+                    <a href="/profile/name" class="author paragraph-4">Author Name</a>
+                    <p class="description paragraph-4">Category Name</p>
+                    <span class="platforms">
+                        <i class="fab fa-windows"></i>
+                        <i class="fab fa-apple"></i>
+                        <i class="fab fa-linux"></i>
+                    </span>
+                </span>
+            </div>
+            <div class="product lg">
+
+                <img src="/assets/images/testing/lego-brawls-banner.jpg" alt="">
+                <span class="content">
+                    <h4 class="name">Product Name</h4>
+                    <a href="/profile/name" class="author paragraph-4">Author Name</a>
+                    <p class="description paragraph-4">Category Name</p>
+                    <span class="platforms">
+                        <i class="fab fa-windows"></i>
+                        <i class="fab fa-apple"></i>
+                        <i class="fab fa-linux"></i>
+                    </span>
+                </span>
+            </div>
+            <div class="product lg">
+
+                <img src="/assets/images/testing/lego-brawls-banner.jpg" alt="">
+                <span class="content">
+                    <h4 class="name">Product Name</h4>
+                    <a href="/profile/name" class="author paragraph-4">Author Name</a>
+                    <p class="description paragraph-4">Category Name</p>
+                    <span class="platforms">
+                        <i class="fab fa-windows"></i>
+                        <i class="fab fa-apple"></i>
+                        <i class="fab fa-linux"></i>
+                    </span>
+                </span>
+            </div>
+        </div>
+    </section>
+</div>
