@@ -1,5 +1,6 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
+using OpenDSM.Core;
 using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.VIEWS;
@@ -44,7 +45,7 @@ public class ProductController : Controller
     [HttpGet("video/{yt_id}")]
     public IActionResult GetVideo(string yt_id)
     {
-        if (TryBetYoutubeDirectURL(yt_id, out Uri url))
+        if (YTHandler.TryGetYoutubeDirectURL(yt_id, out Uri url))
         {
             return Redirect(url.AbsoluteUri);
         }
