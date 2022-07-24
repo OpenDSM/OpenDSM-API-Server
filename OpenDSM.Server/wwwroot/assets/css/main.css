@@ -1222,3 +1222,53 @@ body::-webkit-scrollbar-track {
 }
 
 /*#endregion Cropper */
+
+/*#region Throbber*/
+.fullscreen-view {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--background);
+    justify-content: center;
+    align-items: center;
+    z-index: 9;
+    opacity: 0;
+    transition: opacity 500ms;
+}
+
+    .fullscreen-view.load {
+        opacity: 1;
+    }
+
+    .fullscreen-view.unload {
+        opacity: 0;
+    }
+
+.throbber {
+    aspect-ratio: 1/1;
+    height: 100%;
+    border-radius: 100%;
+    border-left: 1px solid var(--primary);
+    animation-name: Throbber;
+    animation-fill-mode: forwards;
+    animation-direction: normal;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    margin: 2rem;
+}
+
+
+@keyframes Throbber {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/*#endregion Throbber*/
