@@ -1,4 +1,5 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
 
 namespace OpenDSM.Core.Models;
@@ -55,21 +56,7 @@ public class ProductModel
         }
         set
         {
-            byte[] buffer;
-            try
-            {
-                buffer = Convert.FromBase64String(value);
-            }
-            catch
-            {
-                log_user.Error("Unable to create banner image from base 64 provided");
-                return;
-            }
-            string file = Path.Combine(GetProductDirectory(Id), "banner.jpg");
-            using MemoryStream ms = new(buffer);
-            using FileStream fs = new(file, FileMode.OpenOrCreate, FileAccess.Write);
-            ms.CopyToAsync(fs).Wait();
-            FFmpeg.Instance.Resize(1280, file);
+            FileHandler.CreateImageFromBase64(value, GetProductDirectory(Id), "banner", 1280);
         }
     }
 
@@ -77,28 +64,13 @@ public class ProductModel
     {
         get
         {
-            return Directory.GetFiles(Path.Combine(GetProductDirectory(Id), "gallery"), "*.jpg", SearchOption.TopDirectoryOnly);
+            return Directory.GetFiles(Directory.CreateDirectory(Path.Combine(GetProductDirectory(Id), "gallery")).FullName, "*.jpg", SearchOption.TopDirectoryOnly);
         }
         set
         {
-            foreach (string image in value)
+            for (int i = 0; i < value.Length; i++)
             {
-                string[] sections = image.Split("Name!=", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                byte[] buffer;
-                try
-                {
-                    buffer = Convert.FromBase64String(sections[1]);
-                }
-                catch
-                {
-                    log_user.Error("Unable to create banner image from base 64 provided");
-                    return;
-                }
-                string file = Path.Combine(GetProductDirectory(Id), "gallery", $"{sections[0]}");
-                using MemoryStream ms = new(buffer);
-                using FileStream fs = new(file, FileMode.OpenOrCreate, FileAccess.Write);
-                ms.CopyToAsync(fs).Wait();
-                FFmpeg.Instance.Resize(1280, file);
+                FileHandler.CreateImageFromBase64(value[i], Path.Combine(GetProductDirectory(Id), "gallery"), $"gallery_{i}", 1280);
             }
         }
     }
@@ -114,21 +86,7 @@ public class ProductModel
         }
         set
         {
-            byte[] buffer;
-            try
-            {
-                buffer = Convert.FromBase64String(value);
-            }
-            catch
-            {
-                log_user.Error("Unable to create banner image from base 64 provided");
-                return;
-            }
-            string file = Path.Combine(GetProductDirectory(Id), "icon.jpg");
-            using MemoryStream ms = new(buffer);
-            using FileStream fs = new(file, FileMode.OpenOrCreate, FileAccess.Write);
-            ms.CopyToAsync(fs).Wait();
-            FFmpeg.Instance.Resize(128, file);
+            FileHandler.CreateImageFromBase64(value, GetProductDirectory(Id), "icon", 128);
         }
     }
 
@@ -155,7 +113,7 @@ public class ProductModel
         {
             if (Products.GetProductFromID(id, out string name, out string gitRepoName, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out int total_downloads, out int weekly_downloads, out string yt_key, out int owner_id))
             {
-                return new(id, owner_id, name, gitRepoName, useGitReadme, total_downloads, weekly_downloads, yt_key, (uint)price, tags, keywords, subscription);
+                return new(id, owner_id, gitRepoName, name, useGitReadme, total_downloads, weekly_downloads, yt_key, (uint)price, tags, keywords, subscription);
             }
         }
         return null;
