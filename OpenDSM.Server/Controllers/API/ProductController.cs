@@ -1,5 +1,6 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
+using OpenDSM.Core;
 using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.API;
@@ -10,9 +11,18 @@ public class ProductController : ControllerBase
     #region Public Methods
 
     [HttpPost("create")]
-    public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] SQL.PaymentType type, [FromForm] float price, [FromForm] string[]? keywords, [FromForm] int[] tags, [FromForm] string icon, [FromForm] string banner, [FromForm] string[]? gallery)
+    public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner, [FromForm] string[]? gallery)
     {
-        if (ProductModel.TryCreateProduct(gitRepoName, UserModel.GetByID(user_id), name, yt_key ?? "", type, (int)(price * 100), keywords ?? Array.Empty<string>(), tags, out ProductModel model))
+        List<int> ts = new();
+        foreach (var item in tags.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            foreach (var tag in Tags.GetTags())
+            {
+                if (tag.name == item) ts.Add(tag.id);
+            }
+
+        }
+        if (ProductModel.TryCreateProduct(gitRepoName, UserModel.GetByID(user_id), name, yt_key ?? "", subscription, use_git_readme, (int)(price * 100), keywords.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), ts.ToArray(), out ProductModel model))
         {
             model.IconUrl = icon;
             model.BannerImage = banner;
@@ -28,7 +38,7 @@ public class ProductController : ControllerBase
     [HttpGet("video/{yt_id}")]
     public IActionResult GetVideo(string yt_id)
     {
-        if (TryBetYoutubeDirectURL(yt_id, out Uri url))
+        if (YTHandler.TryGetYoutubeDirectURL(yt_id, out Uri url))
         {
             return new JsonResult(new
             {
