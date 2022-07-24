@@ -46,7 +46,10 @@
                         <h4 for="about-box">About</h4>
                         <p class="paragraph-2">This is using markdown language.  For more information view our <a href="#">profile docs</a></p>
                         <textarea type="text" id="about-box" autocomplete="false" setting="about">@Model.About</textarea>
-                        <toggle id="use-git-about" value="true">Use GitHub About?</toggle>
+                        @if (Model.IsDeveloperAccount)
+                        {
+                            <toggle id="use-git-about" value="false">Use GitHub About?</toggle>
+                        }
                     </div>
                     <button class="btn" id="save-profile-btn" disabled>Save</button>
                 </div>
