@@ -1,4 +1,5 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
 
 namespace OpenDSM.Core.Models;
@@ -16,8 +17,6 @@ public class UserModel
         Type = type;
         OwnedProducts = ownedProducts;
         CreatedProducts = Products.GetProductsByOwner(id);
-        ProfileImage = Path.Combine(GetUsersProfileDirectory(Id), "profile.jpg");
-        ProfileBannerImage = Path.Combine(GetUsersProfileDirectory(Id), "banner.jpg");
         string aboutPath = Path.Combine(GetUsersProfileDirectory(Id), "about.md");
         aboutPath = File.Exists(aboutPath) ? aboutPath : "./wwwroot/assets/md/default_about.md";
         using (FileStream fs = new(aboutPath, FileMode.Open, FileAccess.Read))
@@ -41,8 +40,28 @@ public class UserModel
     public bool IsDeveloperAccount => GitHandler.CheckCredentials(new(GitUsername, GitToken));
 
     public int[] OwnedProducts { get; private set; }
-    public string ProfileBannerImage { get; set; }
-    public string ProfileImage { get; set; }
+    public string ProfileBannerImage
+    {
+        get
+        {
+            return Path.Combine(GetUsersProfileDirectory(Id), "banner.jpg");
+        }
+        set
+        {
+            FileHandler.CreateImageFromBase64(value, GetUsersProfileDirectory(Id), "banner", 1280);
+        }
+    }
+    public string ProfileImage
+    {
+        get
+        {
+            return Path.Combine(GetUsersProfileDirectory(Id), "profile.jpg");
+        }
+        set
+        {
+            FileHandler.CreateImageFromBase64(value, GetUsersProfileDirectory(Id), "profile", 300);
+        }
+    }
 
     public GitRepository[] Repositories => GitHandler.GetRepositories(new(GitUsername, GitToken));
 
@@ -121,33 +140,6 @@ public class UserModel
     public void UpdateSetting(string name, dynamic value)
     {
         Authoriztaion.UpdateProperty(Id, Token, name, value);
-    }
-
-    public async Task UploadImage(string base64, bool isProfile)
-    {
-        byte[] buffer;
-        try
-        {
-            buffer = Convert.FromBase64String(base64);
-        }
-        catch (FormatException e)
-        {
-            log_user.Error($"Unable to convert base64 string to byte array: {base64}", e);
-            return;
-        }
-        using (MemoryStream memStream = new(buffer))
-        {
-            using FileStream fs = new(isProfile ? ProfileImage : ProfileBannerImage, FileMode.OpenOrCreate, FileAccess.Write);
-            await memStream.CopyToAsync(fs);
-        }
-        if (isProfile)
-        {
-            await FFmpeg.Instance.Resize(300, ProfileImage);
-        }
-        else
-        {
-            await FFmpeg.Instance.Resize(1280, ProfileBannerImage);
-        }
     }
 
     #endregion Public Methods
