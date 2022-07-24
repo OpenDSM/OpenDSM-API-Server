@@ -62,10 +62,48 @@ $("#submit-btn").on('click', async () => {
     } else {
         let repoName = $("#github-repository-search-box")[0].value;
         let projectName = $("#project-name-box")[0].value;
-        let tags = $("#tags-search-box")[0].value.split("; ");
-        let keywords = $("#")
+        let tags = $("#tags-search-box")[0].value;
+        let keywords = $("#keywords-box")[0].value;
+        let youtubeKey = $("#yt-key-box")[0].value;
+        let subscription = $("#payment-type-box")[0].value == "Subscription";
+        let price = $("#price-box")[0].value;
+        let useGitReadme = $("#use-readme-toggle").attr("value") == "true";
+        let about = $("#about-box")[0].value;
+        let icon = $("#upload-icon").attr("value");
+        let banner = $("#upload-banner").attr("value");
+        let galleryImages = Array.prototype;
 
+        Array.from($(".tmp-gallery-image")).forEach(item => {
+            galleryImages.push(item.style.backgroundImage.replace("url(", "").replace(")", "").replaceAll("\"", "").replaceAll("'", ""))
+        })
         let data = new FormData();
+        data.append("name", projectName);
+        data.append("gitRepoName", repoName);
+        data.append("user_id", user_id);
+        if (youtubeKey != "") {
+            data.append("yt_key", youtubeKey);
+        }
+        data.append("subscription", subscription);
+        data.append("price", price);
+        data.append(`keywords`, keywords);
+        data.append(`tags`, tags);
+        data.append("icon", icon);
+        data.append("banner", banner);
+        data.append("use_git_readme", useGitReadme);
+        if (galleryImages.length > 0) {
+            for (let i = 0; i < galleryImages.length; i++) {
+                if (galleryImages[i] != null && galleryImages[i] != "")
+                    data.append(`gallery[${i}]`, galleryImages[i]);
+            }
+        }
+        let loadingScreen = new LoadingScreen("Creating Product", "This may take a moment...");
+        let response = await fetch("/api/product/create", { method: "POST", body: data });
+        if (response.ok) {
+            let json = await response.json();
+            window.location.href = `/product/${json.id}`
+        }
+        loadingScreen.unload();
+
     }
 });
 
