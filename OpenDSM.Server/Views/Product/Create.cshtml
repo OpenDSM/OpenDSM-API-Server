@@ -9,7 +9,7 @@
 
 <div style="margin-top: 8rem;">
 
-    <section>
+    <section> 
         <h1>Project Creation</h1>
         <p class="paragraph-1">Before continuing, make sure that your project is listed on your linked github account.  All binary files are stored as a release on your github to ensure best possible quality.</p>
     </section>
@@ -24,7 +24,7 @@
                 <div class="dropdown-body">
                     @foreach (GitRepository repo in Model.Repositories)
                     {
-                        <div class="dropdown-item" onclick="$('#project-name-box')[0].value='@repo.Name.Replace("-", " ")'">@repo.Name</div>
+                        <div class="dropdown-item" onmousedown="updateRepository('@repo.Name.Replace("-", " ")')">@repo.Name</div>
                     }
                 </div>
             </div>
@@ -46,12 +46,12 @@
 
             <div class="input" title="Used for searching">
                 <label for="keywords-box">Keywords*</label>
-                <input type="text" id="keywords-box" autocomplete="false" placeholder="Open; Open DSM; DSM;" required>
+                <input type="text" id="keywords-box" autocomplete="false" placeholder="Open; Open DSM; DSM;" required style="text-transform: lowercase">
             </div>
             <div class="input" title="The part of the youtube video after https://youtube.com/watch?v={KEY}">
                 <label for="yt-key-box">Youtube Video Key</label>
                 <input type="text" id="yt-key-box" autocomplete="false" placeholder="dQw4w9WgXcQ">
-                <div class="btn" id="test-video-btn" style="margin: 0;" title="Tests the video key"><i class="fa-solid fa-vial"></i></div>
+                <div class="btn" id="search-video-btn" style="margin: 0;" title="Searches for Youtube Video"><i class="fa-solid fa-magnifying-glass"></i></div>
             </div>
 
             <div class="input dropdown">
