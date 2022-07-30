@@ -1,5 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using YoutubeExplode;
+using YoutubeExplode.Channels;
+using YoutubeExplode.Common;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
@@ -48,6 +50,71 @@ public static class YTHandler
         {
             return "";
         }
+    }
+
+    public static async Task<IReadOnlyList<YoutubeExplode.Playlists.PlaylistVideo>?> GetChannelVideos(string channelId)
+    {
+        YoutubeClient client = new();
+        Channel? channel = null;
+        try
+        {
+            channel = await client.Channels.GetByUserAsync($"https://youtube.com/user/{channelId}");
+        }
+        catch
+        {
+            try
+            {
+                channel = await client.Channels.GetByUserAsync($"https://youtube.com/channel/{channelId}");
+            }
+            catch
+            {
+                try
+                {
+                    channel = await client.Channels.GetByUserAsync($"https://youtube.com/c/{channelId}");
+                }
+                catch
+                {
+                    try
+                    {
+                        channel = await client.Channels.GetByUserAsync($"https://youtube.com/u/{channelId}");
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            channel = await client.Channels.GetBySlugAsync($"https://youtube.com/user/{channelId}");
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                channel = await client.Channels.GetBySlugAsync($"https://youtube.com/channel/{channelId}");
+                            }
+                            catch
+                            {
+                                try
+                                {
+                                    channel = await client.Channels.GetBySlugAsync($"https://youtube.com/c/{channelId}");
+                                }
+                                catch
+                                {
+                                    try
+                                    {
+
+                                        channel = await client.Channels.GetBySlugAsync($"https://youtube.com/u/{channelId}");
+                                    }
+                                    catch
+                                    {
+                                        return null;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return await client.Channels.GetUploadsAsync($"https://youtube.com/channel/{channel.Id}");
     }
     #endregion Public Methods
 }
