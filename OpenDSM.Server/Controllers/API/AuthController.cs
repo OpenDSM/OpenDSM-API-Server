@@ -164,5 +164,22 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpGet("readme/{id}")]
+    public IActionResult GetReadme(int id, bool? git)
+    {
+        UserModel? user = UserModel.GetByID(id);
+        if (user != null)
+        {
+            return Ok(new
+            {
+                about = git.HasValue ? user.GitReadme : user.About
+            });
+        }
+        return BadRequest(new
+        {
+            message = $"User with id of {id} doesn't exist"
+        });
+    }
+
     #endregion Public Methods
 }
