@@ -8,13 +8,13 @@ public class ProductModel
 {
     #region Protected Constructors
 
-    protected ProductModel(int id, int userID, string gitRepoName, string name, bool useGitReademe, int totalDownloads, int totalWeeklyDownloads, string videoKey, uint price, int[] tags, string[] keywords, bool subscription)
+    protected ProductModel(int id, int userID, string gitRepoName, string name, bool useGitReademe, string videoKey, uint price, int[] tags, string[] keywords, bool subscription)
     {
         Id = id;
         Name = name;
         UseGitReadME = useGitReademe;
-        TotalDownloads = totalDownloads;
-        TotalWeeklyDownloads = totalWeeklyDownloads;
+        TotalDownloads = 0;
+        TotalWeeklyDownloads = 0;
         User = UserModel.GetByID(userID);
         Price = price;
         YoutubeKey = videoKey;
@@ -111,9 +111,9 @@ public class ProductModel
     {
         if (Products.CheckProductExists(id))
         {
-            if (Products.GetProductFromID(id, out string name, out string gitRepoName, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out int total_downloads, out int weekly_downloads, out string yt_key, out int owner_id))
+            if (Products.GetProductFromID(id, out string name, out string gitRepoName, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id))
             {
-                return new(id, owner_id, gitRepoName, name, useGitReadme, total_downloads, weekly_downloads, yt_key, (uint)price, tags, keywords, subscription);
+                return new(id, owner_id, gitRepoName, name, useGitReadme,yt_key, (uint)price, tags, keywords, subscription);
             }
         }
         return null;
