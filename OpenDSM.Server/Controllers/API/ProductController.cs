@@ -49,21 +49,6 @@ public class ProductController : ControllerBase
         return BadRequest();
     }
 
-    [HttpGet("video/{yt_id}")]
-    public IActionResult GetVideo(string yt_id)
-    {
-        if (YTHandler.TryGetYoutubeDirectURL(yt_id, out Uri url))
-        {
-            return new JsonResult(new
-            {
-                url = url.AbsoluteUri
-            });
-        }
-        return BadRequest(new
-        {
-            message = "Unable to parse youtube url"
-        });
-    }
 
     #endregion Public Methods
 }
