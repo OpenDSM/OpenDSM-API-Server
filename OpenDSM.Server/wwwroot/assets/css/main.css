@@ -233,6 +233,11 @@ textarea {
     padding: 1rem;
 }
 
+    textarea:disabled {
+        filter: brightness(0.5);
+        overflow-y: hidden;
+    }
+
 #about-section {
     height: 200px;
     margin-bottom: 6rem;
@@ -303,6 +308,7 @@ input[type=number] {
     border-radius: 100%;
     min-width: 50px;
     aspect-ratio: 1/1;
+    background-color: black;
 }
 
 .file-upload {
@@ -377,6 +383,7 @@ input[type=number] {
         max-height: 200px;
         overflow-y: auto;
         display: none;
+        outline: 1px solid var(--primary);
     }
 
 .input.dropdown.active .dropdown-body {
@@ -774,7 +781,7 @@ section:not(#landing) {
     }
 
         .product .buttons .btn {
-            width: 25%;
+            /*            width: 25%;*/
         }
 
     .product p {
@@ -1024,7 +1031,7 @@ body.popup-active {
     height: 100vh;
     left: 0;
     top: 0;
-    z-index: 999;
+    z-index: 9;
     transform: translateY(-100vh);
     transition: transform 500ms;
 }
@@ -1063,20 +1070,19 @@ body.popup-active {
     z-index: 1;
     position: absolute;
     height: 72px;
-    width: 100%;
     display: flex;
     align-items: center;
+    right: 0;
 }
 
     #popup .title #popup-close-btn {
         position: absolute;
         right: 1rem;
-        color: white;
-        border: 2px solid white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
         background-color: var(--background);
         aspect-ratio: 1/1;
         width: 3rem;
-        border-radius: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1087,7 +1093,7 @@ body.popup-active {
     }
 
         #popup .title #popup-close-btn:hover {
-            background-color: var(--secondary);
+            background-color: var(--primary);
             color: var(--background);
         }
 
@@ -1272,3 +1278,51 @@ body::-webkit-scrollbar-track {
 }
 
 /*#endregion Throbber*/
+.yt-vid {
+    width: 300px;
+    overflow: hidden;
+    outline: 1px solid var(--primary);
+    padding: 1rem;
+    margin: 1rem;
+    background: transparent;
+    color: white;
+    transition: background 200ms, color 200ms;
+}
+
+    .yt-vid:hover {
+        background: var(--primary);
+    }
+
+        .yt-vid:hover .list.vertical {
+            cursor: pointer;
+            color: var(--background);
+            font-weight: 900;
+        }
+
+        .yt-vid:hover .btn {
+            background: var(--background);
+            color: white;
+        }
+
+    .yt-vid img {
+        width: 100%;
+        aspect-ratio: 16/9;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .yt-vid .btn {
+        margin-left: 0;
+        margin-bottom: 0;
+    }
+
+#yt-videos {
+    flex-wrap: wrap;
+    justify-content: center;
+    align-self: start;
+}
+
+
+.markdown img{
+    max-width:90%;
+}
