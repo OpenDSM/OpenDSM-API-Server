@@ -32,15 +32,30 @@ $("#yt-key-box").on('focusin', async e => {
         if (clipboard.includes("youtube.com/watch?v=")) {
             let key = clipboard.split("watch?v=")[1].split("&")[0].replace("watch?v=", "").replace("&", "")
             e.currentTarget.value = key;
+            $("#search-video-btn")[0].title = "Tests the video key"
+            $("#search-video-btn")[0].innerHTML = `<i class="fa-solid fa-vial"></i>`
         }
     } catch (ex) {
         console.error(ex);
     }
 })
+$("#yt-key-box").on('keyup', e => {
+    let value = e.currentTarget.value;
+    if (value == "") {
+        $("#search-video-btn")[0].title = "Searches for Youtube Video"
+        $("#search-video-btn")[0].innerHTML = `<i class="fa-solid fa-magnifying-glass"></i>`
+    } else {
+        $("#search-video-btn")[0].title = "Tests the video key"
+        $("#search-video-btn")[0].innerHTML = `<i class="fa-solid fa-vial"></i>`
+    }
+})
+$("#search-video-btn").on('click', () => {
+    if ($("#yt-key-box")[0].value != "") {
+        new VideoPopup($("#yt-key-box")[0].value).open();
+    } else {
+        new YoutubeSearchPopup().open();
+    }
 
-$("#test-video-btn").on('click', () => {
-    let popup = new VideoPopup($("#yt-key-box")[0].value);
-    popup.open();
 })
 $("#accept-tos-toggle").on('click', e => {
     let value = $(e.currentTarget).attr('value') == "true";
@@ -85,7 +100,7 @@ $("#submit-btn").on('click', async () => {
         }
         data.append("subscription", subscription);
         data.append("price", price);
-        data.append(`keywords`, keywords);
+        data.append(`keywords`, keywords.toLowerCase());
         data.append(`tags`, tags);
         data.append("icon", icon);
         data.append("banner", banner);
@@ -128,3 +143,14 @@ function UploadGalleryImage(target) {
     })
     input.click();
 }
+
+function updateRepository(value) {
+    $('#project-name-box')[0].value = value
+    let keywords = value + ";";
+    value.split(" ").forEach(i => {
+        keywords += `${i};`
+    })
+    keywords += `${value.replaceAll(" ", "")};`
+    $("#keywords-box")[0].value = keywords.toLowerCase();
+}
+
