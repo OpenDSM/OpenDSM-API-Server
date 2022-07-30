@@ -1,8 +1,8 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
-using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
-
+using OpenDSM.SQL;
+using Tags = OpenDSM.Core.Models.Tags;
 namespace OpenDSM.Server.Controllers.API;
 
 [Route("api/product")]
@@ -47,6 +47,25 @@ public class ProductController : ControllerBase
             log.Error(e.Message, e);
         }
         return BadRequest();
+    }
+
+    [HttpGet("download")]
+    public IActionResult Download(int product_id, long version_id, Platform platform)
+    {
+        ProductModel? product = ProductModel.GetByID(product_id);
+        if (product != null)
+        {
+            VersionModel? version = VersionModel.GetVersionByID(version_id, product_id);
+            if (version != null)
+            {
+                PlatformVersion? platform_version = version.Platforms.FirstOrDefault(i => i.platform == platform);
+                if (platform_version != null)
+                {
+                    return Redirect(platform_version.downloadUrl);
+                }
+            }
+        }
+        return RedirectToAction("Index", "Error", 500);
     }
 
 
