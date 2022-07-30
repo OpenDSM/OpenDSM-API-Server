@@ -1,16 +1,22 @@
-﻿@model OpenDSM.Core.Models.ProductModel
-
+﻿@using UAParser
+@model OpenDSM.Core.Models.ProductModel
 
 <section id="landing" class="product xl">
-    <video class="poster" src="/assets/images/testing/lego-brawls-trailer.mp4" muted autoplay loop controls></video>
+    @if (Model.HasYoutubeVideo)
+    {
+        <video class="poster" src="/product/video/@Model.YoutubeKey" muted autoplay loop controls></video>
+    }
+    else
+    {
+        <img class="poster" src="/product/@Model.Id/images/banner" />
+    }
     <div class="content">
         <h2 class="name">@Model.Name</h2>
-        <a href="/profile/name" class="author paragraph-1">Author Name</a>
-        <p class="description paragraph-1">@Model.About</p>
+        <a href="/profile/@Model.User.Id" class="author paragraph-1">@Model.User.Username</a>
         <div class="buttons">
             @if (Model.Price == 0)
             {
-
+                <div class="btn">Download @ViewData["OS"]</div>
             }
             else
             {
@@ -18,13 +24,23 @@
             }
 
             <!-- <div class="btn" disabled onclick="new PurchasePopup('author', 'id', true).open()">$9.99/month</div> -->
-            <div class="btn secondary" onclick=" new VideoPopup(`/assets/images/testing/lego-brawls-trailer.mp4`).open()">Watch Trailer</div>
+            @if (Model.HasYoutubeVideo)
+            {
+                <div class="btn secondary" onclick=" new VideoPopup(`@Model.YoutubeKey`).open()">Watch Trailer</div>
+            }
         </div>
-        <span class="platforms">
-            <i class="fab fa-windows"></i>
-            <i class="fab fa-apple"></i>
-            <i class="fab fa-linux"></i>
-        </span>
+        @if (Model.Platforms != null)
+        {
+            <span class="platforms">
+                @foreach (var v in Model.Platforms)
+                {
+                    <p>@v</p>
+                }
+                <i class="fab fa-windows"></i>
+                <i class="fab fa-apple"></i>
+                <i class="fab fa-linux"></i>
+            </span>
+        }
     </div>
 </section>
 <div class="list vertical content raised centered">
@@ -35,59 +51,26 @@
             <div class="carousel-nav-item fas fa-chevron-right"></div>
         </div>
         <div class="list horizontal">
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');" onclick=" new GalleryPopup(this).open()">
-                <p class="name">Banner</p>
-            </div>
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');" onclick=" new GalleryPopup(this).open()">
+            <div class="gallery-image" style="background-image: url('/product/@Model.Id/images/icon');" onclick=" new GalleryPopup(this).open()">
                 <p class="name">Icon</p>
             </div>
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/Flexx-Banner.jpg');" onclick=" new GalleryPopup(this).open()">
-                <p class="name">Unrelated</p>
-            </div>
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');" onclick=" new GalleryPopup(this).open()">
+            <div class="gallery-image" style="background-image: url('/product/@Model.Id/images/banner');" onclick=" new GalleryPopup(this).open()">
                 <p class="name">Banner</p>
             </div>
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');" onclick=" new GalleryPopup(this).open()">
-                <p class="name">Icon</p>
-            </div>
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/Flexx-Banner.jpg');" onclick=" new GalleryPopup(this).open()">
-                <p class="name">Unrelated</p>
-            </div>
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-banner.jpg');" onclick=" new GalleryPopup(this).open()">
-                <p class="name">Banner</p>
-            </div>
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/lego-brawls-icon.png');" onclick=" new GalleryPopup(this).open()">
-                <p class="name">Icon</p>
-            </div>
-            <div class="gallery-image" style="background-image: url('/assets/images/testing/Flexx-Banner.jpg');" onclick=" new GalleryPopup(this).open()">
-                <p class="name">Unrelated</p>
-            </div>
+            @if (Model.GalleryImages.Any())
+            {
+                foreach (string item in Model.GalleryImages)
+                {
+                    FileInfo info = new FileInfo(item);
+                    string filename = info.Name.Replace(info.Extension, "");
+                    <div class="gallery-image" style="background-image: url('/product/@Model.Id/images/gallery/@filename');" onclick=" new GalleryPopup(this).open()">
+                        <p class="name">@filename</p>
+                    </div>
+                }
+            }
         </div>
     </section>
-    <section id="product-page-overview">
-        <div>
-            <h2>Overview</h2>
-            <p class="paragraph-1">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Risus convallis platea a, in quam elit sed in diam. Sed felis aliquam tempus venenatis integer morbi in donec. Eleifend vel dictum quam aliquam vitae quisque. Mi tellus, volutpat pharetra egestas viverra suscipit. Faucibus eleifend viverra quis et potenti sodales vestibulum accumsan, quam. Purus id nunc sit lorem accumsan. Pretium aliquam semper quam congue non. Suscipit mi commodo elit feugiat est dis est. Vestibulum faucibus orci, pharetra, in bibendum risus at. Aenean varius scelerisque elementum amet tellus morbi vel urna nam. Vulputate egestas lacus id pretium, pellentesque turpis. Eu netus in proin gravida. Eu eu, ut nam sodales nulla.
-                Eu sagittis, sollicitudin rhoncus eget odio lectus non. Est urna porttitor tempus convallis mauris, convallis nibh. Facilisis non pretium in neque, aliquam nec integer dui ultricies. Diam nascetur natoque tincidunt elit, sit ullamcorper. Vitae pulvinar sagittis, nec vitae, lectus. Mattis id morbi risus fermentum, mus.
-            </p>
-        </div>
-        <div>
-
-            <h3>Uses</h3>
-            <p class="paragraph-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Risus convallis platea a, in quam elit sed in diam. Sed felis aliquam tempus venenatis integer morbi in donec. Eleifend vel dictum quam aliquam vitae quisque. Mi tellus, volutpat pharetra egestas viverra suscipit. Faucibus eleifend viverra quis et potenti sodales vestibulum accumsan, quam. Purus id nunc sit lorem accumsan. Pretium aliquam semper quam congue non. Suscipit mi commodo elit feugiat est dis est. Vestibulum faucibus orci, pharetra, in bibendum risus at. Aenean varius scelerisque elementum amet tellus morbi vel urna nam. Vulputate egestas lacus id pretium, pellentesque turpis. Eu netus in proin gravida. Eu eu, ut nam sodales nulla.
-                Eu sagittis, sollicitudin rhoncus eget odio lectus non. Est urna porttitor tempus convallis mauris, convallis nibh. Facilisis non pretium in neque, aliquam nec integer dui ultricies. Diam nascetur natoque tincidunt elit, sit ullamcorper. Vitae pulvinar sagittis, nec vitae, lectus. Mattis id morbi risus fermentum, mus.
-            </p>
-        </div>
-        <div>
-            <h3>Commands</h3>
-            <p class="paragraph-2">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Risus convallis platea a, in quam elit sed in diam. Sed felis aliquam tempus venenatis integer morbi in donec. Eleifend vel dictum quam aliquam vitae quisque. Mi tellus, volutpat pharetra egestas viverra suscipit. Faucibus eleifend viverra quis et potenti sodales vestibulum accumsan, quam. Purus id nunc sit lorem accumsan. Pretium aliquam semper quam congue non. Suscipit mi commodo elit feugiat est dis est. Vestibulum faucibus orci, pharetra, in bibendum risus at. Aenean varius scelerisque elementum amet tellus morbi vel urna nam. Vulputate egestas lacus id pretium, pellentesque turpis. Eu netus in proin gravida. Eu eu, ut nam sodales nulla.
-                Eu sagittis, sollicitudin rhoncus eget odio lectus non. Est urna porttitor tempus convallis mauris, convallis nibh. Facilisis non pretium in neque, aliquam nec integer dui ultricies. Diam nascetur natoque tincidunt elit, sit ullamcorper. Vitae pulvinar sagittis, nec vitae, lectus. Mattis id morbi risus fermentum, mus.
-            </p>
-        </div>
-    </section>
+    <section id="product-page-overview" class="markdown">@Model.About</section>
     <section class="ad"></section>
     <section>
         <h2>Versions</h2>
@@ -385,3 +368,6 @@
         </div>
     </section>
 </div>
+
+<script src="/assets/lib/showdown.min.js"></script>
+<script src="/assets/js/product-page.js"></script>
