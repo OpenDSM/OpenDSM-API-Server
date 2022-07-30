@@ -8,23 +8,36 @@ $("#save-profile-btn").on('click', async () => {
     $("#save-profile-btn")[0].disabled = true;
     Array.from($("[setting][modified]")).forEach(async e => {
         let name = $(e).attr('setting');
-        let value = e.value;
+        let value = e.value == null ? $(e).attr("value") : e.value;
         let data = new FormData();
         data.append("name", name);
         data.append("value", value);
         data.append("email", email);
         data.append("token", token);
         await fetch("/api/auth/settings", { method: "PATCH", body: data })
+        $(e).removeAttr("modified")
     })
 })
-
 $("#about-box").on('keyup', e => {
     updateAbout(e.currentTarget.value)
 })
-updateAbout($("#about-rendering")[0].innerHTML)
-function updateAbout(value) {
+function updateAbout(html) {
     let converter = new showdown.Converter()
-    $("#about-rendering")[0].innerHTML = converter.makeHtml(value);
+    $("#about-rendering")[0].innerHTML = converter.makeHtml(html);
+}
+async function loadAbout(git) {
+    $("#about-rendering")[0].innerHTML = "";
+    let response;
+    if (git)
+        response = await fetch(`/api/auth/readme/${id}?git=true`)
+    else
+        response = await fetch(`/api/auth/readme/${id}`)
+    if (response.ok) {
+        let json = await response.json();
+        let value = json.about;
+        updateAbout(value);
+        $("#about-box")[0].disabled = git
+    }
 }
 
 $("[setting]").on('keyup', e => {
@@ -73,4 +86,12 @@ $("#upload-profile-banner.file-upload").on('click', e => {
         popup.open();
     })
     input.click();
+})
+
+$("#use-git-about").on('click', e => {
+    let value = $(e.currentTarget).attr('value') != "true";
+    $("#about-box")[0].disabled = value;
+    $("#save-profile-btn")[0].disabled = false;
+    $(e.currentTarget).attr("modified", "")
+    loadAbout(value)
 })
