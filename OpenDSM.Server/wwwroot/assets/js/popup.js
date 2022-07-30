@@ -276,3 +276,71 @@ class ActivateDeveloperAccountPopup extends Popup {
         })
     }
 }
+
+class YoutubeSearchPopup extends CenteredPopup {
+    constructor() {
+        super("youtube")
+    }
+
+    async open() {
+        await super.open();
+        $("#channel-id").on('keyup', e => {
+            if (e.key == "Enter") {
+                $("#load-yt-list")[0].click();
+            }
+        })
+        $("#load-yt-list").on("click", async () => {
+            let id = $("#channel-id")[0].value;
+            let loading = new LoadingScreen("Getting Youtube Videos", "This may take a moment...");
+            let response = await fetch(`/api/yt/channel/${id}`)
+            loading.unload();
+            $("body")[0].style.overflow = "hidden"
+            if (response.ok) {
+                $("#yt-channel-search-box")[0].style.display = "none"
+                let videos = $("#yt-videos")[0]
+                videos.innerHTML = "";
+                videos.style.display = "";
+                let json = await response.json();
+                for (let i = 0; i < json.length; i++) {
+                    let video = json[i];
+
+                    let vid = document.createElement('div')
+                    vid.classList.add("yt-vid");
+
+                    let link = document.createElement("div");
+                    link.classList.add("list", "vertical");
+                    $(link).on('click', () => {
+                        $('#yt-key-box')[0].value = video.url.split('watch?v=').pop().split("&")[0]
+                        $("#search-video-btn")[0].title = "Tests the video key"
+                        $("#search-video-btn")[0].innerHTML = `<i class="fa-solid fa-vial"></i>`
+                        this.close();
+                    })
+
+                    let img = document.createElement('img');
+                    img.src = video.thumbnails[0].url;
+
+                    let title = document.createElement('p');
+                    title.classList.add("paragraph-1");
+                    title.innerText = video.title;
+
+                    let openBtn = document.createElement('a');
+                    openBtn.classList.add('btn')
+                    openBtn.href = video.url;
+                    openBtn.target = "_blank";
+                    openBtn.innerText = "Open"
+
+                    link.appendChild(img)
+                    link.appendChild(title)
+                    vid.appendChild(link);
+                    vid.appendChild(openBtn);
+
+                    videos.appendChild(vid);
+
+                }
+            } else {
+                new ErrorPopup("Channel Not Found", `Unable to find channel with id of '${id}'<br />Please double check your id and try again...`).open();
+            }
+        })
+    }
+
+}
