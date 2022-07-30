@@ -8,7 +8,7 @@ public class UserModel
 {
     #region Protected Constructors
 
-    protected UserModel(int id, string username, string email, string token, AccountType type, int[] ownedProducts)
+    protected UserModel(int id, string username, string email, string token, AccountType type, bool use_git_readme, int[] ownedProducts)
     {
         Id = id;
         Username = username;
@@ -17,6 +17,7 @@ public class UserModel
         Type = type;
         OwnedProducts = ownedProducts;
         CreatedProducts = Products.GetProductsByOwner(id);
+        UseGitReadme = use_git_readme;
         string aboutPath = Path.Combine(GetUsersProfileDirectory(Id), "about.md");
         aboutPath = File.Exists(aboutPath) ? aboutPath : "./wwwroot/assets/md/default_about.md";
         using (FileStream fs = new(aboutPath, FileMode.Open, FileAccess.Read))
@@ -31,6 +32,19 @@ public class UserModel
     #region Public Properties
 
     public string About { get; private set; }
+    public string GitReadme
+    {
+        get
+        {
+            if (GitHandler.HasReadME(GitUsername, new(GitUsername, GitToken), out string readme))
+            {
+                return readme;
+            }
+            return "";
+        }
+    }
+    public bool HasReadme => GitHandler.HasReadME(GitUsername, new(GitUsername, GitToken), out string _);
+    public bool UseGitReadme { get; set; }
     public int[] CreatedProducts { get; private set; }
     public string Email { get; private set; }
     public string GitToken { get; set; }
@@ -73,20 +87,36 @@ public class UserModel
 
     #region Public Methods
 
+    public static UserModel? GetByUsername(string username)
+    {
+        if (Authoriztaion.GetUserFromUsername(username, out int id, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] products))
+        {
+            return new(id, username, email, "", type, use_git_readme, Array.Empty<int>())
+            {
+                GitUsername = git_username,
+                GitToken = git_token,
+            };
+        }
+        return null;
+    }
     public static UserModel? GetByID(int id)
     {
-        if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out int[] products))
+        if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] products))
         {
-            return new(id, username, email, "", type, Array.Empty<int>());
+            return new(id, username, email, "", type, use_git_readme, Array.Empty<int>())
+            {
+                GitUsername = git_username,
+                GitToken = git_token,
+            };
         }
         return null;
     }
 
     public static UserModel? GetUser(string username, string password, out FailedReason reason)
     {
-        if (Authoriztaion.Login(username, password, out reason, out AccountType type, out int id, out string email, out string uname, out string token, out int[] products, out string r_git_username, out string r_git_token))
+        if (Authoriztaion.Login(username, password, out reason, out AccountType type, out bool use_git_readme, out int id, out string email, out string uname, out string token, out int[] products, out string r_git_username, out string r_git_token))
         {
-            return new(id, uname, email, token, type, products)
+            return new(id, uname, email, token, type, use_git_readme, products)
             {
                 GitToken = r_git_token,
                 GitUsername = r_git_username
@@ -109,9 +139,9 @@ public class UserModel
     public static bool TryGetUserWithToken(string email, string password, out UserModel? user)
     {
         user = null;
-        if (Authoriztaion.LoginWithToken(email, password, out var reason, out AccountType type, out int id, out string r_email, out string uname, out string token, out int[] products, out string r_git_username, out string r_git_token))
+        if (Authoriztaion.LoginWithToken(email, password, out var reason, out AccountType type, out bool use_git_readme, out int id, out string r_email, out string uname, out string token, out int[] products, out string r_git_username, out string r_git_token))
         {
-            user = new(id, uname, email, token, type, products)
+            user = new(id, uname, email, token, type, use_git_readme, products)
             {
                 GitToken = r_git_token,
                 GitUsername = r_git_username
