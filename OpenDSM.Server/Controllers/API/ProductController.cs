@@ -10,11 +10,18 @@ public class ProductController : ControllerBase
 {
     #region Public Methods
 
+    [HttpGet("get")]
+    public IActionResult GetProduct(int id)
+    {
+        return new JsonResult(ProductModel.GetByID(id));
+    }
+
     [HttpPost("create")]
     public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner, [FromForm] string[]? gallery)
     {
         try
         {
+            keywords = keywords.ToLower().Trim();
             List<int> ts = new();
             foreach (var item in tags.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             {
