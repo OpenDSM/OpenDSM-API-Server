@@ -6,6 +6,10 @@
     bool hasBannerImage = File.Exists(Model.ProfileBannerImage);
 }
 
+<script>
+    let id = @Model.Id
+</script>
+
 <section id="landing" class="profile" style="background-image: url('/api/auth/image/banner?id=@Model.Id');">
     <span class="content">
         <span class="list horizontal centered">
@@ -14,7 +18,6 @@
         </span>
     </span>
 </section>
-
 
 @if (is_personal)
 {
@@ -46,9 +49,9 @@
                         <h4 for="about-box">About</h4>
                         <p class="paragraph-2">This is using markdown language.  For more information view our <a href="#">profile docs</a></p>
                         <textarea type="text" id="about-box" autocomplete="false" setting="about">@Model.About</textarea>
-                        @if (Model.IsDeveloperAccount)
+                        @if (Model.IsDeveloperAccount && Model.HasReadme)
                         {
-                            <toggle id="use-git-about" value="false">Use GitHub About?</toggle>
+                            <toggle id="use-git-about" value="@Model.UseGitReadme.ToString().ToLower()" setting="use_git_readme">Use GitHub About?</toggle>
                         }
                     </div>
                     <button class="btn" id="save-profile-btn" disabled>Save</button>
@@ -101,26 +104,27 @@
 }
 
 <section>
-    <div id="about-rendering" class="paragraph-1">@Model.About</div>
+    <div id="about-rendering" class="paragraph-1 markdown">
+    </div>
 </section>
 @if (Model.CreatedProducts.Any())
 {
     <section class="ad"></section>
     <section id="popular-products" class="carousel">
         <h3>Popular</h3>
-        <span class="navigation">
+        <div class="navigation">
             <div class="carousel-nav-item fas fa-chevron-left"></div>
             <div class="carousel-nav-item fas fa-chevron-right"></div>
-        </span>
+        </div>
         <div class="list horizontal">
         </div>
     </section>
     <section id="popular-products" class="carousel">
         <h3>Latest</h3>
-        <span class="navigation">
+        <div class="navigation">
             <div class="carousel-nav-item fas fa-chevron-left"></div>
             <div class="carousel-nav-item fas fa-chevron-right"></div>
-        </span>
+        </div>
         <div class="list horizontal">
         </div>
     </section>
@@ -297,3 +301,7 @@
 }
 <script src="/assets/lib/showdown.min.js"></script>
 <script src="/assets/js/profile.js"></script>
+
+<script>
+    loadAbout(@Model.UseGitReadme.ToString().ToLower());
+</script>
