@@ -44,7 +44,7 @@ $(".carousel-nav-item.fas.fa-chevron-right").on('click', e => {
     carousel.scrollBy(x, 0)
 })
 
-$(".dropdown:not(.multiselect) .dropdown-body .dropdown-item").on('click', e => {
+$(".dropdown:not(.multiselect) .dropdown-body .dropdown-item").on('mousedown', e => {
     e.target.parentElement.parentElement.querySelector('input').value = e.target.innerText
     Array.from(e.currentTarget.parentElement.querySelectorAll('.dropdown-item.selected')).forEach(item => {
         item.classList.remove('selected');
@@ -53,10 +53,13 @@ $(".dropdown:not(.multiselect) .dropdown-body .dropdown-item").on('click', e => 
     e.target.parentElement.classList.remove('active')
 })
 
-$(".dropdown.multiselect .dropdown-body .dropdown-item").on('click', e => {
+$(".dropdown.multiselect .dropdown-body .dropdown-item").on('mousedown', e => {
     let item = e.currentTarget;
     let dropdown = item.parentElement.parentElement;
     let input = dropdown.querySelector('input');
+    setTimeout(() => {
+        input.focus();
+    }, 1)
     if (e.currentTarget.classList.contains('selected')) {
         input.value = input.value.replace(`${e.target.innerText}; `, "");
         item.classList.remove('selected');
@@ -72,9 +75,7 @@ $(".dropdown").on("focusin", e => {
     e.target.parentElement.classList.add('active')
 })
 $(".dropdown").on("focusout", e => {
-    setTimeout(() => {
-        e.target.parentElement.classList.remove('active')
-    }, 200)
+    e.target.parentElement.classList.remove('active')
 })
 $(".search-dropdown").on("keyup", e => {
     let body = e.target.parentElement.querySelector('.dropdown-body')
