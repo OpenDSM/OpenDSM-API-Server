@@ -63,7 +63,7 @@ public static class GitHandler
                 foreach (var item in jarray)
                 {
                     JObject obj = (JObject)item;
-                    if (obj != null && obj["name"] != null && obj["name"].Type.Equals(typeof(string)))
+                    if (obj != null && obj["name"] != null)
                     {
                         if (obj["name"].ToString().ToLower().Equals("readme.md") && obj["download_url"] != null)
                         {
