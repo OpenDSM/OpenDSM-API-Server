@@ -22,6 +22,7 @@ public class ProductModel
         Keywords = keywords;
         GitRepositoryName = gitRepoName;
         Subscription = subscription;
+        PopulateVersions();
     }
 
     #endregion Protected Constructors
@@ -102,6 +103,7 @@ public class ProductModel
     public UserModel User { get; private set; }
     public int UserID { get; private set; }
     public string YoutubeKey { get; private set; }
+    public VersionModel[] Versions { get; private set; }
 
     #endregion Public Properties
 
@@ -113,7 +115,7 @@ public class ProductModel
         {
             if (Products.GetProductFromID(id, out string name, out string gitRepoName, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id))
             {
-                return new(id, owner_id, gitRepoName, name, useGitReadme,yt_key, (uint)price, tags, keywords, subscription);
+                return new(id, owner_id, gitRepoName, name, useGitReadme, yt_key, (uint)price, tags, keywords, subscription);
             }
         }
         return null;
@@ -129,6 +131,25 @@ public class ProductModel
     {
         model = GetByID(id);
         return model != null;
+    }
+
+    public void PopulateVersions()
+    {
+        TotalDownloads = TotalWeeklyDownloads = 0;
+        List<VersionModel> versions_list = new();
+
+        foreach (long version_id in SQL.Versions.GetVersionsByProductID(Id))
+        {
+            VersionModel? version = VersionModel.GetVersionByID(version_id, Id);
+            if (version != null)
+            {
+                versions_list.Add(version);
+                TotalDownloads += version.TotalDownloads;
+                TotalWeeklyDownloads += version.WeeklyDownloads;
+            }
+        }
+
+        Versions = versions_list.ToArray();
     }
 
     #endregion Public Methods
