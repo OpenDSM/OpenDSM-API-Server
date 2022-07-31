@@ -1,6 +1,13 @@
-﻿function updateAbout(value) {
+﻿updateAbout($("#product-page-overview")[0].innerHTML)
+LoadPosterVideo();
+async function updateAbout(value) {
     let converter = new showdown.Converter()
     $("#product-page-overview")[0].innerHTML = converter.makeHtml(value);
-    console.log(value)
+
+    $("#product-page-overview")[0].style.display = "";
 }
-updateAbout($("#product-page-overview")[0].innerHTML)
+async function LoadPosterVideo() {
+    if ($("video.poster").length != 0) {
+        $("video.poster")[0].src = $("video.poster")[0].dataset.src;
+    }
+}
