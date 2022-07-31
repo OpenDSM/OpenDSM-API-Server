@@ -101,7 +101,6 @@ public class ProductModel
     public int TotalWeeklyDownloads { get; private set; }
     public bool UseGitReadME { get; }
     public UserModel User { get; private set; }
-    public int UserID { get; private set; }
     public string YoutubeKey { get; private set; }
     public VersionModel[] Versions { get; private set; }
 
@@ -137,18 +136,31 @@ public class ProductModel
     {
         TotalDownloads = TotalWeeklyDownloads = 0;
         List<VersionModel> versions_list = new();
-
-        foreach (long version_id in SQL.Versions.GetVersionsByProductID(Id))
+        List<Platform> platforms = new();
+        try
         {
-            VersionModel? version = VersionModel.GetVersionByID(version_id, Id);
-            if (version != null)
+
+            foreach (long version_id in SQL.Versions.GetVersionsByProductID(Id))
             {
-                versions_list.Add(version);
-                TotalDownloads += version.TotalDownloads;
-                TotalWeeklyDownloads += version.WeeklyDownloads;
+                VersionModel? version = VersionModel.GetVersionByID(version_id, Id);
+                if (version != null)
+                {
+                    versions_list.Add(version);
+                    TotalDownloads += version.TotalDownloads;
+                    TotalWeeklyDownloads += version.WeeklyDownloads;
+                    foreach (PlatformVersion platform_version in version.Platforms)
+                    {
+                        Platform temp = platform_version.platform;
+                        if (!platforms.Contains(temp))
+                        {
+                            platforms.Add(platform_version.platform);
+                        }
+                    }
+                }
             }
         }
-
+        catch { }
+        Platforms = platforms.ToArray();
         Versions = versions_list.ToArray();
     }
 
