@@ -126,6 +126,15 @@
             <div class="carousel-nav-item fas fa-chevron-right"></div>
         </div>
         <div class="list horizontal">
+            @foreach (int product_id in Model.CreatedProducts)
+            {
+                if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+                {
+                    <div>
+                        @Html.PartialAsync("Elements/LargeProductItem", product).Result
+                    </div>
+                }
+            }
         </div>
     </section>
 }
