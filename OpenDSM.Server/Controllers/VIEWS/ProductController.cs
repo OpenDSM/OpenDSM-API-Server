@@ -42,6 +42,18 @@ public class ProductController : Controller
         }
         return BadRequest();
     }
+    [HttpGet("{id}/images/gallery/{name}")]
+    public IActionResult GetGalleryImage(int id, string name)
+    {
+        ProductModel model = ProductModel.GetByID(id);
+        if (model != null)
+        {
+            string path = Path.Combine(GetProductDirectory(id), "gallery", $"{name}.jpg");
+            FileStream fs = new(path, FileMode.Open, FileAccess.Read);
+            return new FileStreamResult(fs, "image/jpg");
+        }
+        return BadRequest();
+    }
 
     [HttpGet("video/{yt_id}")]
     public IActionResult GetVideo(string yt_id)
@@ -57,13 +69,14 @@ public class ProductController : Controller
     }
 
     [Route("{id}")]
-    public IActionResult Index(int id)
+    public IActionResult Index(int id, bool? preview)
     {
         if (ProductModel.TryGetByID(id, out ProductModel? model))
         {
             if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
                 ViewData["User"] = user;
             ViewData["Title"] = model.Name;
+            ViewData["Preview"] = preview.GetValueOrDefault(false);
             ClientInfo info = Parser.GetDefault().Parse(Request.Headers["User-Agent"]);
             ViewData["OS"] = info.OS.Family;
             return View(model);
