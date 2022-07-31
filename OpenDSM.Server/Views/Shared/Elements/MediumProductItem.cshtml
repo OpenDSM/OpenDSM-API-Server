@@ -1,12 +1,28 @@
 ﻿@using OpenDSM.Core.Models
 @using OpenDSM.SQL
+@using System.Text
 @model ProductModel
+
+@{
+    StringBuilder tagBuilder = new();
+    Tag[] tags = OpenDSM.Core.Models.Tags.GetTags().Where(i => Model.Tags.Contains(i.id)).ToArray();
+    int index = 0;
+    foreach (Tag tag in tags)
+    {
+        tagBuilder.Append(tag.name);
+        index++;
+        if (index >= 3) break;
+        tagBuilder.Append(", ");
+    }
+}
 <div class="product md">
     <img src="@Model.IconUrl" alt="" onclick="window.location.href='/product/@Model.Id'">
     <div class="content">
         <h4 class="name" onclick="window.location.href='/product/@Model.Id'">@Model.Name</h4>
-        <a href="/profile/@Model.UserID" class="author paragraph-4">@UserModel.GetByID(@Model.UserID).Username</a>
-        <p class="description paragraph-4">@Model.Tags[0]</p>
+        <a href="/profile/@Model.User.Id" class="author paragraph-4">@Model.User.Username</a>
+        <p class="description paragraph-4">
+            @tagBuilder.ToString()
+        </p>
         <span class="platforms">
             @foreach (Platform platform in Model.Platforms)
             {
