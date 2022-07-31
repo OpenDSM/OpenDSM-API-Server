@@ -1,10 +1,17 @@
-﻿@using UAParser
+﻿@using OpenDSM.Core.Models
+@using UAParser
 @model OpenDSM.Core.Models.ProductModel
+
+@{
+    UserModel? user = (UserModel)ViewData["user"] ?? null;
+    bool IsPreview = (bool)ViewData["Preview"];
+    bool IsOwner = !IsPreview && user != null && user.Id == Model.User.Id;
+}
 
 <section id="landing" class="product xl">
     @if (Model.HasYoutubeVideo)
     {
-        <video class="poster" src="/product/video/@Model.YoutubeKey" muted autoplay loop controls></video>
+        <video class="poster" poster="/product/@Model.Id/images/banner" data-src="/product/video/@Model.YoutubeKey" muted loop autoplay></video>
     }
     else
     {
@@ -13,16 +20,28 @@
     <div class="content">
         <h2 class="name">@Model.Name</h2>
         <a href="/profile/@Model.User.Id" class="author paragraph-1">@Model.User.Username</a>
+        <p class="paragrph-1" id="short-summery">
+            This is text
+        </p>
         <div class="buttons">
-            @if (Model.Price == 0)
+            @if (IsOwner)
             {
-                <div class="btn">Download @ViewData["OS"]</div>
+                @Html.ActionLink("PREVIEW", "Index", "Product", new{preview=true}, new{@class="btn"})
             }
             else
             {
-                <div class="btn" onclick="new PurchasePopup('@Model.Id', false).open()">BUY - $9.99</div>
+                @if (Model.Versions.Any())
+                {
+                    @if (Model.Price == 0)
+                    {
+                        <div class="btn">Download @ViewData["OS"]</div>
+                    }
+                    else
+                    {
+                        <div class="btn" onclick="new PurchasePopup('@Model.Id', false).open()">BUY - $9.99</div>
+                    }
+                }
             }
-
             <!-- <div class="btn" disabled onclick="new PurchasePopup('author', 'id', true).open()">$9.99/month</div> -->
             @if (Model.HasYoutubeVideo)
             {
@@ -32,13 +51,36 @@
         @if (Model.Platforms != null)
         {
             <span class="platforms">
-                @foreach (var v in Model.Platforms)
+                @foreach (var platform in Model.Platforms)
                 {
-                    <p>@v</p>
+                    switch (platform)
+                    {
+                        case OpenDSM.SQL.Platform.Windows:
+                            <i class="fab fa-windows" title="Windows"></i>
+                            break;
+                        case OpenDSM.SQL.Platform.WindowsARM:
+                            <i class="fab fa-windows" title="Windows ARM"></i>
+                            break;
+                        case OpenDSM.SQL.Platform.Mac:
+                            <i class="fab fa-apple" title="Mac"></i>
+                            break;
+                        case OpenDSM.SQL.Platform.MacARM:
+                            <i class="fab fa-apple" title="Mac ARM / Apple Silicon"></i>
+                            break;
+                        case OpenDSM.SQL.Platform.Linux:
+                            <i class="fab fa-linux" title="Linux"></i>
+                            break;
+                        case OpenDSM.SQL.Platform.LinuxARM:
+                            <i class="fab fa-linux" title="Linux ARM"></i>
+                            break;
+                        case OpenDSM.SQL.Platform.Java:
+                            <i class="fa-brands fa-java" title="Java"></i>
+                            break;
+                        case OpenDSM.SQL.Platform.Android:
+                            <i class="fa-brands fa-android" title="Java"></i>
+                            break;
+                    }
                 }
-                <i class="fab fa-windows"></i>
-                <i class="fab fa-apple"></i>
-                <i class="fab fa-linux"></i>
             </span>
         }
     </div>
@@ -70,251 +112,196 @@
             }
         </div>
     </section>
-    <section id="product-page-overview" class="markdown">@Model.About</section>
-    <section class="ad"></section>
-    <section>
-        <h2>Versions</h2>
-        <div class="list vertical versions-list">
-            <div class="version-item">
-                <div class="list horizontal">
-                    <div class="list vertical">
-                        <h4 class="name">0.0.0</h4>
-                        <p class="paragraph-1" release-type="release">Release</p>
-                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
-                        <span class="platforms">
-                            <i class="fab fa-windows"></i>
-                            <i class="fab fa-apple"></i>
-                            <i class="fab fa-linux"></i>
-                        </span>
-                    </div>
-                    <div class="list vertical">
-                        <button class="btn download" onclick="new DownloadPopup('author', 'id', 'version_id').open()">Download</button>
-                        <button class="btn secondary changelog" onclick="new ChangelogPopup('author', 'id', 'version_id').open()">Changelog</button>
-                    </div>
-                </div>
-            </div>
-            <div class="version-item">
-                <div class="list horizontal">
-                    <div class="list vertical">
-                        <h4 class="name">0.0.0</h4>
-                        <p class="paragraph-1" release-type="beta">Beta</p>
-                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
-
-                        <span class="platforms">
-                            <i class="fab fa-windows"></i>
-                            <i class="fab fa-apple"></i>
-                            <i class="fab fa-linux"></i>
-                        </span>
-                    </div>
-                    <div class="list vertical">
-                        <button class="btn download">Download</button>
-                        <button class="btn secondary changelog">Changelog</button>
-                    </div>
-                </div>
-            </div>
-            <div class="version-item">
-                <div class="list horizontal">
-                    <div class="list vertical">
-                        <h4 class="name">0.0.0</h4>
-                        <p class="paragraph-1" release-type="alpha">Alpha</p>
-                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
-
-                        <span class="platforms">
-                            <i class="fab fa-windows"></i>
-                            <i class="fab fa-apple"></i>
-                            <i class="fab fa-linux"></i>
-                        </span>
-                    </div>
-                    <div class="list vertical">
-                        <button class="btn download">Download</button>
-                        <button class="btn secondary changelog">Changelog</button>
-                    </div>
-                </div>
-            </div>
-            <div class="version-item">
-                <div class="list horizontal">
-                    <div class="list vertical">
-                        <h4 class="name">0.0.0</h4>
-                        <p class="paragraph-1" release-type="release">Release</p>
-                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
-                        <span class="platforms">
-                            <i class="fab fa-windows"></i>
-                            <i class="fab fa-apple"></i>
-                            <i class="fab fa-linux"></i>
-                        </span>
-                    </div>
-                    <div class="list vertical">
-                        <button class="btn download">Download</button>
-                        <button class="btn secondary changelog">Changelog</button>
-                    </div>
-                </div>
-            </div>
-            <div class="version-item">
-                <div class="list horizontal">
-                    <div class="list vertical">
-                        <h4 class="name">0.0.0</h4>
-                        <p class="paragraph-1" release-type="beta">Beta</p>
-                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
-
-                        <span class="platforms">
-                            <i class="fab fa-windows"></i>
-                            <i class="fab fa-apple"></i>
-                            <i class="fab fa-linux"></i>
-                        </span>
-                    </div>
-                    <div class="list vertical">
-                        <button class="btn download">Download</button>
-                        <button class="btn secondary changelog">Changelog</button>
-                    </div>
-                </div>
-            </div>
-            <div class="version-item">
-                <div class="list horizontal">
-                    <div class="list vertical">
-                        <h4 class="name">0.0.0</h4>
-                        <p class="paragraph-1" release-type="alpha">Alpha</p>
-                        <p class="paragraph-3 downloads">1,056,780 Downloads</p>
-
-                        <span class="platforms">
-                            <i class="fab fa-windows"></i>
-                            <i class="fab fa-apple"></i>
-                            <i class="fab fa-linux"></i>
-                        </span>
-                    </div>
-                    <div class="list vertical">
-                        <button class="btn download">Download</button>
-                        <button class="btn secondary changelog">Changelog</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Max Char length = 1000  -->
-    <section class="reviews">
-        <h2>Ratings and reviews</h2>
-        <div class="list vertical">
+    <section id="product-page-overview" class="markdown" style="display:none">@Model.About</section>
+    @if (Model.Versions.Any() || IsOwner)
+    {
+        <section class="ad"></section>
+        <section>
             <div class="list horizontal">
-                <div class="list vertical rating">
-                    <h1>4.3</h1>
-                    <p class="paragraph-2">6.63K reviews</p>
-                </div>
-                <div class="list vertical bars">
-                    <div class="list horizontal">
-                        <p class="paragraph-1">5</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                    <div class="list horizontal">
-                        <p class="paragraph-1">4</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                    <div class="list horizontal">
-                        <p class="paragraph-1">3</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                    <div class="list horizontal">
-                        <p class="paragraph-1">2</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                    <div class="list horizontal">
-                        <p class="paragraph-1">1</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                </div>
+                <h2 style="width:100%">Versions</h2>
+                @if (IsOwner)
+                {
+                    <div id="upload-version" class="btn fa-solid fa-plus" title="Create new release"></div>
+                }
             </div>
-            <div class="list vertical testimonials">
-                <div class="testimonial">
-                    <div class="list vertical">
-                        <div class="list horizontal profile-info">
-                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
-                            <h4 class="name">Drew Chase</h4>
+            <div class="list vertical versions-list">
+                @foreach (VersionModel version in Model.Versions)
+                {
+                    <div class="version-item">
+                        <div class="list horizontal">
+                            <div class="list vertical">
+                                <h4 class="name">@version.Name</h4>
+                                <p class="paragraph-1" release-type="@version.Type.ToString()" style="text-transform: capitalize">@version.Type.ToString()</p>
+                                <p class="paragraph-3 downloads">@version.TotalDownloads.ToString("N") Downloads</p>
+                                <span class="platforms">
+                                    @foreach (var platform in version.Platforms)
+                                    {
+                                        switch (platform.platform)
+                                        {
+                                            case OpenDSM.SQL.Platform.Windows:
+                                                <i class="fab fa-windows" title="Windows" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                break;
+                                            case OpenDSM.SQL.Platform.WindowsARM:
+                                                <i class="fab fa-windows" title="Windows ARM" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                break;
+                                            case OpenDSM.SQL.Platform.Mac:
+                                                <i class="fab fa-apple" title="Mac" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                break;
+                                            case OpenDSM.SQL.Platform.MacARM:
+                                                <i class="fab fa-apple" title="Mac ARM / Apple Silicon" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                break;
+                                            case OpenDSM.SQL.Platform.Linux:
+                                                <i class="fab fa-linux" title="Linux" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                break;
+                                            case OpenDSM.SQL.Platform.LinuxARM:
+                                                <i class="fab fa-linux" title="Linux ARM" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                break;
+                                            case OpenDSM.SQL.Platform.Java:
+                                                <i class="fa-brands fa-java" title="Java" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                break;
+                                            case OpenDSM.SQL.Platform.Android:
+                                                <i class="fa-brands fa-android" title="Java" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                break;
+                                        }
+                                    }
+                                </span>
+                            </div>
+                            <div class="list vertical">
+                                <button class="btn download" onclick="new DownloadPopup('author', 'id', 'version_id').open()">Download</button>
+                                <button class="btn secondary changelog" onclick="new ChangelogPopup('author', 'id', 'version_id').open()">Changelog</button>
+                            </div>
                         </div>
-                        <div class="list vertical testimonial-details">
-                            <div class="list horizontal">
-                                <span class="title">Rating</span>
-                                <span class="value">3.5 Stars</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Date</span>
-                                <span class="value">Oct. 15, 2014</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Time Used</span>
-                                <span class="value">12 Hours</span>
-                            </div>
-                        </div>
-                        <p class="paragraph-1 testimonial-description">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur unde aliquam voluptatibus alias laudantium! Repellendus consectetur fugit eum ab dolor quia, pariatur nulla molestiae tenetur praesentium est nam. Tempora odit harum facilis natus, a, eius aperiam similique inventore veritatis fuga corporis impedit temporibus ipsam assumenda rerum omnis facere quidem labore.
-                        </p>
                     </div>
-                    <button class="btn secondary reply-button">Reply</button>
-                </div>
-                <div class="testimonial">
-                    <div class="list vertical">
-                        <div class="list horizontal profile-info">
-                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
-                            <h4 class="name">Drew Chase</h4>
-                        </div>
-                        <div class="list vertical testimonial-details">
-                            <div class="list horizontal">
-                                <span class="title">Rating</span>
-                                <span class="value">3.5 Stars</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Date</span>
-                                <span class="value">Oct. 15, 2014</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Time Used</span>
-                                <span class="value">12 Hours</span>
-                            </div>
-                        </div>
-                        <p class="paragraph-1 testimonial-description">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. At dolorum obcaecati sit repellendus suscipit nisi voluptas? Vel error necessitatibus est non eius dolor illum. Incidunt, in aperiam possimus ab quia delectus distinctio maiores vero excepturi earum nemo, quisquam nobis suscipit, dicta quaerat. Consequuntur corrupti nam vitae, voluptatibus nisi accusantium temporibus tempora aperiam laborum sed voluptatem quis explicabo eos neque ab quasi corporis! Nisi ipsum eos voluptates distinctio nobis similique dolore, harum, sapiente recusandae veniam voluptate doloribus sunt quis voluptas vero dignissimos repellendus ipsa, dolor dolorem. Aliquam magni, quasi tenetur veritatis, officiis autem eligendi molestias sed ipsum laudantium, fuga cupiditate illo!
-                        </p>
-                    </div>
-                    <button class="btn secondary reply-button">Reply</button>
-                </div>
-                <div class="testimonial">
-                    <div class="list vertical">
-                        <div class="list horizontal profile-info">
-                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
-                            <h4 class="name">Drew Chase</h4>
-                        </div>
-                        <div class="list vertical testimonial-details">
-                            <div class="list horizontal">
-                                <span class="title">Rating</span>
-                                <span class="value">3.5 Stars</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Date</span>
-                                <span class="value">Oct. 15, 2014</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Time Used</span>
-                                <span class="value">12 Hours</span>
-                            </div>
-                        </div>
-                        <p class="paragraph-1 testimonial-description">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil, numquam accusantium. Fugiat dolore sapiente quae ea, cupiditate ipsa saepe perferendis aliquid adipisci inventore nemo tempore omnis incidunt maxime, ratione eligendi dolorum earum? Deleniti et autem dolore, expedita officiis aliquid. Reiciendis omnis deserunt sit atque hic doloribus sint a, accusantium optio dicta. In vero qui, cupiditate totam quae iste labore aliquam ab perferendis, quo iusto! Vero vel iusto cupiditate? Inventore possimus voluptates voluptatem ratione nisi quasi dolorem, at illo quos, commodi asperiores blanditiis rerum et magni quo ipsam. Explicabo, ipsam. Consequatur, quasi ad! Autem officiis ducimus alias quos, magni, molestias, iusto porro ea deleniti aperiam sint accusantium. Culpa non facere magnam ipsa? Laudantium, consequuntur reiciendis molestiae ducimus, eaque similique impedit totam doloremque sunt, ipsam quam accusantium minus voluptas possimus saepe veniam quis libero laborum magnam quisquam! Labore odit nam rem possimus magnam pariatur deleniti quos, minima inventore ratione quam asperiores iste!
-                        </p>
-                    </div>
-                    <button class="btn secondary reply-button">Reply</button>
-                </div>
+                }
             </div>
+        </section>
+        <!-- Max Char length = 1000  -->
+        <section class="reviews">
+            <h2>Ratings and reviews</h2>
+            <div class="list vertical">
+                <div class="list horizontal">
+                    <div class="list vertical rating">
+                        <h1>4.3</h1>
+                        <p class="paragraph-2">6.63K reviews</p>
+                    </div>
+                    <div class="list vertical bars">
+                        <div class="list horizontal">
+                            <p class="paragraph-1">5</p>
+                            <div class="progress-bar">
+                                <div class="fill" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                        <div class="list horizontal">
+                            <p class="paragraph-1">4</p>
+                            <div class="progress-bar">
+                                <div class="fill" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                        <div class="list horizontal">
+                            <p class="paragraph-1">3</p>
+                            <div class="progress-bar">
+                                <div class="fill" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                        <div class="list horizontal">
+                            <p class="paragraph-1">2</p>
+                            <div class="progress-bar">
+                                <div class="fill" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                        <div class="list horizontal">
+                            <p class="paragraph-1">1</p>
+                            <div class="progress-bar">
+                                <div class="fill" style="width: 50%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list vertical testimonials">
+                    <div class="testimonial">
+                        <div class="list vertical">
+                            <div class="list horizontal profile-info">
+                                <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                                <h4 class="name">Drew Chase</h4>
+                            </div>
+                            <div class="list vertical testimonial-details">
+                                <div class="list horizontal">
+                                    <span class="title">Rating</span>
+                                    <span class="value">3.5 Stars</span>
+                                </div>
+                                <div class="list horizontal">
+                                    <span class="title">Date</span>
+                                    <span class="value">Oct. 15, 2014</span>
+                                </div>
+                                <div class="list horizontal">
+                                    <span class="title">Time Used</span>
+                                    <span class="value">12 Hours</span>
+                                </div>
+                            </div>
+                            <p class="paragraph-1 testimonial-description">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur unde aliquam voluptatibus alias laudantium! Repellendus consectetur fugit eum ab dolor quia, pariatur nulla molestiae tenetur praesentium est nam. Tempora odit harum facilis natus, a, eius aperiam similique inventore veritatis fuga corporis impedit temporibus ipsam assumenda rerum omnis facere quidem labore.
+                            </p>
+                        </div>
+                        <button class="btn secondary reply-button">Reply</button>
+                    </div>
+                    <div class="testimonial">
+                        <div class="list vertical">
+                            <div class="list horizontal profile-info">
+                                <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                                <h4 class="name">Drew Chase</h4>
+                            </div>
+                            <div class="list vertical testimonial-details">
+                                <div class="list horizontal">
+                                    <span class="title">Rating</span>
+                                    <span class="value">3.5 Stars</span>
+                                </div>
+                                <div class="list horizontal">
+                                    <span class="title">Date</span>
+                                    <span class="value">Oct. 15, 2014</span>
+                                </div>
+                                <div class="list horizontal">
+                                    <span class="title">Time Used</span>
+                                    <span class="value">12 Hours</span>
+                                </div>
+                            </div>
+                            <p class="paragraph-1 testimonial-description">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. At dolorum obcaecati sit repellendus suscipit nisi voluptas? Vel error necessitatibus est non eius dolor illum. Incidunt, in aperiam possimus ab quia delectus distinctio maiores vero excepturi earum nemo, quisquam nobis suscipit, dicta quaerat. Consequuntur corrupti nam vitae, voluptatibus nisi accusantium temporibus tempora aperiam laborum sed voluptatem quis explicabo eos neque ab quasi corporis! Nisi ipsum eos voluptates distinctio nobis similique dolore, harum, sapiente recusandae veniam voluptate doloribus sunt quis voluptas vero dignissimos repellendus ipsa, dolor dolorem. Aliquam magni, quasi tenetur veritatis, officiis autem eligendi molestias sed ipsum laudantium, fuga cupiditate illo!
+                            </p>
+                        </div>
+                        <button class="btn secondary reply-button">Reply</button>
+                    </div>
+                    <div class="testimonial">
+                        <div class="list vertical">
+                            <div class="list horizontal profile-info">
+                                <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                                <h4 class="name">Drew Chase</h4>
+                            </div>
+                            <div class="list vertical testimonial-details">
+                                <div class="list horizontal">
+                                    <span class="title">Rating</span>
+                                    <span class="value">3.5 Stars</span>
+                                </div>
+                                <div class="list horizontal">
+                                    <span class="title">Date</span>
+                                    <span class="value">Oct. 15, 2014</span>
+                                </div>
+                                <div class="list horizontal">
+                                    <span class="title">Time Used</span>
+                                    <span class="value">12 Hours</span>
+                                </div>
+                            </div>
+                            <p class="paragraph-1 testimonial-description">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil, numquam accusantium. Fugiat dolore sapiente quae ea, cupiditate ipsa saepe perferendis aliquid adipisci inventore nemo tempore omnis incidunt maxime, ratione eligendi dolorum earum? Deleniti et autem dolore, expedita officiis aliquid. Reiciendis omnis deserunt sit atque hic doloribus sint a, accusantium optio dicta. In vero qui, cupiditate totam quae iste labore aliquam ab perferendis, quo iusto! Vero vel iusto cupiditate? Inventore possimus voluptates voluptatem ratione nisi quasi dolorem, at illo quos, commodi asperiores blanditiis rerum et magni quo ipsam. Explicabo, ipsam. Consequatur, quasi ad! Autem officiis ducimus alias quos, magni, molestias, iusto porro ea deleniti aperiam sint accusantium. Culpa non facere magnam ipsa? Laudantium, consequuntur reiciendis molestiae ducimus, eaque similique impedit totam doloremque sunt, ipsam quam accusantium minus voluptas possimus saepe veniam quis libero laborum magnam quisquam! Labore odit nam rem possimus magnam pariatur deleniti quos, minima inventore ratione quam asperiores iste!
+                            </p>
+                        </div>
+                        <button class="btn secondary reply-button">Reply</button>
+                    </div>
+                </div>
 
-        </div>
-    </section>
+            </div>
+        </section>
 
+    }
     <section class="ad"></section>
 
     <section id="similar-products" class="carousel">
@@ -368,6 +355,10 @@
         </div>
     </section>
 </div>
+@if (IsPreview)
+{
+    @Html.ActionLink("PREVIEW", "Index", "Product", new{}, new{id="preview-label", title="Exit Preview"})
+}
 
 <script src="/assets/lib/showdown.min.js"></script>
 <script src="/assets/js/product-page.js"></script>
