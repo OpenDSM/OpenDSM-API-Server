@@ -344,3 +344,34 @@ class YoutubeSearchPopup extends CenteredPopup {
     }
 
 }
+
+class SearchFilterPopup extends Popup {
+    constructor() {
+        super("search-filter")
+    }
+
+    async open() {
+        super.open();
+        setTimeout(() => {
+            $(".search-category").on('click', e => {
+                let parts = window.location.search.split("?category=").pop().split("&");
+                let category = parts[0]
+                let tags = "";
+                if (parts.length > 1) {
+                    tags = parts.pop().split("tags=").pop();
+                    if (e.currentTarget.classList.contains("active")) {
+                        // Remove Tag
+                        tags = decodeURI(tags).replace(`${$(e.currentTarget).attr("filter")};`, "").replace(`${$(e.currentTarget).attr("title")}`, "")
+                    } else {
+                        // Add Tag
+                        tags += `${$(e.currentTarget).attr("filter")};`
+                    }
+                } else {
+                    tags += `${$(e.currentTarget).attr("filter")};`
+                }
+                window.history.pushState("", "", `search?category=${category}&tags=${tags}`)
+                e.currentTarget.classList.toggle("active");
+            })
+        }, 500)
+    }
+}
