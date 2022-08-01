@@ -1,16 +1,47 @@
 ﻿@using OpenDSM.Core
 @using OpenDSM.Core.Models;
 @using OpenDSM.Core.Handlers;
-@model UserModel;
+@using System.Text
+
+@{
+    UserModel user = (UserModel)ViewData["User"];
+    ProductModel product = (ProductModel)(ViewData["Product"] ?? null);
+    bool EditMode = product != null;
+    StringBuilder keywordsBuilder = new();
+    StringBuilder tagBuilder = new();
+    if (EditMode)
+    {
+        foreach (string s in product.Keywords)
+        {
+            keywordsBuilder.Append(s);
+            keywordsBuilder.Append("; ");
+        }
+
+        foreach (Tag tag in Tags.GetTags().Where(i => product.Tags.Contains(i.id)))
+        {
+            tagBuilder.Append(tag.name);
+            tagBuilder.Append("; ");
+        }
+
+    }
+}
 
 <script>
-    var user_id = @Model.Id
+    var user_id = @user.Id;
+    var editmode = @EditMode.ToString().ToLower();
 </script>
 
 <div style="margin-top: 8rem;">
 
-    <section> 
-        <h1>Project Creation</h1>
+    <section>
+        @if (EditMode)
+        {
+            <h1>Product Modification</h1>
+        }
+        else
+        {
+            <h1>Project Creation</h1>
+        }
         <p class="paragraph-1">Before continuing, make sure that your project is listed on your linked github account.  All binary files are stored as a release on your github to ensure best possible quality.</p>
     </section>
     <section class="ad"></section>
@@ -20,9 +51,9 @@
         <div class="list vertical" style="width: 100%;">
             <div class="input search-dropdown dropdown" title="The Github Repository">
                 <label for="github-repository-search-box">Repository*</label>
-                <input type="text" id="github-repository-search-box" autocomplete="false" required>
+                <input type="text" id="github-repository-search-box" autocomplete="false" required value="@(EditMode?product.GitRepositoryName:"")">
                 <div class="dropdown-body">
-                    @foreach (GitRepository repo in Model.Repositories)
+                    @foreach (GitRepository repo in user.Repositories)
                     {
                         <div class="dropdown-item" onmousedown="updateRepository('@repo.Name.Replace("-", " ")')">@repo.Name</div>
                     }
@@ -30,12 +61,12 @@
             </div>
             <div class="input" title="the name of the project">
                 <label for="project-name-box">Project Name*</label>
-                <input type="text" id="project-name-box" autocomplete="false" required>
+                <input type="text" id="project-name-box" autocomplete="false" required value="@(EditMode?product.Name:"")">
             </div>
 
             <div class="input dropdown multiselect" title="The projects tags" max="3">
                 <label for="tags-search-box">Tags*</label>
-                <input type="text" id="tags-search-box" autocomplete="false" placeholder="Desktop; Games; Server;" readonly required>
+                <input type="text" id="tags-search-box" autocomplete="false" placeholder="Desktop; Games; Server;" readonly required value="@(EditMode?tagBuilder.ToString():"")">
                 <div class="dropdown-body">
                     @foreach (Tag tag in Tags.GetTags())
                     {
@@ -46,11 +77,11 @@
 
             <div class="input" title="Used for searching">
                 <label for="keywords-box">Keywords*</label>
-                <input type="text" id="keywords-box" autocomplete="false" placeholder="Open; Open DSM; DSM;" required style="text-transform: lowercase">
+                <input type="text" id="keywords-box" autocomplete="false" placeholder="Open; Open DSM; DSM;" required style="text-transform: lowercase" value="@(EditMode?keywordsBuilder.ToString():"")">
             </div>
             <div class="input" title="The part of the youtube video after https://youtube.com/watch?v={KEY}">
                 <label for="yt-key-box">Youtube Video Key</label>
-                <input type="text" id="yt-key-box" autocomplete="false" placeholder="dQw4w9WgXcQ">
+                <input type="text" id="yt-key-box" autocomplete="false" placeholder="@(EditMode?product.YoutubeKey:"dQw4w9WgXcQ")">
                 <div class="btn" id="search-video-btn" style="margin: 0;" title="Searches for Youtube Video"><i class="fa-solid fa-magnifying-glass"></i></div>
             </div>
 
@@ -87,7 +118,7 @@
             <div class="list horizontal">
                 <div class="list vertical">
                     <label for="upload-icon" class="file-upload-title">Icon*</label>
-                    <div id="upload-icon" class="file-upload" required>
+                    <div id="upload-icon" class="file-upload" required style="@(EditMode?$"background-image: url('/product/{product.Id}/images/Icon')":"")">
                         <div class="content">
                             <i class="fas fa-plus"></i>
                         </div>
@@ -95,7 +126,7 @@
                 </div>
                 <div class="list vertical">
                     <label for="upload-banner" class="file-upload-title">Banner*</label>
-                    <div id="upload-banner" class="file-upload" required>
+                    <div id="upload-banner" class="file-upload" required style="@(EditMode?$"background-image: url('/product/{product.Id}/images/Banner')":"")">
                         <div class="content">
                             <i class="fas fa-plus"></i>
                         </div>
@@ -111,6 +142,23 @@
                         </div>
                     </div>
                 </div>
+                @if (EditMode)
+                {
+                    foreach (string file in product.GalleryImages)
+                    {
+                        FileInfo info = new(file);
+                        string name = info.Name.Replace(info.Extension, "");
+
+                        <div class="list vertical">
+                            <h4 class="file-upload-title">@name</h4>
+                            <div class="file-upload tmp-gallery-image" onclick="this.parentElement.remove()" style="background-image: url('/product/@product.Id/images/gallery/@name')">
+                                <div class="content">
+                                    <i class="fas fa-trash"></i>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
             </div>
         </div>
     </section>
@@ -131,3 +179,8 @@
 <script src="/assets/lib/CropperJS/cropper.min.js"></script>
 <script src="/assets/lib/CropperJS/jquery-cropper.min.js"></script>
 <script src="/assets/js/create-product.js"></script>
+
+@if (EditMode)
+{
+    @Html.ActionLink(product.Name, "Index", "Product", new{id=product.Id}, new{id="preview-label", title="Open Product Page in new Tab", target="_blank"})
+}

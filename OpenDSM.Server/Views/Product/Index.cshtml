@@ -5,7 +5,7 @@
 @{
     UserModel? user = (UserModel)ViewData["user"] ?? null;
     bool IsPreview = (bool)ViewData["Preview"];
-    bool IsOwner = !IsPreview && user != null && user.Id == Model.User.Id;
+    bool IsOwner = !IsPreview && user != null && user.Equals(Model.User);
 }
 
 <section id="landing" class="product xl">
@@ -27,6 +27,7 @@
             @if (IsOwner)
             {
                 @Html.ActionLink("PREVIEW", "Index", "Product", new{preview=true}, new{@class="btn"})
+                @Html.ActionLink("EDIT", "Modify", "Product", new{id=Model.Id}, new{@class="btn secondary"})
             }
             else
             {
@@ -41,11 +42,11 @@
                         <div class="btn" onclick="new PurchasePopup('@Model.Id', false).open()">BUY - $9.99</div>
                     }
                 }
-            }
-            <!-- <div class="btn" disabled onclick="new PurchasePopup('author', 'id', true).open()">$9.99/month</div> -->
-            @if (Model.HasYoutubeVideo)
-            {
-                <div class="btn secondary" onclick=" new VideoPopup(`@Model.YoutubeKey`).open()">Watch Trailer</div>
+                <!-- <div class="btn" disabled onclick="new PurchasePopup('author', 'id', true).open()">$9.99/month</div> -->
+                @if (Model.HasYoutubeVideo)
+                {
+                    <div class="btn secondary" onclick=" new VideoPopup(`@Model.YoutubeKey`).open()">Watch Trailer</div>
+                }
             }
         </div>
         @if (Model.Platforms != null)

@@ -20,7 +20,7 @@ public class ProductController : Controller
             ViewData["User"] = user;
             if (user.IsDeveloperAccount)
             {
-                return View(user);
+                return View();
             }
             else
             {
@@ -28,6 +28,29 @@ public class ProductController : Controller
             }
         }
         return RedirectToAction("Index", "Error", new { code = 401 });
+    }
+
+    [Route("modify")]
+    public IActionResult Modify(int id)
+    {
+        if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
+        {
+            ViewData["Title"] = "Modify Product";
+            ViewData["User"] = user;
+            if (user.IsDeveloperAccount)
+            {
+                if (ProductModel.TryGetByID(id, out ProductModel product) && product.User.Equals(user))
+                {
+                    ViewData["Product"] = product;
+                    return View("Create");
+                }
+            }
+            else
+            {
+                return RedirectToAction("Profile", "Auth");
+            }
+        }
+        return RedirectToAction("Index", "Error", new { code = 500 });
     }
 
     [HttpGet("{id}/images/{name}")]
