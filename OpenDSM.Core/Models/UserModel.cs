@@ -172,5 +172,10 @@ public class UserModel
         Authoriztaion.UpdateProperty(Id, Token, name, value);
     }
 
+    public override bool Equals(object? obj)
+    {
+        return obj != null && obj.GetType().Equals(typeof(UserModel)) && ((UserModel)obj).Id == Id && ((UserModel)obj).Email == Email && ((UserModel)obj).Username == Username;
+    }
+
     #endregion Public Methods
 }
