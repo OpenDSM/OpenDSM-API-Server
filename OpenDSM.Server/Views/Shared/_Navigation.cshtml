@@ -10,17 +10,17 @@
         <h4>OpenDSM</h4>
     </a>
     <div id="nav-items">
-        <a href="/" class="btn secondary">Home</a>
+        @Html.ActionLink("Home", "Index", "Home", new {}, new{@class="btn secondary"})
+        @Html.ActionLink("Search", "Search", "Home", new {}, new{@class="btn secondary"})
+        <span class="separator vertical"></span>
         @if (isLoggedIn)
         {
-            <span class="separator vertical"></span>
             <a href="/profile/" class="profile-image" style="background-image: url('/api/auth/image/profile?id=@user.Id');"></a>
         }
         else
         {
-            <span class="separator vertical"></span>
-            <a href="/auth/signup" class="btn secondary">Sign Up</a>
-            <a href="/auth/login" class="btn">Login</a>
+            @Html.ActionLink("Sign Up", "Signup", "Auth", new {}, new{@class="btn secondary"})
+            @Html.ActionLink("Login", "Login", "Auth", new {}, new{@class="btn"})
         }
     </div>
 </nav>
