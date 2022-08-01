@@ -399,6 +399,25 @@ input[type=number] {
     padding: 1rem;
 }
 
+
+#preview-label {
+    font-size: 4rem;
+    text-decoration: none;
+    text-transform: uppercase;
+    position: fixed;
+    bottom: 0;
+    right: 1rem;
+    color: white;
+    opacity: .5;
+    font-weight: 900;
+    z-index: 8;
+    transition: color 200ms, opacity 200ms;
+}
+
+    #preview-label:hover {
+        opacity: 1;
+        color: var(--primary)
+    }
 /*#endregion Elements */
 
 /*#region DSMPlayer */
@@ -576,28 +595,20 @@ section:not(#landing) {
 }
 
     .progress-bar .fill {
-        /* box-shadow: var(--glow); */
         border-radius: 100px;
         height: 100%;
         width: 50%;
         background-color: var(--primary);
     }
 
-#popup-body {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    height: calc(80vh - 8rem);
-    overflow: auto;
-    padding: 4rem;
-    margin-top: 4rem;
-    margin-right: 4rem;
-}
-
 #tos {
     max-height: 400px;
     min-height: 400px;
     overflow-y: scroll;
+}
+
+.markdown img {
+    max-width: 90%;
 }
 
 /*#endregion Layout */
@@ -745,8 +756,18 @@ section:not(#landing) {
 /*#endregion Versions */
 
 /*#region Products */
-
+/*#region Product Page*/
+#short-summery {
+    margin: 1rem 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+/*#endregion Product Page*/
 /*#region General */
+
+
 
 .product {
     display: flex;
@@ -1025,6 +1046,18 @@ section:not(#landing) {
 
 /*#region Popup */
 
+
+#popup-body {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: calc(80vh - 8rem);
+    overflow: auto;
+    padding: 4rem;
+    margin-top: 4rem;
+    margin-right: 4rem;
+}
+
 body.popup-active {
     overflow: hidden;
 }
@@ -1042,12 +1075,9 @@ body.popup-active {
 
 #popup-content {
     position: fixed;
-    outline: 2px solid var(--primary);
-    width: 90vw;
-    height: 90vh;
+    width: 100vw;
+    height: 100vh;
     background-color: var(--background);
-    left: 5vw;
-    top: 5vh;
 }
 
 #popup-bg {
@@ -1062,8 +1092,8 @@ body.popup-active {
 }
 
 #popup .content {
-    max-height: calc(90vh);
-    height: calc(90vh);
+    max-height: 100vh;
+    height: 100vh;
     overflow: auto;
     background-position: center;
     background-size: contain;
@@ -1142,10 +1172,49 @@ body.popup-active {
     overflow-x: hidden;
 }
 
+#search-category-page {
+    height: 100vh;
+    min-height: 500px;
+    display: flex;
+    margin-top: 8rem;
+    margin-bottom: 8rem;
+    max-height: 100vh;
+    justify-content: flex-start;
+    align-items: center;
+    width: 80%;
+}
+
+.search-category {
+    aspect-ratio: 9/16;
+    width: 33%;
+    min-width: 300px;
+    margin: 2rem;
+    background: black;
+    background-size: cover;
+    background-position: center;
+    filter: contrast(0.5);
+    transition: transform 500ms, filter 500ms;
+    cursor:pointer;
+}
+
+    .search-category:hover, .search-category.active {
+        transform: translateY(-15px);
+        filter: contrast(1);
+    }
+
+    .search-category[category="Applications"] {
+        background-image: url("/assets/images/search-categories/Applications.jpg");
+    }
+
+    .search-category[category="Games"] {
+        background-image: url("/assets/images/search-categories/Gaming.jpg");
+    }
+
+    .search-category[category="Users"] {
+        background-image: url("/assets/images/search-categories/Users.jpg");
+    }
 /*#endregion Search */
-
 /*#region Profile Page */
-
 #landing.profile {
     position: relative;
     min-height: 440px;
@@ -1282,6 +1351,8 @@ body::-webkit-scrollbar-track {
 }
 
 /*#endregion Throbber*/
+
+/*#region Youtube Video Browser*/
 .yt-vid {
     width: 300px;
     overflow: hidden;
@@ -1325,35 +1396,4 @@ body::-webkit-scrollbar-track {
     justify-content: center;
     align-self: start;
 }
-
-
-.markdown img {
-    max-width: 90%;
-}
-
-#preview-label {
-    font-size: 4rem;
-    text-decoration: none;
-    text-transform: uppercase;
-    position: fixed;
-    bottom: 0;
-    right: 1rem;
-    color: white;
-    opacity: .5;
-    font-weight: 900;
-    z-index: 99999;
-    transition: color 200ms, opacity 200ms;
-}
-
-    #preview-label:hover {
-        opacity: 1;
-        color: var(--primary)
-    }
-
-#short-summery {
-    margin: 1rem 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
+/*#endregion Youtube Video Browser*/
