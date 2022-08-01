@@ -1,5 +1,6 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
+using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.VIEWS;
@@ -16,6 +17,24 @@ public class HomeController : Controller
         {
             ViewData["User"] = user;
         }
+        return View();
+    }
+
+    [Route("search")]
+    public IActionResult Search(string? query, SearchCategory? category)
+    {
+        if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? loggedin))
+        {
+            ViewData["User"] = loggedin;
+        }
+        ViewData["Title"] = query ?? "Search";
+        if (category == null)
+        {
+            return View("SearchCategorySelector");
+
+        }
+        ViewData["query"] = query ?? "";
+        ViewData["Category"] = category;
         return View();
     }
 

@@ -1,0 +1,10 @@
+﻿@using OpenDSM.Core.Handlers;
+<div id="search-category-page" class="list vertical centered">
+    <h1>Search</h1>
+    <div class="list horizontal">
+        @foreach (SearchCategory category in Enum.GetValues(typeof(SearchCategory)))
+        {
+            <a href="?category=@category" class="search-category" category="@category" title="@category"></a>
+        }
+    </div>
+</div>

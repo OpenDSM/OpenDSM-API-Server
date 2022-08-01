@@ -1,0 +1,15 @@
+﻿@using OpenDSM.Core.Handlers
+@{
+    string category = ((SearchCategory)ViewData["Category"]).ToString();
+}
+
+<div id="search-category-page" class="list vertical centered" style="width: 90%">
+    <h1>@category</h1>
+    <div class="input">
+        <label for="search-input" style="max-width: 50px;min-width: 50px;" title="Search"><i class="fa fa-magnifying-glass"></i></label>
+        <input type="text" name="search-input" id="search-input" title="Search">
+        <div class="btn" style="margin: 0;" title="Show Filters" onclick="new SearchFilterPopup().open()"><i class="fa-solid fa-sliders"></i></div>
+    </div>
+    <div class="list vertical">
+    </div>
+</div>
