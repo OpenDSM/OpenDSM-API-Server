@@ -101,13 +101,20 @@ public class UserModel
     }
     public static UserModel? GetByID(int id)
     {
-        if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] products))
+        try
         {
-            return new(id, username, email, "", type, use_git_readme, Array.Empty<int>())
+            if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] _))
             {
-                GitUsername = git_username,
-                GitToken = git_token,
-            };
+                return new(id, username, email, "", type, use_git_readme, Array.Empty<int>())
+                {
+                    GitUsername = git_username,
+                    GitToken = git_token,
+                };
+            }
+        }
+        catch (Exception e)
+        {
+            log.Error($"Unable to GetuserFromID: {id}", e.Message, e.StackTrace ?? "");
         }
         return null;
     }
