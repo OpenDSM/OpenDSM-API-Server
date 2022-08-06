@@ -48,16 +48,23 @@ public class AuthController : ControllerBase
             };
             if (System.IO.File.Exists(path))
             {
-                return new FileStreamResult(new FileStream(path, FileMode.Open, FileAccess.Read), "image/png");
+                return new FileStreamResult(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), "image/png");
+            }
+            if (type == "profile")
+            {
+                return Redirect("/assets/images/missing-profile-image.svg");
+            }
+            else if (type == "banner")
+            {
+                return Redirect("/assets/images/missing-banner.jpg");
             }
         }
-        if (type == "profile")
+        else
         {
-            return Redirect("/assets/images/missing-profile-image.svg");
-        }
-        else if (type == "banner")
-        {
-            return Redirect("/assets/images/missing-banner.jpg");
+            return NotFound(new
+            {
+                message = $"No user with an ID of {id} exists"
+            });
         }
         return NotFound(new
         {
@@ -92,23 +99,37 @@ public class AuthController : ControllerBase
     {
         return await Task.Run(() =>
         {
-            if (Authoriztaion.Register(username, email, AccountType.User, password, out var reason))
+            try
             {
-                if (UserModel.TryGetUser(username, password, out UserModel? user))
+
+                if (Authoriztaion.Register(username, email, password, out var reason))
                 {
-                    return new JsonResult(new
+                    if (UserModel.TryGetUser(username, password, out UserModel? user))
                     {
-                        success = true,
-                        message = "Account Created Successfully",
-                        user
-                    });
+                        return new JsonResult(new
+                        {
+                            success = true,
+                            message = "Account Created Successfully",
+                            user
+                        });
+                    }
                 }
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = string.Concat(reason.ToString().Select(x => char.IsUpper(x) ? " " + x : x.ToString())).Trim()
+                });
             }
-            return new JsonResult(new
+            catch (Exception e)
             {
-                success = false,
-                message = string.Concat(reason.ToString().Select(x => char.IsUpper(x) ? " " + x : x.ToString())).Trim()
-            });
+                log.Error($"Unable to create user", e);
+                return new JsonResult(new
+                {
+                    success = false,
+                    error = e.Message,
+                    stacktrace = e.StackTrace,
+                });
+            }
         });
     }
 
