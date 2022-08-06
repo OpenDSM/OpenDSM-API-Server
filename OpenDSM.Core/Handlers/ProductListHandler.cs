@@ -10,6 +10,12 @@ namespace OpenDSM.Core.Handlers;
 
 public class ProductListHandler
 {
+    public static ProductModel[] GetPopularProducts(int count = 20)
+    {
+        ProductModel[] products = new ProductModel[count];
+
+        return products;
+    }
     public static ProductModel[] GetProductsByTag(params Tag[] tags)
     {
         List<ProductModel> products = new();
