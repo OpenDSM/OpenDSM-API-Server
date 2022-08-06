@@ -1,6 +1,5 @@
 // LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 global using static OpenDSM.Core.Global;
-using CLPortmapper;
 
 namespace OpenDSM.Server;
 
@@ -19,29 +18,12 @@ public class Program
         log.Info($"Welcome to {ApplicationName} Server");
         log.Debug(Copywrite);
         bool useKestrel = true;
-        bool portForward = false;
         foreach (string arg in args)
         {
             if (arg.Equals("--iis"))
             {
                 useKestrel = false;
             }
-            else if (arg.Equals("--firewall"))
-            {
-                PortHandler.AddToFirewall();
-                Environment.Exit(0);
-            }
-            else if (arg.Equals("--portforward"))
-            {
-                portForward = true;
-            }
-        }
-        if (portForward)
-        {
-            PortHandler.AddToFirewall();
-            log.Warn($"Automatic Port Forwarding is Enabled");
-            log.Debug($"Opening Port {port}");
-            PortHandler.OpenPort(port);
         }
         Host.CreateDefaultBuilder().ConfigureWebHostDefaults(builder =>
         {
@@ -64,8 +46,6 @@ public class Program
         }).Build().Run();
 
         log.Warn("Shutting Down...");
-        if (portForward)
-            PortHandler.ClosePort(port);
     }
 
     #endregion Private Methods
