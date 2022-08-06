@@ -1,6 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
+using System.Net;
 
 namespace OpenDSM.Core.Models;
 
@@ -8,7 +9,7 @@ public class ProductModel
 {
     #region Protected Constructors
 
-    protected ProductModel(int id, int userID, string gitRepoName, string name, bool useGitReademe, string videoKey, uint price, int[] tags, string[] keywords, bool subscription)
+    protected ProductModel(int id, int userID, string gitRepoName, string name, string summery, bool useGitReademe, string videoKey, uint price, int[] tags, string[] keywords, bool subscription, int pageViews, DateTime posted)
     {
         Id = id;
         Name = name;
@@ -22,6 +23,9 @@ public class ProductModel
         Keywords = keywords;
         GitRepositoryName = gitRepoName;
         Subscription = subscription;
+        ShortSummery = summery;
+        TotalPageViews = pageViews;
+        Posted = posted;
         PopulateVersions();
     }
 
@@ -99,6 +103,12 @@ public class ProductModel
     public int[] Tags { get; set; }
     public int TotalDownloads { get; private set; }
     public int TotalWeeklyDownloads { get; private set; }
+    public int TotalPageViews { get; private set; }
+    public string ShortSummery { get; set; }
+    public byte Rating { get; private set; }
+    public List<ReviewModel> Reviews { get; private set; }
+    public DateTime Posted { get; set; }
+    public float ViewDownloadRatio => TotalDownloads / TotalPageViews;
     public bool UseGitReadME { get; }
     public UserModel User { get; private set; }
     public string YoutubeKey { get; private set; }
@@ -112,9 +122,9 @@ public class ProductModel
     {
         if (Products.CheckProductExists(id))
         {
-            if (Products.GetProductFromID(id, out string name, out string gitRepoName, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id))
+            if (Products.GetProductFromID(id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted))
             {
-                return new(id, owner_id, gitRepoName, name, useGitReadme, yt_key, (uint)price, tags, keywords, subscription);
+                return new(id, owner_id, gitRepoName, name, summery, useGitReadme, yt_key, (uint)price, tags, keywords, subscription, pageViews, posted);
             }
         }
         return null;
@@ -162,6 +172,31 @@ public class ProductModel
         catch { }
         Platforms = platforms.ToArray();
         Versions = versions_list.ToArray();
+    }
+
+    public void PopulateReviews()
+    {
+        Reviews = new();
+        int[] review_ids = SQL.Reviews.GetReviewsByProductID(Id);
+        foreach (int id in review_ids)
+        {
+            if (SQL.Reviews.GetReviewByID(id, out _, out byte rating, out string summery, out string body, out DateTime posted, out int user_id))
+            {
+                Reviews.Add(new()
+                {
+                    Posted = posted,
+                    Product = this,
+                    Rating = rating,
+                    Summery = summery,
+                    User = UserModel.GetByID(user_id)
+                });
+            }
+        }
+    }
+
+    public void AttemptUniquePageView(IPAddress connecting_address)
+    {
+
     }
 
     #endregion Public Methods
