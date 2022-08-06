@@ -9,11 +9,11 @@ public static class Global
 {
     #region Public Fields
 
-    public static ILog log = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(LogsDirectory);
-    public static ILog log_access = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(AccessLogsDirectory);
-    public static ILog log_admin = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(AccessLogsDirectory);
-    public static ILog log_sales = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(SalesLogsDirectory);
-    public static ILog log_user = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(UserLogsDirectory);
+    public static ILog log = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(LogsDirectory).SetPattern("[OPENDSM] (%TYPE%: %DATE%): %MESSAGE%");
+    public static ILog log_access = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(AccessLogsDirectory).SetPattern("[ACCESS] (%TYPE%: %DATE%): %MESSAGE%");
+    public static ILog log_admin = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(AccessLogsDirectory).SetPattern("[ADMIN] (%TYPE%: %DATE%): %MESSAGE%");
+    public static ILog log_sales = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(SalesLogsDirectory).SetPattern("[SALES] (%TYPE%: %DATE%): %MESSAGE%");
+    public static ILog log_user = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(UserLogsDirectory).SetPattern("[USER] (%TYPE%: %DATE%): %MESSAGE%");
 
     #endregion Public Fields
 
