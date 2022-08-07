@@ -60,13 +60,19 @@ internal class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+            app.UseHttpLogging();
+            app.UseMiniProfiler();
         }
-        app.UseStatusCodePagesWithReExecute("/Error/{0}");
+        else
+        {
+            app.UseStatusCodePagesWithReExecute("/Error/{0}");
+        }
         app.UseForwardedHeaders();
         app.UseMvc();
         app.UseRouting();
         app.UseStaticFiles();
         app.UseDefaultFiles();
+        //app.UseHttpsRedirection();
     }
 
     public void ConfigureServices(IServiceCollection service)
@@ -75,6 +81,7 @@ internal class Startup
         {
             action.EnableEndpointRouting = false;
         });
+        service.AddMiniProfiler();
     }
 
     #endregion Public Methods
