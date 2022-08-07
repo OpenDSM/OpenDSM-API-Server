@@ -1,4 +1,5 @@
 ﻿@using OpenDSM.Core.Models
+@using OpenDSM.SQL
 @using UAParser
 @model OpenDSM.Core.Models.ProductModel
 
@@ -6,12 +7,27 @@
     UserModel? user = (UserModel)ViewData["user"] ?? null;
     bool IsPreview = (bool)ViewData["Preview"];
     bool IsOwner = !IsPreview && user != null && user.Equals(Model.User);
+    string OS = (string)ViewData["OS"];
+    bool HasOSDownload = Enum.TryParse(typeof(Platform), OS, true, out var p) && Model.Platforms.Any(i => i == (Platform)p);
+    long latest_version_id = -1;
+    if (HasOSDownload)
+    {
+        foreach ((_, VersionModel version) in Model.Versions)
+        {
+            if (version.Platforms.Any(i => i.platform == (Platform)p))
+            {
+                latest_version_id = version.ID;
+                break;
+            }
+        }
+    }
 }
+
 
 <section id="landing" class="product xl">
     @if (Model.HasYoutubeVideo)
     {
-        <video class="poster" poster="/product/@Model.Id/images/banner" data-src="/product/video/@Model.YoutubeKey" muted loop autoplay></video>
+        <video class="poster" poster="/product/@Model.Id/images/banner" data-vidrl="/product/video/@Model.YoutubeKey" muted loop autoplay></video>
     }
     else
     {
@@ -35,7 +51,10 @@
                 {
                     @if (Model.Price == 0)
                     {
-                        <div class="btn">Download @ViewData["OS"]</div>
+                        if (HasOSDownload)
+                        {
+                            <div class="btn" onclick="new DownloadPopup(@Model.Id, @latest_version_id, '@OS')">Download</div>
+                        }
                     }
                     else
                     {
@@ -122,57 +141,63 @@
                 <h2 style="width:100%">Versions</h2>
                 @if (IsOwner)
                 {
-                    <div id="upload-version" class="btn fa-solid fa-plus" title="Create new release"></div>
+                    <div id="upload-version" class="btn fa-solid fa-plus" title="Create new release" onclick="new CreateVersionPopup(@Model.Id).open()"></div>
                 }
             </div>
             <div class="list vertical versions-list">
-                @foreach (VersionModel version in Model.Versions)
+                @foreach ((_, VersionModel version) in Model.Versions)
                 {
                     <div class="version-item">
                         <div class="list horizontal">
                             <div class="list vertical">
                                 <h4 class="name">@version.Name</h4>
-                                <p class="paragraph-1" release-type="@version.Type.ToString()" style="text-transform: capitalize">@version.Type.ToString()</p>
-                                <p class="paragraph-3 downloads">@version.TotalDownloads.ToString("N") Downloads</p>
+                                <p class="paragraph-1" release-type="@version.Type.ToString().ToLower()" style="text-transform: capitalize">@version.Type.ToString()</p>
+                                <p class="paragraph-3 downloads">@version.TotalDownloads.ToString("N0") Downloads</p>
                                 <span class="platforms">
                                     @foreach (var platform in version.Platforms)
                                     {
+                                        string download_param = $"`{Model.Name}`,{Model.Id}, {version.ID}, '{platform.platform}', `{version.Name}`";
                                         switch (platform.platform)
                                         {
                                             case OpenDSM.SQL.Platform.Windows:
-                                                <i class="fab fa-windows" title="Windows" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                <i class="fab fa-windows" title="Windows" onclick="new DownloadPopup(@download_param).open()"></i>
                                                 break;
                                             case OpenDSM.SQL.Platform.WindowsARM:
-                                                <i class="fab fa-windows" title="Windows ARM" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                <i class="fab fa-windows" title="Windows ARM" onclick="new DownloadPopup(@download_param).open()"></i>
                                                 break;
                                             case OpenDSM.SQL.Platform.Mac:
-                                                <i class="fab fa-apple" title="Mac" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                <i class="fab fa-apple" title="Mac" onclick="new DownloadPopup(@download_param).open()"></i>
                                                 break;
                                             case OpenDSM.SQL.Platform.MacARM:
-                                                <i class="fab fa-apple" title="Mac ARM / Apple Silicon" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                <i class="fab fa-apple" title="Mac ARM / Apple Silicon" onclick="new DownloadPopup(@download_param).open()"></i>
                                                 break;
                                             case OpenDSM.SQL.Platform.Linux:
-                                                <i class="fab fa-linux" title="Linux" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                <i class="fab fa-linux" title="Linux" onclick="new DownloadPopup(@download_param).open()"></i>
                                                 break;
                                             case OpenDSM.SQL.Platform.LinuxARM:
-                                                <i class="fab fa-linux" title="Linux ARM" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                <i class="fab fa-linux" title="Linux ARM" onclick="new DownloadPopup(@download_param).open()"></i>
                                                 break;
                                             case OpenDSM.SQL.Platform.Java:
-                                                <i class="fa-brands fa-java" title="Java" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                <i class="fa-brands fa-java" title="Java" onclick="new DownloadPopup(@download_param).open()"></i>
                                                 break;
                                             case OpenDSM.SQL.Platform.Android:
-                                                <i class="fa-brands fa-android" title="Java" onclick="new DownloadPopup(@Model.Id, @version.ID, '@platform.platform.ToString()')"></i>
+                                                <i class="fa-brands fa-android" title="Java" onclick="new DownloadPopup(@download_param).open()"></i>
                                                 break;
                                         }
                                     }
                                 </span>
+
                             </div>
                             <div class="list vertical">
-                                <button class="btn download" onclick="new DownloadPopup('author', 'id', 'version_id').open()">Download</button>
-                                <button class="btn secondary changelog" onclick="new ChangelogPopup('author', 'id', 'version_id').open()">Changelog</button>
+                                <button class="btn download" onclick="new DownloadPopup(`@Model.Name`,@Model.Id, @version.ID, '@OS', `@version.Name`).open()">Download</button>
+                                @if (!string.IsNullOrWhiteSpace(version.Changelog))
+                                {
+                                    <button class="btn secondary changelog" onclick="new ChangelogPopup(`@version.Type.ToString() - @version.Name`, `@version.Changelog`).open()">Changelog</button>
+                                }
                             </div>
                         </div>
                     </div>
+
                 }
             </div>
         </section>
