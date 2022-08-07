@@ -26,7 +26,6 @@ public class ProductModel
         ShortSummery = summery;
         TotalPageViews = pageViews;
         Posted = posted;
-        PopulateVersions();
     }
 
     #endregion Protected Constructors
@@ -112,7 +111,7 @@ public class ProductModel
     public bool UseGitReadME { get; }
     public UserModel User { get; private set; }
     public string YoutubeKey { get; private set; }
-    public VersionModel[] Versions { get; private set; }
+    public Dictionary<long, VersionModel> Versions { get; private set; }
 
     #endregion Public Properties
 
@@ -120,12 +119,17 @@ public class ProductModel
 
     public static ProductModel? GetByID(int id)
     {
-        if (Products.CheckProductExists(id))
+        try
         {
+
             if (Products.GetProductFromID(id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted))
             {
                 return new(id, owner_id, gitRepoName, name, summery, useGitReadme, yt_key, (uint)price, tags, keywords, subscription, pageViews, posted);
             }
+        }
+        catch
+        {
+
         }
         return null;
     }
@@ -133,7 +137,12 @@ public class ProductModel
     public static bool TryCreateProduct(string gitRepoName, UserModel user, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out ProductModel model)
     {
         model = null;
-        return Products.Create(user.Id, gitRepoName, name, yt_key, subscription, use_git_readme, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model);
+        if (Products.Create(user.Id, gitRepoName, name, yt_key, subscription, use_git_readme, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model))
+        {
+            GitHandler.CreateWebHook(new(user.GitUsername, user.GitToken), model);
+            return true;
+        }
+        return false;
     }
 
     public static bool TryGetByID(int id, out ProductModel? model)
@@ -149,29 +158,27 @@ public class ProductModel
         List<Platform> platforms = new();
         try
         {
-
-            foreach (long version_id in SQL.Versions.GetVersionsByProductID(Id))
+            foreach (int version_id in GitHandler.GitReleases(GitRepositoryName, new(User.GitUsername, User.GitToken)))
             {
-                VersionModel? version = VersionModel.GetVersionByID(version_id, Id);
-                if (version != null)
+                if (GitHandler.GetVersionFromID(GitRepositoryName, version_id, Id, new(User.GitUsername, User.GitToken), out VersionModel version))
                 {
                     versions_list.Add(version);
-                    TotalDownloads += version.TotalDownloads;
-                    TotalWeeklyDownloads += version.WeeklyDownloads;
-                    foreach (PlatformVersion platform_version in version.Platforms)
+                    foreach (PlatformVersion platform in version.Platforms)
                     {
-                        Platform temp = platform_version.platform;
-                        if (!platforms.Contains(temp))
+                        if (!platforms.Contains(platform.platform))
                         {
-                            platforms.Add(platform_version.platform);
+                            platforms.Add(platform.platform);
                         }
                     }
+                    TotalDownloads += version.TotalDownloads;
+                    TotalWeeklyDownloads += version.WeeklyDownloads;
                 }
             }
         }
         catch { }
         Platforms = platforms.ToArray();
-        Versions = versions_list.ToArray();
+        Versions = versions_list.ToDictionary(i => i.ID);
+
     }
 
     public void PopulateReviews()
