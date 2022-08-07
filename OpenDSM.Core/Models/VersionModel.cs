@@ -14,7 +14,7 @@ public enum ReleaseType
     Alpha,
     Unkown
 }
-public record PlatformVersion(Platform platform, string downloadUrl, int total_downloads, int weekly_downloads);
+public record PlatformVersion(Platform platform, string downloadUrl, int total_downloads, int weekly_downloads, long file_size);
 public class VersionModel
 {
     public long ID { get; }
@@ -24,44 +24,23 @@ public class VersionModel
     public int TotalDownloads { get; }
     public int WeeklyDownloads { get; }
     public List<PlatformVersion> Platforms { get; }
+    public string Changelog { get; }
 
-    public VersionModel(long iD, int product_id, string name, ReleaseType type, int total_downloads, int weekly_downloads, List<PlatformVersion> platforms)
+    public VersionModel(long iD, int product_id, string name, ReleaseType type, List<PlatformVersion> platforms, string changelog)
     {
         ID = iD;
         Name = name;
         Type = type;
         Platforms = platforms;
         ProductID = product_id;
-        TotalDownloads = total_downloads;
-        WeeklyDownloads = weekly_downloads;
-    }
-
-    public static VersionModel CreateVersion(ProductModel product, string name, string changelog_url, ReleaseType type, List<PlatformVersion> platforms)
-    {
-        Versions.CreateVersion(product.Id, name, (byte)type, changelog_url, out long id);
+        TotalDownloads = 0;
+        WeeklyDownloads = 0;
         foreach (PlatformVersion platform in platforms)
         {
-            Versions.CreatePlatformVersion(platform.platform, platform.downloadUrl, id);
+            TotalDownloads += platform.total_downloads;
+            WeeklyDownloads += platform.weekly_downloads;
         }
-        return new VersionModel(id, product.Id, name, type, 0, 0, platforms);
+        Changelog = changelog;
     }
-    public static VersionModel? GetVersionByID(long id, int product_id)
-    {
-        if (Versions.GetVersionByID(id, product_id, out string name, out byte releaseType, out byte[] platforms))
-        {
-            int version_total_downloads = 0, version_weekly_downloads = 0;
-            List<PlatformVersion> platform_list = new();
-            foreach (byte platform_id in platforms)
-            {
-                if (Versions.GetPlatformVersionByID(platform_id, id, out string download_url, out int total_downloads, out int weekly_dowloads))
-                {
-                    platform_list.Add(new((Platform)platform_id, download_url, total_downloads, weekly_dowloads));
-                    version_total_downloads += total_downloads;
-                    version_weekly_downloads += weekly_dowloads;
-                }
-            }
-            return new(id, product_id, name, (ReleaseType)releaseType, version_total_downloads, version_weekly_downloads, platform_list);
-        }
-        return null;
-    }
+
 }
