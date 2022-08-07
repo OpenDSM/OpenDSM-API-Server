@@ -49,13 +49,14 @@ public class ProductController : ControllerBase
         return BadRequest();
     }
 
+
     [HttpGet("download")]
     public IActionResult Download(int product_id, long version_id, Platform platform)
     {
         ProductModel? product = ProductModel.GetByID(product_id);
         if (product != null)
         {
-            VersionModel? version = VersionModel.GetVersionByID(version_id, product_id);
+            VersionModel? version = product.Versions[version_id];
             if (version != null)
             {
                 PlatformVersion? platform_version = version.Platforms.FirstOrDefault(i => i.platform == platform);
@@ -68,6 +69,22 @@ public class ProductController : ControllerBase
         return RedirectToAction("Index", "Error", 500);
     }
 
+    [HttpPost("trigger-version-check")]
+    public IActionResult TriggerVersionCheck([FromQuery] int product_id)
+    {
+        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
+        {
+            model.PopulateVersions();
+            return Ok(new
+            {
+                model.Versions
+            });
+        }
+        return BadRequest(new
+        {
+            message = "Product Doesn't Exist"
+        });
+    }
 
     #endregion Public Methods
 }
