@@ -56,11 +56,10 @@ public class ProductController : Controller
     [HttpGet("{id}/images/{name}")]
     public IActionResult GetImage(int id, string name)
     {
-        ProductModel model = ProductModel.GetByID(id);
-        if (model != null)
+        string path = Path.Combine(GetProductDirectory(id), $"{name}.jpg");
+        if (System.IO.File.Exists(path))
         {
-            string path = Path.Combine(GetProductDirectory(id), $"{name}.jpg");
-            FileStream fs = new(path, FileMode.Open, FileAccess.Read);
+            FileStream fs = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             return new FileStreamResult(fs, "image/jpg");
         }
         return BadRequest();
@@ -68,10 +67,9 @@ public class ProductController : Controller
     [HttpGet("{id}/images/gallery/{name}")]
     public IActionResult GetGalleryImage(int id, string name)
     {
-        ProductModel model = ProductModel.GetByID(id);
-        if (model != null)
+        string path = Path.Combine(GetProductDirectory(id), "gallery", $"{name}.jpg");
+        if (System.IO.File.Exists(path))
         {
-            string path = Path.Combine(GetProductDirectory(id), "gallery", $"{name}.jpg");
             FileStream fs = new(path, FileMode.Open, FileAccess.Read);
             return new FileStreamResult(fs, "image/jpg");
         }
@@ -94,6 +92,7 @@ public class ProductController : Controller
     [Route("{id}")]
     public IActionResult Index(int id, bool? preview)
     {
+
         if (ProductModel.TryGetByID(id, out ProductModel? model))
         {
             if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
