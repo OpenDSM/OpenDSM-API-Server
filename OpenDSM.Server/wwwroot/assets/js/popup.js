@@ -16,6 +16,7 @@ class Popup {
             this.close()
         })
 
+        InitElements();
         return $("#popup .content")[0]
     }
     close() {
@@ -34,10 +35,11 @@ class CenteredPopup extends Popup {
         super(name);
     }
     async open() {
-        await super.open();
+        let element = await super.open();
         $("#popup-content .content")[0].style.display = "flex"
         $("#popup-content .content")[0].style.justifyContent = "center"
         $("#popup-content .content")[0].style.alignItems = "center"
+        return element;
     }
     async close() {
         $("#popup-content .content")[0].style.display = ""
@@ -119,26 +121,18 @@ class PurchasePopup extends Popup {
 }
 
 class ChangelogPopup extends Popup {
-    author;
-    id;
-    version_id;
-    constructor(author, id, version_id) {
+    changelog;
+    version;
+    constructor(version, changelog) {
         super("changelog")
-        this.author = author
-        this.id = id;
-        this.version_id = version_id;
+        this.changelog = changelog;
+        this.version = version;
     }
     async open() {
         let element = await super.open();
-        let response = await fetch(`/api/product/${this.author}/${this.id}/${this.version_id}`)
-        if (response.ok) {
-            let json = await response.json();
-            $(element).find('h1.title')[0].innerText = json["version"]
-            $(element).find('.description')[0].innerText = json["log"]
-        } else {
-            $(element).find('h1')[0].innerText = "Changelog Not Found"
-            console.log($(element).find('.description')[0])
-        }
+        $(element).find('h1')[0].innerText = this.version;
+        let converter = new showdown.Converter()
+        $(element).find('.description')[0].innerHTML = converter.makeHtml(this.changelog)
     }
 
     close() {
@@ -146,33 +140,26 @@ class ChangelogPopup extends Popup {
     }
 }
 
-class DownloadPopup extends Popup {
-    author;
+class DownloadPopup extends CenteredPopup {
+    product_name;
     id;
     version_id;
-    constructor(author, id, version_id) {
+    platform;
+    version_name;
+    constructor(product_name, id, version_id, platform, version_name) {
         super("download")
-        this.author = author
+        this.product_name = product_name;
         this.id = id;
         this.version_id = version_id;
+        this.platform = platform;
+        this.version_name = version_name;
     }
     async open() {
         let element = await super.open();
-        let response = await fetch(`/api/product/${this.author}/${this.id}/${this.version_id}`)
-
-        if (response.ok) {
-            let json = await response.json();
-            let url = json['url'];
-
-            let blob = await fetch(url).then(r => r.blob());
-            let link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `${this.author}-${this.id}-${this.version_id}.zip`
-            link.click();
-        } else {
-            $(element).find('h1')[0].innerText = "Download Not Found"
-            $(element).find('p')[0].innerText = "Sorry, sometimes life give's us problems without solutions..."
-        }
+        let link = $(element).find("#download-link")[0];
+        link.href = `/api/product/download?product_id=${this.id}&version_id=${this.version_id}&platform=${this.platform}`;
+        link.download = `${this.product_name}-${this.platform}-${this.version_name}.zip`
+        link.click();
     }
 
     close() {
@@ -373,5 +360,108 @@ class SearchFilterPopup extends Popup {
                 e.currentTarget.classList.toggle("active");
             })
         }, 500)
+    }
+}
+
+class CreateVersionPopup extends Popup {
+    product_id;
+    constructor(product_id) {
+        super('create-version')
+        this.product_id = product_id;
+    }
+    async open() {
+        let element = await super.open();
+        $(element).find(".file-upload").on('click', e => {
+            if (e.currentTarget.classList.contains("active")) {
+                $(`input[type="file"]#${e.currentTarget.id}-input`)[0].remove()
+                $(e.currentTarget).find("i")[0].classList.remove("fa-trash")
+                $(e.currentTarget).find("i")[0].classList.add("fa-plus")
+
+                e.currentTarget.classList.remove('active');
+            } else {
+                let input = document.createElement("input");
+                input.type = "file";
+                input.accept = "application/zip"
+                input.id = `${e.currentTarget.id}-input`;
+                $(input).on('change', el => {
+                    $(e.currentTarget).find("i")[0].classList.remove("fa-plus")
+                    $(e.currentTarget).find("i")[0].classList.add("fa-trash")
+                    $(e.currentTarget)[0].classList.add('active');
+                })
+                element.appendChild(input);
+                input.click();
+                input.style.display = "none";
+            }
+        })
+
+        /*
+         <h4 style="display: flex;justify-content: start;align-content: center;align-items: center;width: 100%;">
+            <i class="throbber" style="width: 35px;"></i> Windows
+        </h4>
+        <h4 style="display: flex;justify-content: start;align-content: center;align-items: center;width: 100%;">
+            <i class="fa fa-check" style="width: 35px;margin: 2rem;color: var(--primary);"></i> Linux
+        </h4>
+         */
+        let check = setInterval(() => {
+
+            let version = $("input#version-name")[0].value;
+            let releaseType = $("input#release-type")[0].value;
+            let changelog = $("textarea#changelog-box")[0].value;
+            let inputs = Array.from($(element).find('input[type="file"]'))
+
+            if (version != "" && releaseType != "" && changelog != "", inputs.length != 0) {
+                $(element).find('button.btn#finish-button')[0].disabled = false;
+            } else {
+                $(element).find('button.btn#finish-button')[0].disabled = true;
+            }
+        }, 500);
+        $(element).find('button.btn#finish-button').on('click', async () => {
+            window.onbeforeunload = function () {
+                return "Are you sure? Unsaved changes maybe dismissed or corrupted";
+            }
+            let version = $("input#version-name")[0].value;
+            let releaseType = $("input#release-type")[0].value;
+            let changelog = $("textarea#changelog-box")[0].value;
+            let inputs = Array.from($(element).find('input[type="file"]'))
+
+            if (version != "" && releaseType != "" && changelog != "", inputs.length != 0) {
+                let info = $("#info-section")[0]
+                let uploads = $("#upload-section")[0]
+                let uploadTasks = $("#upload-tasks")[0]
+                info.style.display = "none";
+                uploads.style.display = "";
+
+                let name = "Creating Git Release";
+                let header = document.createElement("h4");
+                header.classList.add("upload-task");
+                header.id = `${name}-upload-task`;
+
+                let icon = document.createElement("i");
+                icon.classList.add("throbber");
+
+                header.appendChild(icon);
+                header.append(name);
+                uploadTasks.appendChild(header);
+
+                let response = await fetch(``)
+                icon.classList.remove('throbber');
+                icon.classList.add('fa','fa-check');
+
+                inputs.forEach(i => {
+                    let name = i.id.replace("-upload-input", "");
+                    let header = document.createElement("h4");
+                    header.classList.add("upload-task");
+                    header.id = `${name}-upload-task`;
+
+                    let icon = document.createElement("i");
+                    icon.classList.add("throbber");
+
+                    header.appendChild(icon);
+                    header.append(`Uploading ${name}`);
+
+                    uploadTasks.appendChild(header);
+                })
+            }
+        });
     }
 }
