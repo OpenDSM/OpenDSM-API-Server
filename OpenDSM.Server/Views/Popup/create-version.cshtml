@@ -1,3 +1,98 @@
 @{
     Layout = null;
 }
+<div id="info-section" class="list vertical centered" style="padding: 60px 0;">
+
+    <section>
+        <h2>Info</h2>
+        <div class="input">
+            <label for="version-name">Version Name</label>
+            <input type="text" id="version-name" required autocomplete="off">
+        </div>
+        <div class="input dropdown">
+            <label for="release-type">Release Type</label>
+            <input type="text" name="release-type" id="release-type" readonly required>
+            <div class="dropdown-body">
+                <div class="dropdown-item">Release</div>
+                <div class="dropdown-item">Beta</div>
+                <div class="dropdown-item">Alpha</div>
+            </div>
+        </div>
+
+        <div class="large-input list vertical" id="about-section">
+            <h4 for="changelog-box">Changelog</h4>
+            <p class="paragraph-2">This is using markdown language.  For more information view our <a href="#">documentation on markdown</a></p>
+            <textarea type="text" id="changelog-box" autocomplete="off" required></textarea>
+        </div>
+
+    </section>
+    <div class="ad"></div>
+    <section>
+        <h2>Files</h2>
+        <p class="paragraph-3">For more information view our documentation on <a href="#">file uploads.</a></p>
+        <div class="list vertical" style="margin: 1rem 0;">
+            <div class="list horizontal" style="margin: 1rem 0;">
+                <div class="list vertical">
+                    <h4>Windows</h4>
+                    <div id="windows-upload" class="file-upload">
+                        <div class="content">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="list vertical">
+                    <h4>Mac</h4>
+                    <div id="mac-upload" class="file-upload">
+                        <div class="content">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="list vertical">
+                    <h4>Linux</h4>
+                    <div id="linux-upload" class="file-upload">
+                        <div class="content">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="list horizontal" style="margin: 1rem 0;">
+                <div class="list vertical">
+                    <h4>Windows ARM</h4>
+                    <div id="windows-arm-upload" class="file-upload">
+                        <div class="content">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="list vertical">
+                    <h4>Mac ARM</h4>
+                    <div id="mac-arm-upload" class="file-upload">
+                        <div class="content">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="list vertical">
+                    <h4>Linux ARM</h4>
+                    <div id="linux-arm-upload" class="file-upload">
+                        <div class="content">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="ad"></div>
+    <button id="finish-button" class="btn">Finish</button>
+</div>
+
+<section id="upload-section" class="list vertical centered" style="padding: 60px 0; display:none;">
+    <h1>Creating Release...</h1>
+    <div id="upload-tasks" class="list vertical">
+    </div>
+    <button id="done-button" class="btn" disabled>Done</button>
+</section>
+
