@@ -551,6 +551,7 @@ main > .content.raised {
     align-items: center;
     margin-left: auto;
     margin-right: auto;
+    justify-content: center;
 }
 
 .no-select, toggle, .btn, img, .brand {
@@ -611,8 +612,25 @@ section:not(#landing) {
     max-width: 90%;
 }
 
-/*#endregion Layout */
+.upload-task {
+    display: flex;
+    justify-content: start;
+    align-content: center;
+    align-items: center;
+    width: 100%;
+    text-transform: capitalize;
+}
 
+    .upload-task i {
+        width: 35px;
+        margin: 2rem;
+        color: var(--primary);
+    }
+
+#upload-tasks {
+    width: 100%;
+}
+/*#endregion Layout */
 /*#region Ratings and Reviews */
 .reviews > .list.vertical {
     margin: 2rem 0;
@@ -753,6 +771,10 @@ section:not(#landing) {
             margin: .5rem;
         }
 
+            .version-item .platforms i:hover {
+                cursor: pointer;
+                color: var(--primary);
+            }
 /*#endregion Versions */
 
 /*#region Products */
@@ -1051,11 +1073,7 @@ section:not(#landing) {
     display: flex;
     align-items: center;
     flex-direction: column;
-    height: calc(80vh - 8rem);
     overflow: auto;
-    padding: 4rem;
-    margin-top: 4rem;
-    margin-right: 4rem;
 }
 
 body.popup-active {
@@ -1091,7 +1109,7 @@ body.popup-active {
     cursor: pointer;
 }
 
-#popup .content {
+#popup #popup-content > .content {
     max-height: 100vh;
     height: 100vh;
     overflow: auto;
@@ -1194,7 +1212,7 @@ body.popup-active {
     background-position: center;
     filter: contrast(0.5);
     transition: transform 500ms, filter 500ms;
-    cursor:pointer;
+    cursor: pointer;
 }
 
     .search-category:hover, .search-category.active {
@@ -1214,6 +1232,7 @@ body.popup-active {
         background-image: url("/assets/images/search-categories/Users.jpg");
     }
 /*#endregion Search */
+
 /*#region Profile Page */
 #landing.profile {
     position: relative;
@@ -1253,6 +1272,11 @@ body.popup-active {
 /*#endregion Profile Page */
 
 /*#region Scrollbar */
+* {
+    scrollbar-color: var(--primary) transparent;
+    scrollbar-width: thin;
+}
+
 ::-webkit-scrollbar {
     position: absolute;
     width: 5px;
