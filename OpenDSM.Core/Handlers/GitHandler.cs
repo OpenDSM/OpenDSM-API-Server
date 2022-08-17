@@ -1,30 +1,73 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using CLMath;
 using Newtonsoft.Json.Linq;
+using Octokit;
 using OpenDSM.Core.Models;
 using OpenDSM.SQL;
 using System.Net.Http.Json;
+using System.Text;
+using System.Xml.Linq;
 
 namespace OpenDSM.Core.Handlers;
 
-public record GitRepository(int ID, string Name);
+public record GitRepository(long ID, string Name);
 public record GitCredentials(string Username, string Token);
 
 public static class GitHandler
 {
+
     #region Public Methods
 
     public static bool CheckCredentials(GitCredentials credentials)
     {
         if (!string.IsNullOrWhiteSpace(credentials.Token) && !string.IsNullOrWhiteSpace(credentials.Username))
         {
-            using HttpClient client = GetClient(credentials);
-            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/users/{credentials.Username}/repos").Result;
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return response.Content != null;
+                GitHubClient client = GetClient(credentials);
+                return true;
+            }
+            catch
+            {
+
             }
         }
         return false;
+    }
+
+    public async static Task<int> CreateRelease(GitCredentials credentials, ProductModel product, string name, ReleaseType type, string changelog)
+    {
+        try
+        {
+            GitHubClient client = GetClient(credentials);
+            Release release = await client.Repository.Release.Create(credentials.Username, product.GitRepositoryName, new(name)
+            {
+                Name = $"{type} - {name}",
+                Body = changelog,
+            });
+            return release.Id;
+        }
+        catch
+        {
+            return -1;
+        }
+    }
+
+    public async static Task CreateWebHook(GitCredentials credentials, ProductModel product)
+    {
+        if (CheckCredentials(credentials))
+        {
+            GitHubClient client = GetClient(credentials);
+            Dictionary<string, string> config = new Dictionary<string, string>();
+            config.Add("url", $"https://opendsm.tk/api/product/trigger-version-check?product_id={product.Id}");
+            config.Add("content_type", "application/json");
+
+            await client.Repository.Hooks.Create(credentials.Username, product.GitRepositoryName, new("opendsm", config)
+            {
+                Active = true,
+                Events = new string[] { "release" },
+            });
+        }
     }
 
     public static GitRepository[] GetRepositories(GitCredentials credentials)
@@ -32,22 +75,11 @@ public static class GitHandler
         List<GitRepository> repos = new();
         if (CheckCredentials(credentials))
         {
-            using HttpClient client = GetClient(credentials);
-            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/users/{credentials.Username}/repos").Result;
-            if (response.IsSuccessStatusCode)
+            GitHubClient client = GetClient(credentials);
+            IReadOnlyList<Repository> repositories = client.Repository.GetAllForCurrent().Result;
+            foreach (Repository repository in repositories)
             {
-                if (response.Content != null)
-                {
-                    JArray jArray = JArray.Parse(response.Content.ReadAsStringAsync().Result);
-                    foreach (JToken token in jArray)
-                    {
-                        JObject jObject = JObject.FromObject(token);
-                        if (int.TryParse(jObject["id"].ToString(), out int id))
-                        {
-                            repos.Add(new(id, jObject["name"].ToString()));
-                        }
-                    }
-                }
+                repos.Add(new(repository.Id, repository.FullName));
             }
         }
 
@@ -57,79 +89,50 @@ public static class GitHandler
     public static bool GetVersionFromID(string git_repo, int git_version_id, int product_id, GitCredentials credentials, out VersionModel version)
     {
         ReleaseType releaseType = ReleaseType.Unkown;
-        string version_name = "";
         List<PlatformVersion> platforms = new();
         version = null;
         if (CheckCredentials(credentials))
         {
-            using HttpClient client = GetClient(credentials);
-            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/repos/{credentials.Username}/{git_repo}/releases/{git_version_id}").Result;
-            if (response.IsSuccessStatusCode)
+            GitHubClient client = GetClient(credentials);
+            Release release = client.Repository.Release.Get(credentials.Username, git_repo, git_version_id).Result;
+            IReadOnlyList<ReleaseAsset> assets = release.Assets;
+            foreach (ReleaseAsset asset in assets)
             {
-                try
+                foreach (Platform platform in Enum.GetValues(typeof(Platform)))
                 {
-
-                    JObject json = JObject.Parse(response.Content.ReadAsStringAsync().Result);
-                    if (json != null)
+                    if (asset.Name.ToLower().Contains(platform.ToString().ToLower()))
                     {
-                        version_name = (string)json["name"];
-                        foreach (ReleaseType type in Enum.GetValues(typeof(ReleaseType)))
-                        {
-                            if (version_name.ToLower().Contains(type.ToString().ToLower()))
-                            {
-                                releaseType = type;
-                                break;
-                            }
-                        }
-                        version_name = version_name.Replace(releaseType.ToString(), "").Trim().Trim('-').Trim(); // 'ReleaseType - Version_Name'  -> ' - Version_Name' -> 'Version_Name'
-                        if (json["assets"] != null)
-                        {
-                            JArray assets = (JArray)json["assets"];
-                            foreach (JToken token in assets)
-                            {
-                                JObject asset = (JObject)token;
-                                string name = (string)asset["name"];
-                                foreach (Platform platform in Enum.GetValues(typeof(Platform)))
-                                {
-                                    if (name.ToLower().Contains(platform.ToString().ToLower()))
-                                    {
-                                        if (asset["browser_download_url"] != null)
-                                        {
-                                            platforms.Add(new(platform, (string)asset["browser_download_url"], (int)(asset["download_count"] ?? 0), 0, (long)(asset["size"] ?? 0)));
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            version = new((long)json["id"], product_id, version_name, releaseType, platforms, (string)(json["body"] ?? ""));
-                            return true;
-                        }
+                        platforms.Add(new(platform, asset.BrowserDownloadUrl, asset.DownloadCount, 0, asset.Size));
+                        break;
                     }
                 }
-                catch (Exception e)
+            }
+
+            foreach (ReleaseType type in Enum.GetValues(typeof(ReleaseType)))
+            {
+                if (release.Name.ToLower().Contains(type.ToString().ToLower()))
                 {
-                    log.Error($"Unable to GetVersionFromID: {git_version_id}", e.Message, e.StackTrace);
+                    releaseType = type;
+                    break;
                 }
             }
+            string version_name = release.Name.Replace(releaseType.ToString(), "").Trim().Trim('-').Trim();
+            version = new(git_version_id, product_id, version_name, releaseType, platforms, release.Body, release.CreatedAt.LocalDateTime);
+            return true;
         }
         return false;
     }
 
-    public static int[] GitReleases(string repo_name, GitCredentials credentials)
+    public async static Task<long[]> GitReleases(string repo_name, GitCredentials credentials)
     {
-        List<int> ids = new();
+        List<long> ids = new();
         if (CheckCredentials(credentials))
         {
-            using HttpClient client = GetClient(credentials);
-            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/repos/{credentials.Username}/{repo_name}/releases").Result;
-            if (response.IsSuccessStatusCode)
+            GitHubClient client = GetClient(credentials);
+            IReadOnlyList<Release> releases = await client.Repository.Release.GetAll(credentials.Username, repo_name);
+            foreach (Release release in releases)
             {
-                JArray array = JArray.Parse(response.Content.ReadAsStringAsync().Result);
-                foreach (JToken token in array)
-                {
-                    JObject json = (JObject)token;
-                    ids.Add((int)json["id"]);
-                }
+                ids.Add(release.Id);
             }
         }
         return ids.ToArray();
@@ -139,69 +142,57 @@ public static class GitHandler
     {
         if (CheckCredentials(credentials))
         {
-            using HttpClient client = GetClient(credentials);
-            using HttpResponseMessage response = client.GetAsync($"https://api.github.com/repos/{credentials.Username}/{RepositoryName}/contents/").Result;
-            if (response.IsSuccessStatusCode)
+            try
             {
-                JArray jarray = JArray.Parse(response.Content.ReadAsStringAsync().Result);
-                foreach (var item in jarray)
-                {
-                    JObject obj = (JObject)item;
-                    if (obj != null && obj["name"] != null)
-                    {
-                        if (obj["name"].ToString().ToLower().Equals("readme.md") && obj["download_url"] != null)
-                        {
-                            string url = obj["download_url"].ToString();
-                            using HttpClient c = GetClient(credentials);
-                            using HttpResponseMessage msg = c.GetAsync(url).Result;
-                            if (msg.IsSuccessStatusCode)
-                            {
-                                if (msg.Content != null)
-                                {
-                                    ReadMe = msg.Content.ReadAsStringAsync().Result;
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
+                GitHubClient client = GetClient(credentials);
+                Readme readme = client.Repository.Content.GetReadme(credentials.Username, RepositoryName).Result;
+                ReadMe = readme.Content;
+                return true;
             }
+            catch { }
         }
         ReadMe = "";
         return false;
     }
-
-    public static void CreateWebHook(GitCredentials credentials, ProductModel product)
+    public async static Task<bool> UploadReleaseAsset(GitCredentials credentials, Stream file, ProductModel product, Platform platform, int release_id)
     {
         if (CheckCredentials(credentials))
         {
-            using HttpClient client = GetClient(credentials);
-            using HttpRequestMessage message = new(HttpMethod.Post, $"https://api.github.com/repos/{credentials.Username}/{product.GitRepositoryName}/hooks");
-            message.Content = JsonContent.Create(new
+            try
             {
-                active = true,
-                events = new string[] { "release" },
-                config = new
+                GitHubClient client = GetClient(credentials);
+                ReleaseAssetUpload assetUpload = new()
                 {
-                    url = $"https://opendsm.tk/api/product/trigger-version-check?product_id={product.Id}",
-                    content_type = "application/json"
-                }
-            });
-            using HttpResponseMessage response = client.Send(message);
+                    FileName = $"{platform}.zip",
+                    ContentType = "application/zip",
+                    RawData = file
+                };
+                Release release = await client.Repository.Release.Get(product.User.GitUsername, product.GitRepositoryName, release_id);
+                ReleaseAsset asset = await client.Repository.Release.UploadAsset(release, assetUpload);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                log.Error("Unable to upload release assets", e.Message, e.StackTrace);
+            }
         }
+
+        return false;
     }
 
     #endregion Public Methods
 
     #region Private Methods
 
-    private static HttpClient GetClient(GitCredentials credentials)
+    private static GitHubClient GetClient(GitCredentials credentials)
     {
-        HttpClient client = new();
-        client.DefaultRequestHeaders.Add("User-Agent", ApplicationName);
-        client.DefaultRequestHeaders.Add("Authorization", $"token {credentials.Token}");
-        return client;
+        return new(new ProductHeaderValue(credentials.Username))
+        {
+            Credentials = new(credentials.Token)
+        };
     }
 
     #endregion Private Methods
+
 }
