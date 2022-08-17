@@ -59,10 +59,12 @@ $("#upload-profile-image.file-upload").on('click', e => {
             data.append("base64", base);
             data.append("email", email);
             data.append("token", token);
+            let loading = new LoadingScreen("Uploading Profile", "This may take a moment!");
             await fetch('/api/auth/image/profile', { method: "POST", body: data })
             Array.from($(".profile-image")).forEach(item => {
                 item.style.backgroundImage = `url("data:image/png;base64,${base}")`
             })
+            loading.unload();
         });
         popup.open();
     })
@@ -80,8 +82,10 @@ $("#upload-profile-banner.file-upload").on('click', e => {
             data.append("base64", base);
             data.append("email", email);
             data.append("token", token);
+            let loading = new LoadingScreen("Uploading Banner", "This may take a moment!");
             await fetch('/api/auth/image/banner', { method: "POST", body: data })
             $(".profile#landing")[0].style.backgroundImage = `url("data:image/png;base64,${base}")`
+            loading.unload();
         });
         popup.open();
     })
