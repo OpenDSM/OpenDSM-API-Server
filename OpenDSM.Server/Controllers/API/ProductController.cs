@@ -1,5 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
 using OpenDSM.SQL;
 using Tags = OpenDSM.Core.Models.Tags;
@@ -8,13 +10,8 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("api/product")]
 public class ProductController : ControllerBase
 {
-    #region Public Methods
 
-    [HttpGet("get")]
-    public IActionResult GetProduct(int id)
-    {
-        return new JsonResult(ProductModel.GetByID(id));
-    }
+    #region Public Methods
 
     [HttpPost("create")]
     public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner, [FromForm] string[]? gallery)
@@ -49,6 +46,49 @@ public class ProductController : ControllerBase
         return BadRequest();
     }
 
+    [HttpPost("create-version")]
+    public IActionResult CreateVersion([FromForm] int id, [FromForm] string name, [FromForm] ReleaseType type, [FromForm] string changelog)
+    {
+        if (IsLoggedIn(Request.Cookies, out UserModel user))
+        {
+            if (ProductModel.TryGetByID(id, out ProductModel? model))
+            {
+                int release_id = GitHandler.CreateRelease(user.GitCredentials, model, name, type, changelog).Result;
+                if (release_id != -1)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = $"Release created with id: {release_id}",
+                        id = release_id,
+                        repo = model.GitRepositoryName,
+                        owner = user.GitUsername,
+                        git_token = user.GitToken,
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    success = false,
+                    message = $"Couldn't create release",
+                    id = -1
+                });
+            }
+
+            return BadRequest(new
+            {
+                success = false,
+                message = $"Couldn't get product from id: {id}",
+                id = -1
+            });
+        }
+        return BadRequest(new
+        {
+            success = false,
+            message = "Couldn't authorize user",
+            id = -1
+        });
+    }
 
     [HttpGet("download")]
     public IActionResult Download(int product_id, long version_id, Platform platform)
@@ -69,12 +109,17 @@ public class ProductController : ControllerBase
         return RedirectToAction("Index", "Error", 500);
     }
 
+    [HttpGet("get")]
+    public IActionResult GetProduct(int id)
+    {
+        return new JsonResult(ProductModel.GetByID(id));
+    }
     [HttpPost("trigger-version-check")]
     public IActionResult TriggerVersionCheck([FromQuery] int product_id)
     {
         if (ProductModel.TryGetByID(product_id, out ProductModel? model))
         {
-            model.PopulateVersions();
+            model.PopulateVersionsFromGit();
             return Ok(new
             {
                 model.Versions
@@ -85,6 +130,49 @@ public class ProductController : ControllerBase
             message = "Product Doesn't Exist"
         });
     }
+    [HttpPost("upload-version-asset"), DisableRequestSizeLimit]
+    public async Task<IActionResult> UploadAsset([FromQuery] int id, [FromQuery] int release_id, [FromQuery] Platform platform, [FromForm] IFormFile file)
+    {
+        if (IsLoggedIn(Request.Cookies, out UserModel user))
+        {
+            if (ProductModel.TryGetByID(id, out ProductModel product))
+            {
+                try
+                {
+                    if (await GitHandler.UploadReleaseAsset(user.GitCredentials, file.OpenReadStream(), product, platform, release_id))
+                    {
+                        return Ok(new
+                        {
+                            message = "asset uploaded!"
+                        });
+                    }
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(new
+                    {
+                        message = $"Unable to upload git release asset: {e.Message}",
+                        stacktrace = e.StackTrace
+                    });
+                }
+                return BadRequest(new
+                {
+                    message = $"Unable to upload git release asset"
+                });
+
+            }
+
+            return BadRequest(new
+            {
+                message = $"Unable to find product with id of {id}"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "User couldn't be authenticated"
+        });
+    }
 
     #endregion Public Methods
+
 }
