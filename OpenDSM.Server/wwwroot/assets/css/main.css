@@ -399,7 +399,6 @@ input[type=number] {
     padding: 1rem;
 }
 
-
 #preview-label {
     font-size: 4rem;
     text-decoration: none;
@@ -789,8 +788,6 @@ section:not(#landing) {
 /*#endregion Product Page*/
 /*#region General */
 
-
-
 .product {
     display: flex;
     flex-direction: column;
@@ -1068,7 +1065,6 @@ section:not(#landing) {
 
 /*#region Popup */
 
-
 #popup-body {
     display: flex;
     align-items: center;
@@ -1306,8 +1302,8 @@ body::-webkit-scrollbar-track {
 /*#region Cropper */
 
 .image-container {
-    max-height: 80vh;
-    min-height: 80vh;
+    max-height: calc(100% - 75px);
+    min-height: calc(100% - 75px);
     overflow: hidden;
 }
 
@@ -1362,7 +1358,6 @@ body::-webkit-scrollbar-track {
     animation-iteration-count: infinite;
     margin: 2rem;
 }
-
 
 @keyframes Throbber {
     0% {

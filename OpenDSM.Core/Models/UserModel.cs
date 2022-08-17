@@ -1,4 +1,5 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using Microsoft.AspNetCore.Http;
 using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
 
@@ -6,6 +7,7 @@ namespace OpenDSM.Core.Models;
 
 public class UserModel
 {
+
     #region Protected Constructors
 
     protected UserModel(int id, string username, string email, string token, AccountType type, bool use_git_readme, int[] ownedProducts)
@@ -32,27 +34,25 @@ public class UserModel
     #region Public Properties
 
     public string About { get; private set; }
+    public int[] CreatedProducts { get; private set; }
+    public string Email { get; private set; }
+    public GitCredentials GitCredentials => new(GitUsername ?? "", GitToken ?? "");
     public string GitReadme
     {
         get
         {
-            if (GitHandler.HasReadME(GitUsername, new(GitUsername, GitToken), out string readme))
+            if (GitHandler.HasReadME(GitUsername, GitCredentials, out string readme))
             {
                 return readme;
             }
             return "";
         }
     }
-    public bool HasReadme => GitHandler.HasReadME(GitUsername, new(GitUsername, GitToken), out string _);
-    public bool UseGitReadme { get; set; }
-    public int[] CreatedProducts { get; private set; }
-    public string Email { get; private set; }
     public string GitToken { get; set; }
     public string GitUsername { get; set; }
+    public bool HasReadme => GitHandler.HasReadME(GitUsername, GitCredentials, out string _);
     public int Id { get; private set; }
-
-    public bool IsDeveloperAccount => GitHandler.CheckCredentials(new(GitUsername, GitToken));
-
+    public bool IsDeveloperAccount => !string.IsNullOrEmpty(GitUsername) && !string.IsNullOrEmpty(GitToken) && GitCredentials != null && GitHandler.CheckCredentials(GitCredentials);
     public int[] OwnedProducts { get; private set; }
     public string ProfileBannerImage
     {
@@ -65,6 +65,7 @@ public class UserModel
             FileHandler.CreateImageFromBase64(value, GetUsersProfileDirectory(Id), "banner", 1280);
         }
     }
+
     public string ProfileImage
     {
         get
@@ -77,28 +78,16 @@ public class UserModel
         }
     }
 
-    public GitRepository[] Repositories => GitHandler.GetRepositories(new(GitUsername, GitToken));
-
+    public GitRepository[] Repositories => GitHandler.GetRepositories(GitCredentials);
     public string Token { get; private set; }
     public AccountType Type { get; private set; }
+    public bool UseGitReadme { get; set; }
     public string Username { get; private set; }
 
     #endregion Public Properties
 
     #region Public Methods
 
-    public static UserModel? GetByUsername(string username)
-    {
-        if (Authoriztaion.GetUserFromUsername(username, out int id, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] products))
-        {
-            return new(id, username, email, "", type, use_git_readme, Array.Empty<int>())
-            {
-                GitUsername = git_username,
-                GitToken = git_token,
-            };
-        }
-        return null;
-    }
     public static UserModel? GetByID(int id)
     {
         try
@@ -119,6 +108,18 @@ public class UserModel
         return null;
     }
 
+    public static UserModel? GetByUsername(string username)
+    {
+        if (Authoriztaion.GetUserFromUsername(username, out int id, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] products))
+        {
+            return new(id, username, email, "", type, use_git_readme, Array.Empty<int>())
+            {
+                GitUsername = git_username,
+                GitToken = git_token,
+            };
+        }
+        return null;
+    }
     public static UserModel? GetUser(string username, string password, out FailedReason reason)
     {
         if (Authoriztaion.Login(username, password, out reason, out AccountType type, out bool use_git_readme, out int id, out string email, out string uname, out string token, out int[] products, out string r_git_username, out string r_git_token))
@@ -158,6 +159,11 @@ public class UserModel
         return false;
     }
 
+    public override bool Equals(object? obj)
+    {
+        return obj != null && obj.GetType().Equals(typeof(UserModel)) && ((UserModel)obj).Id == Id && ((UserModel)obj).Email == Email && ((UserModel)obj).Username == Username;
+    }
+
     public void UpdateAbout(string markdown)
     {
         if (About != markdown)
@@ -177,11 +183,6 @@ public class UserModel
     public void UpdateSetting(string name, dynamic value)
     {
         Authoriztaion.UpdateProperty(Id, Token, name, value);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return obj != null && obj.GetType().Equals(typeof(UserModel)) && ((UserModel)obj).Id == Id && ((UserModel)obj).Email == Email && ((UserModel)obj).Username == Username;
     }
 
     #endregion Public Methods

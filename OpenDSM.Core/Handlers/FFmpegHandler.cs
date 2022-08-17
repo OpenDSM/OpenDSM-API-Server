@@ -5,6 +5,7 @@ namespace OpenDSM.Core.Handlers;
 
 internal class FFmpegHandler
 {
+
     #region Public Fields
 
     public static FFmpegHandler Instance = Instance ??= new();
@@ -58,4 +59,5 @@ internal class FFmpegHandler
         });
 
     #endregion Public Methods
+
 }

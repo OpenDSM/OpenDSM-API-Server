@@ -8,12 +8,13 @@ namespace OpenDSM.Server.Controllers.VIEWS;
 [Route("/")]
 public class HomeController : Controller
 {
+
     #region Public Methods
 
     public IActionResult Index()
     {
         ViewData["Title"] = "The Open Digital Software Marketplace";
-        if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request.Cookies, out UserModel? user))
         {
             ViewData["User"] = user;
         }
@@ -23,7 +24,7 @@ public class HomeController : Controller
     [Route("search")]
     public IActionResult Search(string? query, SearchCategory? category)
     {
-        if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? loggedin))
+        if (IsLoggedIn(Request.Cookies, out UserModel? loggedin))
         {
             ViewData["User"] = loggedin;
         }
@@ -39,4 +40,5 @@ public class HomeController : Controller
     }
 
     #endregion Public Methods
+
 }

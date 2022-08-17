@@ -1,10 +1,12 @@
 // LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 global using static OpenDSM.Core.Global;
-
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
 namespace OpenDSM.Server;
 
 public class Program
 {
+
     #region Private Fields
 
     private static int port = 8080;
@@ -15,6 +17,7 @@ public class Program
 
     private static void Main(string[] args)
     {
+
         log.Info($"Welcome to {ApplicationName} Server");
         log.Debug(Copywrite);
         bool useKestrel = true;
@@ -49,10 +52,12 @@ public class Program
     }
 
     #endregion Private Methods
+
 }
 
 internal class Startup
 {
+
     #region Public Methods
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -66,17 +71,26 @@ internal class Startup
         else
         {
             app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
+            app.UseHttpsRedirection();
         }
-        app.UseForwardedHeaders();
+        app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().Build());
         app.UseMvc();
         app.UseRouting();
         app.UseStaticFiles();
         app.UseDefaultFiles();
-        //app.UseHttpsRedirection();
     }
 
     public void ConfigureServices(IServiceCollection service)
     {
+        service.Configure<ForwardedHeadersOptions>(options =>
+        {
+            options.KnownProxies.Add(IPAddress.Parse("10.0.0.100"));
+        });
         service.AddMvc(action =>
         {
             action.EnableEndpointRouting = false;
@@ -85,4 +99,5 @@ internal class Startup
     }
 
     #endregion Public Methods
+
 }

@@ -6,6 +6,7 @@ namespace OpenDSM.Server.Controllers.VIEWS;
 [Route("/popup")]
 public class PopupController : Controller
 {
+
     #region Public Methods
 
     [Route("{name}")]
@@ -15,4 +16,5 @@ public class PopupController : Controller
     }
 
     #endregion Public Methods
+
 }

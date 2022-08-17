@@ -6,6 +6,8 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("/api/yt")]
 public class YTController : ControllerBase
 {
+    #region Public Methods
+
     [HttpGet("channel/{id}")]
     public IActionResult GetChannelUploads(string id)
     {
@@ -27,4 +29,6 @@ public class YTController : ControllerBase
             message = "Unable to parse youtube url"
         });
     }
+
+    #endregion Public Methods
 }

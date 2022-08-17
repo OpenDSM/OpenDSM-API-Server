@@ -7,6 +7,7 @@ namespace OpenDSM.Server.Controllers.VIEWS;
 [Route("Error")]
 public class ErrorController : Controller
 {
+
     #region Public Methods
 
     [Route("{code}")]
@@ -14,7 +15,7 @@ public class ErrorController : Controller
     {
         ViewData["Title"] = $"{code}";
 
-        if (AuthController.IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request.Cookies, out UserModel? user))
         {
             ViewData["User"] = user;
         }
@@ -22,4 +23,5 @@ public class ErrorController : Controller
     }
 
     #endregion Public Methods
+
 }

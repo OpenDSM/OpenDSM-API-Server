@@ -17,16 +17,9 @@ public enum ReleaseType
 public record PlatformVersion(Platform platform, string downloadUrl, int total_downloads, int weekly_downloads, long file_size);
 public class VersionModel
 {
-    public long ID { get; }
-    public int ProductID { get; }
-    public string Name { get; }
-    public ReleaseType Type { get; }
-    public int TotalDownloads { get; }
-    public int WeeklyDownloads { get; }
-    public List<PlatformVersion> Platforms { get; }
-    public string Changelog { get; }
+    #region Public Constructors
 
-    public VersionModel(long iD, int product_id, string name, ReleaseType type, List<PlatformVersion> platforms, string changelog)
+    public VersionModel(long iD, int product_id, string name, ReleaseType type, List<PlatformVersion> platforms, string changelog, DateTime posted)
     {
         ID = iD;
         Name = name;
@@ -41,6 +34,22 @@ public class VersionModel
             WeeklyDownloads += platform.weekly_downloads;
         }
         Changelog = changelog;
+        Posted = posted;
     }
 
+    #endregion Public Constructors
+
+    #region Public Properties
+
+    public string Changelog { get; }
+    public long ID { get; }
+    public string Name { get; }
+    public List<PlatformVersion> Platforms { get; }
+    public DateTime Posted { get; }
+    public int ProductID { get; }
+    public int TotalDownloads { get; }
+    public ReleaseType Type { get; }
+    public int WeeklyDownloads { get; }
+
+    #endregion Public Properties
 }

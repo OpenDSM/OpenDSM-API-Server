@@ -21,85 +21,85 @@
 
 @if (is_personal)
 {
-    <section class="ad"></section>
-    <section>
-        <h2>Settings</h2>
-        <div class="list vertical">
-            <div class="list horizontal">
-                <div class="list vertical" style="width: 300px;min-width: 300px;">
-                    <h4>Profile Image</h4>
-                    <div id="upload-profile-image" class="file-upload" style="@(hasProfileImage?$"background-image: url('/api/auth/image/profile?id={Model.Id}')":"")">
-                        <div class="content">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                    </div>
-                    <h4>Banner Image</h4>
-                    <div id="upload-profile-banner" class="file-upload" style="@(hasBannerImage?$"background-image: url('/api/auth/image/banner?id={Model.Id}')":"")">
-                        <div class="content">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="list vertical" style="width: 100%;">
-                    <div class="input" title="Your Username">
-                        <label for="username-box">Username</label>
-                        <input type="text" id="username-box" autocomplete="false" placeholder="@Model.Username" setting="username">
-                    </div>
-                    <div class="large-input list vertical" id="about-section">
-                        <h4 for="about-box">About</h4>
-                        <p class="paragraph-2">This is using markdown language.  For more information view our <a href="#">profile docs</a></p>
-                        <textarea type="text" id="about-box" autocomplete="false" setting="about">@Model.About</textarea>
+                                        <section class="ad"></section>
+                                        <section>
+                                            <h2>Settings</h2>
+                                            <div class="list vertical">
+                                                <div class="list horizontal">
+                                                    <div class="list vertical" style="width: 300px;min-width: 300px;">
+                                                        <h4>Profile Image</h4>
+                                                        <div id="upload-profile-image" class="file-upload" style="@(hasProfileImage?$"background-image: url('/api/auth/image/profile?id={Model.Id}')":"")">
+                                                            <div class="content">
+                                                                <i class="fas fa-plus"></i>
+                                                            </div>
+                                                        </div>
+                                                        <h4>Banner Image</h4>
+                                                        <div id="upload-profile-banner" class="file-upload" style="@(hasBannerImage?$"background-image: url('/api/auth/image/banner?id={Model.Id}')":"")">
+                                                            <div class="content">
+                                                                <i class="fas fa-plus"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="list vertical" style="width: 100%;">
+                                                        <div class="input" title="Your Username">
+                                                            <label for="username-box">Username</label>
+                                                            <input type="text" id="username-box" autocomplete="false" placeholder="@Model.Username" setting="username">
+                                                        </div>
+                                                        <div class="large-input list vertical" id="about-section">
+                                                            <h4 for="about-box">About</h4>
+                                                            <p class="paragraph-2">This is using markdown language.  For more information view our <a href="#">profile docs</a></p>
+                                                            <textarea type="text" id="about-box" autocomplete="false" setting="about">@Model.About</textarea>
                         @if (Model.IsDeveloperAccount && Model.HasReadme)
                         {
-                            <toggle id="use-git-about" value="@Model.UseGitReadme.ToString().ToLower()" setting="use_git_readme">Use GitHub About?</toggle>
+                                                                                                    <toggle id="use-git-about" value="@Model.UseGitReadme.ToString().ToLower()" setting="use_git_readme">Use GitHub About?</toggle>
                         }
-                    </div>
-                    <button class="btn" id="save-profile-btn" disabled>Save</button>
-                </div>
-            </div>
-            <div class="list horizontal centered" style="width: 100%; justify-content: center;">
+                                                        </div>
+                                                        <button class="btn" id="save-profile-btn" disabled>Save</button>
+                                                    </div>
+                                                </div>
+                                                <div class="list horizontal centered" style="width: 100%; justify-content: center;">
                 @if (Model.IsDeveloperAccount)
                 {
-                    <a href="/product/create/" class="btn" style="width: 20%;">Create Product</a>
+                                                                                            <a href="/product/create/" class="btn" style="width: 20%;">Create Product</a>
                 }
                 else
                 {
-                    <div class="btn" onclick="new ActivateDeveloperAccountPopup().open()" style="width: 20%;">Activate Developer Account</div>
+                                                                                            <div class="btn" onclick="new ActivateDeveloperAccountPopup().open()" style="width: 20%;">Activate Developer Account</div>
                 }
-                <div class="btn secondary" style="width: 20%;" id="logout-btn">Logout</div>
-            </div>
-        </div>
-    </section>
+                                                    <div class="btn secondary" style="width: 20%;" id="logout-btn">Logout</div>
+                                                </div>
+                                            </div>
+                                        </section>
     @if (Model.CreatedProducts.Any())
     {
-        <section style="margin: 12rem auto;">
-            <h2>Analytics</h2>
-            <div class="list vertical">
-                <div class="list vertical">
-                    <h3>Held Balance</h3>
-                    <h4>$4,587.67</h4>
-                    <button class="btn" style="width: 300px;">Transfer</button>
-                </div>
-                <div class="centered list horizontal">
-                    <i class="fa-solid fa-up-long" style="font-size: 12rem;"></i>
-                    <div class="list vertical" style="margin-right: 100px;">
-                        <h1>250K<br />Downloads</h1>
-                        <h4>Up 12%</h4>
-                        <p class="paragraph-2">Values are calculated Monthly<br />View our documentation on <a href="/docs/analytics">analytics</a></p>
-                    </div>
-                    <img src="/assets/images/Chart.svg" style="width: 100%; height: 659px;">
-                </div>
-                <div class="centered list horizontal">
-                    <i class="fa-solid fa-down-long" style="font-size: 12rem;"></i>
-                    <div class="list vertical" style="margin-right: 100px;">
-                        <h1>$1.5K<br />Revenue</h1>
-                        <h4>Down 12%</h4>
-                        <p class="paragraph-2">Values are calculated Monthly<br />View our documentation on <a href="/docs/analytics">analytics</a></p>
-                    </div>
-                    <img src="/assets/images/Chart.svg" style="width: 100%; height: 659px;transform: scaleX(-1)">
-                </div>
-            </div>
-        </section>
+                                                                                <section style="margin: 12rem auto;">
+                                                                                    <h2>Analytics</h2>
+                                                                                    <div class="list vertical">
+                                                                                        <div class="list vertical">
+                                                                                            <h3>Held Balance</h3>
+                                                                                            <h4>$4,587.67</h4>
+                                                                                            <button class="btn" style="width: 300px;">Transfer</button>
+                                                                                        </div>
+                                                                                        <div class="centered list horizontal">
+                                                                                            <i class="fa-solid fa-up-long" style="font-size: 12rem;"></i>
+                                                                                            <div class="list vertical" style="margin-right: 100px;">
+                                                                                                <h1>250K<br />Downloads</h1>
+                                                                                                <h4>Up 12%</h4>
+                                                                                                <p class="paragraph-2">Values are calculated Monthly<br />View our documentation on <a href="/docs/analytics">analytics</a></p>
+                                                                                            </div>
+                                                                                            <img src="/assets/images/Chart.svg" style="width: 100%; height: 659px;">
+                                                                                        </div>
+                                                                                        <div class="centered list horizontal">
+                                                                                            <i class="fa-solid fa-down-long" style="font-size: 12rem;"></i>
+                                                                                            <div class="list vertical" style="margin-right: 100px;">
+                                                                                                <h1>$1.5K<br />Revenue</h1>
+                                                                                                <h4>Down 12%</h4>
+                                                                                                <p class="paragraph-2">Values are calculated Monthly<br />View our documentation on <a href="/docs/analytics">analytics</a></p>
+                                                                                            </div>
+                                                                                            <img src="/assets/images/Chart.svg" style="width: 100%; height: 659px;transform: scaleX(-1)">
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </section>
     }
 }
 
@@ -109,204 +109,204 @@
 </section>
 @if (Model.CreatedProducts.Any())
 {
-    <section class="ad"></section>
-    <section id="popular-products" class="carousel">
-        <h3>Popular</h3>
-        <div class="navigation">
-            <div class="carousel-nav-item fas fa-chevron-left"></div>
-            <div class="carousel-nav-item fas fa-chevron-right"></div>
-        </div>
-        <div class="list horizontal">
-        </div>
-    </section>
-    <section id="popular-products" class="carousel">
-        <h3>Latest</h3>
-        <div class="navigation">
-            <div class="carousel-nav-item fas fa-chevron-left"></div>
-            <div class="carousel-nav-item fas fa-chevron-right"></div>
-        </div>
-        <div class="list horizontal">
+                                        <section class="ad"></section>
+                                        <section id="popular-products" class="carousel">
+                                            <h3>Popular</h3>
+                                            <div class="navigation">
+                                                <div class="carousel-nav-item fas fa-chevron-left"></div>
+                                                <div class="carousel-nav-item fas fa-chevron-right"></div>
+                                            </div>
+                                            <div class="list horizontal">
+                                            </div>
+                                        </section>
+                                        <section id="popular-products" class="carousel">
+                                            <h3>Latest</h3>
+                                            <div class="navigation">
+                                                <div class="carousel-nav-item fas fa-chevron-left"></div>
+                                                <div class="carousel-nav-item fas fa-chevron-right"></div>
+                                            </div>
+                                            <div class="list horizontal">
             @foreach (int product_id in Model.CreatedProducts)
             {
                 if (ProductModel.TryGetByID(product_id, out ProductModel? product))
                 {
-                    <div>
+                                                                                                                                <div>
                         @Html.PartialAsync("Elements/LargeProductItem", product).Result
-                    </div>
+                                                                                                                                </div>
                 }
             }
-        </div>
-    </section>
+                                            </div>
+                                        </section>
 }
 
 
 @if (Model.CreatedProducts.Any())
 {
-    <section class=" ad"></section>
-    <section class="search">
-        <div class="list horizontal">
-            <div class="list vertical search-categories">
-                <h4>Categories</h4>
-                <toggle id="desktop-category-search-filter" value="true">Desktop</toggle>
-                <toggle id="gaming-category-search-filter" value="false">Games</toggle>
-                <toggle id="opensource-category-search-filter" value="false">Open Source</toggle>
-                <toggle id="server-category-search-filter" value="false">Server</toggle>
-                <toggle id="utilities-category-search-filter" value="false">Utilities</toggle>
-                <toggle id="entertainment-category-search-filter" value="false">Entertainment</toggle>
-                <toggle id="dev-tools-category-search-filter" value="false">Dev Tools</toggle>
-                <h4>Pricing</h4>
-                <toggle id="free-pricing-search-filter" value="false">FREE</toggle>
-                <div class="input" title="Minimum price search filter">
-                    <label for="minimum-price-search-filter">Min</label>
-                    <input id="minimum-price-search-filter" type="number" value="0.00">
-                </div>
-                <div class="input" title="Maximum price search filter">
-                    <label for="maximum-price-search-filter">Max</label>
-                    <input id="maximum-price-search-filter" type="number" value="99.99">
-                </div>
-            </div>
-            <div class="list vertical search-view">
-                <div class="input icon">
-                    <label for="search-box" class="fas fa-magnifying-glass"></label>
-                    <input type="text" id="search-box" autocomplete="false" placeholder="Search">
-                </div>
-                <div class="list horizontal grid search-result">
-                </div>
-            </div>
-        </div>
-    </section>
+                                        <section class=" ad"></section>
+                                        <section class="search">
+                                            <div class="list horizontal">
+                                                <div class="list vertical search-categories">
+                                                    <h4>Categories</h4>
+                                                    <toggle id="desktop-category-search-filter" value="true">Desktop</toggle>
+                                                    <toggle id="gaming-category-search-filter" value="false">Games</toggle>
+                                                    <toggle id="opensource-category-search-filter" value="false">Open Source</toggle>
+                                                    <toggle id="server-category-search-filter" value="false">Server</toggle>
+                                                    <toggle id="utilities-category-search-filter" value="false">Utilities</toggle>
+                                                    <toggle id="entertainment-category-search-filter" value="false">Entertainment</toggle>
+                                                    <toggle id="dev-tools-category-search-filter" value="false">Dev Tools</toggle>
+                                                    <h4>Pricing</h4>
+                                                    <toggle id="free-pricing-search-filter" value="false">FREE</toggle>
+                                                    <div class="input" title="Minimum price search filter">
+                                                        <label for="minimum-price-search-filter">Min</label>
+                                                        <input id="minimum-price-search-filter" type="number" value="0.00">
+                                                    </div>
+                                                    <div class="input" title="Maximum price search filter">
+                                                        <label for="maximum-price-search-filter">Max</label>
+                                                        <input id="maximum-price-search-filter" type="number" value="99.99">
+                                                    </div>
+                                                </div>
+                                                <div class="list vertical search-view">
+                                                    <div class="input icon">
+                                                        <label for="search-box" class="fas fa-magnifying-glass"></label>
+                                                        <input type="text" id="search-box" autocomplete="false" placeholder="Search">
+                                                    </div>
+                                                    <div class="list horizontal grid search-result">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
 
-    <!-- Max Char length = 1000  -->
-    <section class="reviews">
-        <h2>Ratings and reviews</h2>
-        <div class="list vertical">
-            <div class="list horizontal">
-                <div class="list vertical rating">
-                    <h1>4.3</h1>
-                    <p class="paragraph-2">6.63K reviews</p>
-                </div>
-                <div class="list vertical bars">
-                    <div class="list horizontal">
-                        <p class="paragraph-3">5</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                    <div class="list horizontal">
-                        <p class="paragraph-3">4</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                    <div class="list horizontal">
-                        <p class="paragraph-3">3</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                    <div class="list horizontal">
-                        <p class="paragraph-3">2</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                    <div class="list horizontal">
-                        <p class="paragraph-3">1</p>
-                        <div class="progress-bar">
-                            <div class="fill" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="list vertical testimonials">
-                <div class="testimonial">
-                    <div class="list vertical">
-                        <div class="list horizontal profile-info">
-                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
-                            <h4 class="name">Drew Chase</h4>
-                        </div>
-                        <div class="list vertical testimonial-details">
-                            <div class="list horizontal">
-                                <span class="title">Rating</span>
-                                <span class="value">3.5 Stars</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Date</span>
-                                <span class="value">Oct. 15, 2014</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Time Used</span>
-                                <span class="value">12 Hours</span>
-                            </div>
-                        </div>
-                        <p class="paragraph-1 testimonial-description">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur unde aliquam voluptatibus alias laudantium! Repellendus consectetur fugit eum ab dolor quia, pariatur nulla molestiae tenetur praesentium est nam. Tempora odit harum facilis natus, a, eius aperiam similique inventore veritatis fuga corporis impedit temporibus ipsam assumenda rerum omnis facere quidem labore.
-                        </p>
-                    </div>
-                    <button class="btn secondary reply-button">Reply</button>
-                </div>
-                <div class="testimonial">
-                    <div class="list vertical">
-                        <div class="list horizontal profile-info">
-                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
-                            <h4 class="name">Drew Chase</h4>
-                        </div>
-                        <div class="list vertical testimonial-details">
-                            <div class="list horizontal">
-                                <span class="title">Rating</span>
-                                <span class="value">3.5 Stars</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Date</span>
-                                <span class="value">Oct. 15, 2014</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Time Used</span>
-                                <span class="value">12 Hours</span>
-                            </div>
-                        </div>
-                        <p class="paragraph-1 testimonial-description">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. At dolorum obcaecati sit repellendus suscipit nisi voluptas? Vel error necessitatibus est non eius dolor illum. Incidunt, in aperiam possimus ab quia delectus distinctio maiores vero excepturi earum nemo, quisquam nobis suscipit, dicta quaerat. Consequuntur corrupti nam vitae, voluptatibus nisi accusantium temporibus tempora aperiam laborum sed voluptatem quis explicabo eos neque ab quasi corporis! Nisi ipsum eos voluptates distinctio nobis similique dolore, harum, sapiente recusandae veniam voluptate doloribus sunt quis voluptas vero dignissimos repellendus ipsa, dolor dolorem. Aliquam magni, quasi tenetur veritatis, officiis autem eligendi molestias sed ipsum laudantium, fuga cupiditate illo!
-                        </p>
-                    </div>
-                    <button class="btn secondary reply-button">Reply</button>
-                </div>
-                <div class="testimonial">
-                    <div class="list vertical">
-                        <div class="list horizontal profile-info">
-                            <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
-                            <h4 class="name">Drew Chase</h4>
-                        </div>
-                        <div class="list vertical testimonial-details">
-                            <div class="list horizontal">
-                                <span class="title">Rating</span>
-                                <span class="value">3.5 Stars</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Date</span>
-                                <span class="value">Oct. 15, 2014</span>
-                            </div>
-                            <div class="list horizontal">
-                                <span class="title">Time Used</span>
-                                <span class="value">12 Hours</span>
-                            </div>
-                        </div>
-                        <p class="paragraph-1 testimonial-description">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil, numquam accusantium. Fugiat dolore sapiente quae ea, cupiditate ipsa saepe perferendis aliquid adipisci inventore nemo tempore omnis incidunt maxime, ratione eligendi dolorum earum? Deleniti et autem dolore, expedita officiis aliquid. Reiciendis omnis deserunt sit atque hic doloribus sint a, accusantium optio dicta. In vero qui, cupiditate totam quae iste labore aliquam ab perferendis, quo iusto! Vero vel iusto cupiditate? Inventore possimus voluptates voluptatem ratione nisi quasi dolorem, at illo quos, commodi asperiores blanditiis rerum et magni quo ipsam. Explicabo, ipsam. Consequatur, quasi ad! Autem officiis ducimus alias quos, magni, molestias, iusto porro ea deleniti aperiam sint accusantium. Culpa non facere magnam ipsa? Laudantium, consequuntur reiciendis molestiae ducimus, eaque similique impedit totam doloremque sunt, ipsam quam accusantium minus voluptas possimus saepe veniam quis libero laborum magnam quisquam! Labore odit nam rem possimus magnam pariatur deleniti quos, minima inventore ratione quam asperiores iste!
-                        </p>
-                    </div>
-                    <button class="btn secondary reply-button">Reply</button>
-                </div>
-            </div>
+                                        <!-- Max Char length = 1000  -->
+                                        <section class="reviews">
+                                            <h2>Ratings and reviews</h2>
+                                            <div class="list vertical">
+                                                <div class="list horizontal">
+                                                    <div class="list vertical rating">
+                                                        <h1>4.3</h1>
+                                                        <p class="paragraph-2">6.63K reviews</p>
+                                                    </div>
+                                                    <div class="list vertical bars">
+                                                        <div class="list horizontal">
+                                                            <p class="paragraph-3">5</p>
+                                                            <div class="progress-bar">
+                                                                <div class="fill" style="width: 50%;"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="list horizontal">
+                                                            <p class="paragraph-3">4</p>
+                                                            <div class="progress-bar">
+                                                                <div class="fill" style="width: 50%;"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="list horizontal">
+                                                            <p class="paragraph-3">3</p>
+                                                            <div class="progress-bar">
+                                                                <div class="fill" style="width: 50%;"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="list horizontal">
+                                                            <p class="paragraph-3">2</p>
+                                                            <div class="progress-bar">
+                                                                <div class="fill" style="width: 50%;"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="list horizontal">
+                                                            <p class="paragraph-3">1</p>
+                                                            <div class="progress-bar">
+                                                                <div class="fill" style="width: 50%;"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="list vertical testimonials">
+                                                    <div class="testimonial">
+                                                        <div class="list vertical">
+                                                            <div class="list horizontal profile-info">
+                                                                <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                                                                <h4 class="name">Drew Chase</h4>
+                                                            </div>
+                                                            <div class="list vertical testimonial-details">
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Rating</span>
+                                                                    <span class="value">3.5 Stars</span>
+                                                                </div>
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Date</span>
+                                                                    <span class="value">Oct. 15, 2014</span>
+                                                                </div>
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Time Used</span>
+                                                                    <span class="value">12 Hours</span>
+                                                                </div>
+                                                            </div>
+                                                            <p class="paragraph-1 testimonial-description">
+                                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur unde aliquam voluptatibus alias laudantium! Repellendus consectetur fugit eum ab dolor quia, pariatur nulla molestiae tenetur praesentium est nam. Tempora odit harum facilis natus, a, eius aperiam similique inventore veritatis fuga corporis impedit temporibus ipsam assumenda rerum omnis facere quidem labore.
+                                                            </p>
+                                                        </div>
+                                                        <button class="btn secondary reply-button">Reply</button>
+                                                    </div>
+                                                    <div class="testimonial">
+                                                        <div class="list vertical">
+                                                            <div class="list horizontal profile-info">
+                                                                <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                                                                <h4 class="name">Drew Chase</h4>
+                                                            </div>
+                                                            <div class="list vertical testimonial-details">
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Rating</span>
+                                                                    <span class="value">3.5 Stars</span>
+                                                                </div>
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Date</span>
+                                                                    <span class="value">Oct. 15, 2014</span>
+                                                                </div>
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Time Used</span>
+                                                                    <span class="value">12 Hours</span>
+                                                                </div>
+                                                            </div>
+                                                            <p class="paragraph-1 testimonial-description">
+                                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. At dolorum obcaecati sit repellendus suscipit nisi voluptas? Vel error necessitatibus est non eius dolor illum. Incidunt, in aperiam possimus ab quia delectus distinctio maiores vero excepturi earum nemo, quisquam nobis suscipit, dicta quaerat. Consequuntur corrupti nam vitae, voluptatibus nisi accusantium temporibus tempora aperiam laborum sed voluptatem quis explicabo eos neque ab quasi corporis! Nisi ipsum eos voluptates distinctio nobis similique dolore, harum, sapiente recusandae veniam voluptate doloribus sunt quis voluptas vero dignissimos repellendus ipsa, dolor dolorem. Aliquam magni, quasi tenetur veritatis, officiis autem eligendi molestias sed ipsum laudantium, fuga cupiditate illo!
+                                                            </p>
+                                                        </div>
+                                                        <button class="btn secondary reply-button">Reply</button>
+                                                    </div>
+                                                    <div class="testimonial">
+                                                        <div class="list vertical">
+                                                            <div class="list horizontal profile-info">
+                                                                <span class="profile-image" style="background-image: url('/assets/images/testing/profile-image.jpg');"></span>
+                                                                <h4 class="name">Drew Chase</h4>
+                                                            </div>
+                                                            <div class="list vertical testimonial-details">
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Rating</span>
+                                                                    <span class="value">3.5 Stars</span>
+                                                                </div>
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Date</span>
+                                                                    <span class="value">Oct. 15, 2014</span>
+                                                                </div> 
+                                                                <div class="list horizontal">
+                                                                    <span class="title">Time Used</span>
+                                                                    <span class="value">12 Hours</span>
+                                                                </div>
+                                                            </div>
+                                                            <p class="paragraph-1 testimonial-description">
+                                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil, numquam accusantium. Fugiat dolore sapiente quae ea, cupiditate ipsa saepe perferendis aliquid adipisci inventore nemo tempore omnis incidunt maxime, ratione eligendi dolorum earum? Deleniti et autem dolore, expedita officiis aliquid. Reiciendis omnis deserunt sit atque hic doloribus sint a, accusantium optio dicta. In vero qui, cupiditate totam quae iste labore aliquam ab perferendis, quo iusto! Vero vel iusto cupiditate? Inventore possimus voluptates voluptatem ratione nisi quasi dolorem, at illo quos, commodi asperiores blanditiis rerum et magni quo ipsam. Explicabo, ipsam. Consequatur, quasi ad! Autem officiis ducimus alias quos, magni, molestias, iusto porro ea deleniti aperiam sint accusantium. Culpa non facere magnam ipsa? Laudantium, consequuntur reiciendis molestiae ducimus, eaque similique impedit totam doloremque sunt, ipsam quam accusantium minus voluptas possimus saepe veniam quis libero laborum magnam quisquam! Labore odit nam rem possimus magnam pariatur deleniti quos, minima inventore ratione quam asperiores iste!
+                                                            </p>
+                                                        </div>
+                                                        <button class="btn secondary reply-button">Reply</button>
+                                                    </div>
+                                                </div>
 
-        </div>
-    </section>
+                                            </div>
+                                        </section>
 }
 
 @if (is_personal)
 {
-    <script src="/assets/lib/CropperJS/cropper.min.js"></script>
-    <script src="/assets/lib/CropperJS/jquery-cropper.min.js"></script>
+                                        <script src="/assets/lib/CropperJS/cropper.min.js"></script>
+                                        <script src="/assets/lib/CropperJS/jquery-cropper.min.js"></script>
 }
 <script src="/assets/lib/showdown.min.js"></script>
 <script src="/assets/js/profile.js"></script>

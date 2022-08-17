@@ -8,16 +8,8 @@ namespace OpenDSM.Core.Handlers;
 
 public static class FileHandler
 {
-    public static bool TryCreateImageFromBase64(string base64, string directory, string file, out string path) => !string.IsNullOrEmpty(path = CreateImageFromBase64(base64, directory, file));
-    public static bool TryCreateImageFromBase64(string base64, string directory, string file, int width, out string path)
-    {
-        if (TryCreateImageFromBase64(base64, directory, file, out path))
-        {
-            FFmpegHandler.Instance.Resize(width, -1, path).Wait();
-            return true;
-        }
-        return false;
-    }
+    #region Public Methods
+
     public static void CreateImageFromBase64(string base64, string directory, string file, int width)
     {
         if (TryCreateImageFromBase64(base64, directory, file, out string path))
@@ -25,6 +17,7 @@ public static class FileHandler
             FFmpegHandler.Instance.Resize(width, -1, path).Wait();
         }
     }
+
     public static string CreateImageFromBase64(string base64, string directory, string file)
     {
         try
@@ -47,5 +40,16 @@ public static class FileHandler
         }
     }
 
+    public static bool TryCreateImageFromBase64(string base64, string directory, string file, out string path) => !string.IsNullOrEmpty(path = CreateImageFromBase64(base64, directory, file));
+    public static bool TryCreateImageFromBase64(string base64, string directory, string file, int width, out string path)
+    {
+        if (TryCreateImageFromBase64(base64, directory, file, out path))
+        {
+            FFmpegHandler.Instance.Resize(width, -1, path).Wait();
+            return true;
+        }
+        return false;
+    }
 
+    #endregion Public Methods
 }

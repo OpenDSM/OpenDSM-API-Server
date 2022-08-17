@@ -10,6 +10,8 @@ namespace OpenDSM.Core.Handlers;
 
 public class ProductListHandler
 {
+    #region Public Methods
+
     public static ProductModel[] GetPopularProducts(int count = 20)
     {
         ProductModel[] products = new ProductModel[count];
@@ -36,4 +38,6 @@ public class ProductListHandler
 
         return products.ToArray();
     }
+
+    #endregion Public Methods
 }

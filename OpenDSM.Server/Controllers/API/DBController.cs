@@ -7,6 +7,8 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("/api/db")]
 public class DBController : ControllerBase
 {
+    #region Public Methods
+
     [HttpGet("status")]
     public IActionResult Index()
     {
@@ -24,4 +26,6 @@ public class DBController : ControllerBase
             ok = false,
         });
     }
+
+    #endregion Public Methods
 }

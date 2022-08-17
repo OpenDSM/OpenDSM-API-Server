@@ -55,7 +55,6 @@ $("#search-video-btn").on('click', () => {
     } else {
         new YoutubeSearchPopup().open();
     }
-
 })
 $("#accept-tos-toggle").on('click', e => {
     let value = $(e.currentTarget).attr('value') == "true";
@@ -118,7 +117,6 @@ $("#submit-btn").on('click', async () => {
             window.location.href = `/product/${json.id}`
         }
         loadingScreen.unload();
-
     }
 });
 
@@ -153,4 +151,3 @@ function updateRepository(value) {
     keywords += `${value.replaceAll(" ", "")};`
     $("#keywords-box")[0].value = keywords.toLowerCase();
 }
-

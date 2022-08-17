@@ -16,7 +16,6 @@
         throbber.classList.add("throbber");
         throbber.style.height = "100px";
 
-
         this.#view.append(header);
         this.#view.append(body);
         this.#view.append(throbber);

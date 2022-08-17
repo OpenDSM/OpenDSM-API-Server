@@ -9,6 +9,7 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("/api/auth")]
 public class AuthController : ControllerBase
 {
+
     #region Public Methods
 
     [HttpPost("activate-dev-account")]
@@ -69,6 +70,23 @@ public class AuthController : ControllerBase
         return NotFound(new
         {
             message = $"Image type not found: {type}"
+        });
+    }
+
+    [HttpGet("readme/{id}")]
+    public IActionResult GetReadme(int id, bool? git)
+    {
+        UserModel? user = UserModel.GetByID(id);
+        if (user != null)
+        {
+            return Ok(new
+            {
+                about = git.HasValue ? user.GitReadme : user.About
+            });
+        }
+        return BadRequest(new
+        {
+            message = $"User with id of {id} doesn't exist"
         });
     }
 
@@ -182,23 +200,6 @@ public class AuthController : ControllerBase
         return BadRequest(new
         {
             message = "Invalid Credentials"
-        });
-    }
-
-    [HttpGet("readme/{id}")]
-    public IActionResult GetReadme(int id, bool? git)
-    {
-        UserModel? user = UserModel.GetByID(id);
-        if (user != null)
-        {
-            return Ok(new
-            {
-                about = git.HasValue ? user.GitReadme : user.About
-            });
-        }
-        return BadRequest(new
-        {
-            message = $"User with id of {id} doesn't exist"
         });
     }
 

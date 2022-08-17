@@ -5,6 +5,7 @@ public record Tag(int id, string name);
 
 public class Tags
 {
+
     #region Private Fields
 
     private static Tags Instance = Instance ??= new();
@@ -37,4 +38,5 @@ public class Tags
     }
 
     #endregion Public Methods
+
 }
