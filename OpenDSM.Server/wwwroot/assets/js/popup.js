@@ -206,6 +206,8 @@ class ImagePopup extends Popup {
                 dragMode: "none",
                 movable: false,
                 zoomable: false,
+                responsive: true,
+                restore: false,
             })
         }, 1000)
 
@@ -322,14 +324,12 @@ class YoutubeSearchPopup extends CenteredPopup {
                     vid.appendChild(openBtn);
 
                     videos.appendChild(vid);
-
                 }
             } else {
                 new ErrorPopup("Channel Not Found", `Unable to find channel with id of '${id}'<br />Please double check your id and try again...`).open();
             }
         })
     }
-
 }
 
 class SearchFilterPopup extends Popup {
@@ -369,6 +369,7 @@ class CreateVersionPopup extends Popup {
         super('create-version')
         this.product_id = product_id;
     }
+
     async open() {
         let element = await super.open();
         $(element).find(".file-upload").on('click', e => {
@@ -387,23 +388,13 @@ class CreateVersionPopup extends Popup {
                     $(e.currentTarget).find("i")[0].classList.remove("fa-plus")
                     $(e.currentTarget).find("i")[0].classList.add("fa-trash")
                     $(e.currentTarget)[0].classList.add('active');
+                    element.appendChild(input);
                 })
-                element.appendChild(input);
                 input.click();
                 input.style.display = "none";
             }
         })
-
-        /*
-         <h4 style="display: flex;justify-content: start;align-content: center;align-items: center;width: 100%;">
-            <i class="throbber" style="width: 35px;"></i> Windows
-        </h4>
-        <h4 style="display: flex;justify-content: start;align-content: center;align-items: center;width: 100%;">
-            <i class="fa fa-check" style="width: 35px;margin: 2rem;color: var(--primary);"></i> Linux
-        </h4>
-         */
         let check = setInterval(() => {
-
             let version = $("input#version-name")[0].value;
             let releaseType = $("input#release-type")[0].value;
             let changelog = $("textarea#changelog-box")[0].value;
@@ -416,6 +407,7 @@ class CreateVersionPopup extends Popup {
             }
         }, 500);
         $(element).find('button.btn#finish-button').on('click', async () => {
+            clearInterval(check);
             window.onbeforeunload = function () {
                 return "Are you sure? Unsaved changes maybe dismissed or corrupted";
             }
@@ -443,24 +435,82 @@ class CreateVersionPopup extends Popup {
                 header.append(name);
                 uploadTasks.appendChild(header);
 
-                let response = await fetch(``)
-                icon.classList.remove('throbber');
-                icon.classList.add('fa','fa-check');
+                let data = new FormData();
+                data.append("id", this.product_id);
+                data.append("name", version)
+                data.append("type", releaseType)
+                data.append("changelog", changelog);
 
-                inputs.forEach(i => {
-                    let name = i.id.replace("-upload-input", "");
-                    let header = document.createElement("h4");
-                    header.classList.add("upload-task");
-                    header.id = `${name}-upload-task`;
+                let response = await fetch(`/api/product/create-version`, { method: "POST", body: data });
+                let itemsUploaded = 0;
+                if (response.ok) {
+                    let json = await response.json();
+                    let release_id = json["id"];
 
-                    let icon = document.createElement("i");
-                    icon.classList.add("throbber");
+                    icon.classList.remove('throbber');
+                    icon.classList.add('fa', 'fa-check');
 
-                    header.appendChild(icon);
-                    header.append(`Uploading ${name}`);
+                    inputs.forEach(async i => {
+                        let name = i.id.replace("-upload-input", "");
+                        let header = document.createElement("h4");
+                        header.classList.add("upload-task");
+                        header.id = `${name}-upload-task`;
 
-                    uploadTasks.appendChild(header);
-                })
+                        let icon = document.createElement("i");
+                        icon.classList.add("throbber");
+
+                        header.appendChild(icon);
+                        header.append(`Uploading ${name}`);
+
+                        uploadTasks.appendChild(header);
+
+                        try {
+                            let data = new FormData()
+                            data.append("file", i.files[0]);
+                            let response = await fetch(`/api/product/upload-version-asset?id=${id}&release_id=${release_id}&platform=${name}`, { method: "POST", body: data })
+                            itemsUploaded++;
+                            icon.classList.remove('throbber');
+                            if (response.ok) {
+                                icon.classList.add('fa', 'fa-check');
+                            } else {
+                                icon.classList.add('fa-solid', 'fa-x');
+                            }
+                        } catch (error) {
+                            console.log(response)
+                            console.log("Error")
+                            console.error(error)
+                        }
+                    })
+                } else {
+                    icon.classList.remove('throbber');
+                    icon.classList.add('fa-solid', 'fa-x');
+                }
+
+                check = setInterval(async () => {
+                    if (itemsUploaded == inputs.length) {
+                        clearInterval(check);
+                        name = "Saving";
+                        header = document.createElement("h4");
+                        header.classList.add("upload-task");
+                        header.id = `${name}-upload-task`;
+
+                        icon = document.createElement("i");
+                        icon.classList.add("throbber");
+
+                        header.appendChild(icon);
+                        header.append(name);
+                        uploadTasks.appendChild(header);
+                        await fetch(`/api/product/trigger-version-check?product_id=${id}`, { method: "POST" })
+                        icon.classList.remove('throbber');
+                        icon.classList.add('fa', 'fa-check');
+
+                        $(element).find('button.btn#done-button').on('click', () => {
+                            window.location.reload()
+                        })
+                        window.onbeforeunload = null;
+                        $(element).find('button.btn#done-button')[0].disabled = false;
+                    }
+                }, 500)
             }
         });
     }
