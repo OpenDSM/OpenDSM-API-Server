@@ -6,6 +6,7 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("/api/yt")]
 public class YTController : ControllerBase
 {
+
     #region Public Methods
 
     [HttpGet("channel/{id}")]
@@ -31,4 +32,5 @@ public class YTController : ControllerBase
     }
 
     #endregion Public Methods
+
 }

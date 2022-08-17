@@ -8,6 +8,7 @@ namespace OpenDSM.Core.Models;
 
 public static class ReviewListHandler
 {
+
     #region Public Methods
 
     public static byte GetProductAverageRating(ProductModel product)
@@ -44,4 +45,5 @@ public static class ReviewListHandler
     }
 
     #endregion Public Methods
+
 }

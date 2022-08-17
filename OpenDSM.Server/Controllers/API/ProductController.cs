@@ -109,6 +109,12 @@ public class ProductController : ControllerBase
         return RedirectToAction("Index", "Error", 500);
     }
 
+    [HttpGet("get")]
+    public IActionResult GetProduct(int id)
+    {
+        return new JsonResult(ProductModel.GetByID(id));
+    }
+
     [HttpDelete("remove-version")]
     public async Task<IActionResult> RemoveVersion(int id, int product)
     {
@@ -160,6 +166,23 @@ public class ProductController : ControllerBase
 
     }
 
+    [HttpPost("trigger-version-check")]
+    public IActionResult TriggerVersionCheck([FromQuery] int product_id)
+    {
+        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
+        {
+            model.PopulateVersionsFromGit();
+            return Ok(new
+            {
+                model.Versions
+            });
+        }
+        return BadRequest(new
+        {
+            message = "Product Doesn't Exist"
+        });
+    }
+
     [HttpPatch("update-version")]
     public async Task<IActionResult> UpdateVersion([FromQuery]int id, [FromQuery]int product, [FromForm]string name, [FromForm] string changelog, [FromForm] ReleaseType type)
     {
@@ -207,28 +230,6 @@ public class ProductController : ControllerBase
         return BadRequest(new
         {
             message = "User not logged in!"
-        });
-    }
-
-    [HttpGet("get")]
-    public IActionResult GetProduct(int id)
-    {
-        return new JsonResult(ProductModel.GetByID(id));
-    }
-    [HttpPost("trigger-version-check")]
-    public IActionResult TriggerVersionCheck([FromQuery] int product_id)
-    {
-        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
-        {
-            model.PopulateVersionsFromGit();
-            return Ok(new
-            {
-                model.Versions
-            });
-        }
-        return BadRequest(new
-        {
-            message = "Product Doesn't Exist"
         });
     }
     [HttpPost("upload-version-asset"), DisableRequestSizeLimit]

@@ -186,4 +186,5 @@ public class UserModel
     }
 
     #endregion Public Methods
+
 }

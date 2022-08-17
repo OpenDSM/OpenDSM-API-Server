@@ -541,7 +541,6 @@ class EditVersionPopup extends Popup {
 
             this.close();
 
-
             let name = $(element).find("#version-name")[0].value
             let changelog = $(element).find("#changelog-box")[0].value
             let release = $(element).find("#release-type")[0].value
@@ -560,7 +559,6 @@ class EditVersionPopup extends Popup {
 
             loading.unload();
             window.location.reload();
-
         })
     }
 }
@@ -591,7 +589,6 @@ class DeleteVersionPopup extends CenteredPopup {
             }
 
             loading.unload();
-
         })
     }
 }

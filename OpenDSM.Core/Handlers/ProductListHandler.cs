@@ -10,6 +10,7 @@ namespace OpenDSM.Core.Handlers;
 
 public class ProductListHandler
 {
+
     #region Public Methods
 
     public static ProductModel[] GetPopularProducts(int count = 20)
@@ -40,4 +41,5 @@ public class ProductListHandler
     }
 
     #endregion Public Methods
+
 }

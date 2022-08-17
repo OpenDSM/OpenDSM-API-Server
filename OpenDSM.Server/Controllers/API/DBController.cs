@@ -7,6 +7,7 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("/api/db")]
 public class DBController : ControllerBase
 {
+
     #region Public Methods
 
     [HttpGet("status")]
@@ -28,4 +29,5 @@ public class DBController : ControllerBase
     }
 
     #endregion Public Methods
+
 }

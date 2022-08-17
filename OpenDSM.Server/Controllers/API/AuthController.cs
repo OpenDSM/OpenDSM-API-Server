@@ -204,4 +204,5 @@ public class AuthController : ControllerBase
     }
 
     #endregion Public Methods
+
 }

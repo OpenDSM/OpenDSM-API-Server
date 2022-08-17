@@ -280,4 +280,5 @@ public class ProductModel
     }
 
     #endregion Public Methods
+
 }

@@ -8,6 +8,7 @@ namespace OpenDSM.Core.Models;
 
 public class ReviewModel
 {
+
     #region Public Properties
 
     public DateTime Posted { get; set; }
@@ -17,4 +18,5 @@ public class ReviewModel
     public UserModel User { get; set; }
 
     #endregion Public Properties
+
 }

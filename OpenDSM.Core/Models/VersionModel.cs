@@ -17,6 +17,7 @@ public enum ReleaseType
 public record PlatformVersion(Platform platform, string downloadUrl, int total_downloads, int weekly_downloads, long file_size);
 public class VersionModel
 {
+
     #region Public Constructors
 
     public VersionModel(long iD, int product_id, string name, ReleaseType type, List<PlatformVersion> platforms, string changelog, DateTime posted)
@@ -52,4 +53,5 @@ public class VersionModel
     public int WeeklyDownloads { get; }
 
     #endregion Public Properties
+
 }

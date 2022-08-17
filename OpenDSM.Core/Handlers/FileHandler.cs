@@ -8,6 +8,7 @@ namespace OpenDSM.Core.Handlers;
 
 public static class FileHandler
 {
+
     #region Public Methods
 
     public static void CreateImageFromBase64(string base64, string directory, string file, int width)
@@ -52,4 +53,5 @@ public static class FileHandler
     }
 
     #endregion Public Methods
+
 }
