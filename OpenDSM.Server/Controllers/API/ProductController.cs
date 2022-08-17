@@ -109,6 +109,107 @@ public class ProductController : ControllerBase
         return RedirectToAction("Index", "Error", 500);
     }
 
+    [HttpDelete("remove-version")]
+    public async Task<IActionResult> RemoveVersion(int id, int product)
+    {
+        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        {
+            if (ProductModel.TryGetByID(product, out ProductModel? model))
+            {
+                if (model.User.Equals( user))
+                {
+                    if (model.Versions.ContainsKey(id))
+                    {
+                        if (await GitHandler.RemoveVersion(user.GitCredentials, model, model.Versions[id]))
+                        {
+                            return Ok(new
+                            {
+                                message = "Version removed successfully!"
+                            });
+                        }
+                        else
+                        {
+                            return BadRequest(new
+                            {
+                                message = "Unable to remove version"
+                            });
+                        }
+                    }
+
+                    return BadRequest(new
+                    {
+                        message = $"Could not find version with an id of {id} under product \"{model.Name}\""
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = "User is not authorized!"
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = $"Could not find product with an id of {product}"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "User not logged in!"
+        });
+
+    }
+
+    [HttpPatch("update-version")]
+    public async Task<IActionResult> UpdateVersion([FromQuery]int id, [FromQuery]int product, [FromForm]string name, [FromForm] string changelog, [FromForm] ReleaseType type)
+    {
+        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        {
+            if (ProductModel.TryGetByID(product, out ProductModel? model))
+            {
+                if (model.User.Equals(user))
+                {
+                    if (model.Versions.ContainsKey(id))
+                    {
+                        if (await GitHandler.UpdateVersion(user.GitCredentials, model, model.Versions[id], name, type, changelog))
+                        {
+                            return Ok(new
+                            {
+                                message = "Version updated successfully!"
+                            });
+                        }
+                        else
+                        {
+                            return BadRequest(new
+                            {
+                                message = "Unable to update version"
+                            });
+                        }
+                    }
+
+                    return BadRequest(new
+                    {
+                        message = $"Could not find version with an id of {id} under product \"{model.Name}\""
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = "User is not authorized!"
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = $"Could not find product with an id of {product}"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "User not logged in!"
+        });
+    }
+
     [HttpGet("get")]
     public IActionResult GetProduct(int id)
     {

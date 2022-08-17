@@ -145,9 +145,9 @@
                 }
         </div>
         <div class="list vertical versions-list">
-                @foreach ((_, VersionModel version) in Model.Versions)
+                @foreach ((_, VersionModel version) in Model.Versions.Take(Model.Versions.Count>20?20:Model.Versions.Count))
                 {
-                <div class="version-item">
+                <div class="version-item" id="@version.ID">
                 <div class="list horizontal">
                 <div class="list vertical">
                 <h4 class="name">@version.Name</h4>
@@ -191,7 +191,7 @@
                 <div class="list vertical">
                                 @if (IsOwner)
                                 {
-                                                <button class="btn download" onclick="new EditVersionPopup(`@version.ID`, `@version.ProductID`).open()">Edit</button>
+                                                <button class="btn download" onclick="new EditVersionPopup(`@version.ID`, `@version.ProductID`, `@version.Name`, `@version.Changelog`, `@version.Type`).open()">Edit</button>
                                     @if (!string.IsNullOrWhiteSpace(version.Changelog))
                                     {
                                         <button class="btn secondary changelog" onclick="new DeleteVersionPopup(`@version.ID`, `@version.ProductID`).open()">DELETE</button>

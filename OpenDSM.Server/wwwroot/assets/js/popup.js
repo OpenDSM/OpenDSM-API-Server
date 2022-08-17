@@ -515,3 +515,83 @@ class CreateVersionPopup extends Popup {
         });
     }
 }
+
+class EditVersionPopup extends Popup {
+    ID;
+    ProductID;
+    Name;
+    Changelog;
+    Release;
+    constructor(ID, ProductID, Name, Changelog, Release) {
+        super("edit-version")
+        this.ID = ID;
+        this.ProductID = ProductID;
+        this.Name = Name;
+        this.Changelog = Changelog;
+        this.Release = Release;
+    }
+
+    async open() {
+        let element = await super.open();
+        $(element).find("#version-name")[0].value = this.Name;
+        $(element).find("#changelog-box")[0].value = this.Changelog;
+        $(element).find("#release-type")[0].value = this.Release;
+        $(element).find("#finish-button").on('click', async () => {
+            let loading = new LoadingScreen("Updating Version", "Don't go anywhere!")
+
+            this.close();
+
+
+            let name = $(element).find("#version-name")[0].value
+            let changelog = $(element).find("#changelog-box")[0].value
+            let release = $(element).find("#release-type")[0].value
+
+            let data = new FormData()
+            data.append('name', name)
+            data.append('changelog', changelog)
+            data.append('type', release)
+
+            let response = await fetch(`/api/product/update-version?id=${this.ID}&product=${this.ProductID}`, { method: "PATCH", body: data })
+            console.log(response)
+            if (!response.ok) {
+                let json = await response.json();
+                alert(json["message"]);
+            }
+
+            loading.unload();
+            window.location.reload();
+
+        })
+    }
+}
+
+class DeleteVersionPopup extends CenteredPopup {
+    ID;
+    ProductID;
+
+    constructor(ID, ProductID) {
+        super("delete-version")
+        this.ID = ID;
+        this.ProductID = ProductID;
+    }
+
+    async open() {
+        let element = await super.open();
+        $("#delete-button").on('click', async () => {
+            let loading = new LoadingScreen("Deleting Version", "Don't go anywhere!")
+
+            this.close();
+            let response = await fetch(`/api/product/remove-version?id=${this.ID}&product=${this.ProductID}`, {method: "DELETE"})
+
+            if (!response.ok) {
+                let json = await response.json();
+                alert(json["message"]);
+            } else {
+                $(`.version-item#${this.ID}`)[0].remove();
+            }
+
+            loading.unload();
+
+        })
+    }
+}

@@ -33,4 +33,12 @@
     <None Include="Views\Popup\video.cshtml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Popup\delete-version.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Popup\delete-version.cshtml" />
+  </ItemGroup>
+
 </Project>

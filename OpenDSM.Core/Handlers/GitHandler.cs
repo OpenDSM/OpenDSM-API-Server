@@ -154,6 +154,45 @@ public static class GitHandler
         ReadMe = "";
         return false;
     }
+
+    public static async Task<bool> RemoveVersion(GitCredentials credentials, ProductModel productModel, VersionModel versionModel)
+    {
+        if (CheckCredentials(credentials))
+        {
+            try
+            {
+                GitHubClient client = GetClient(credentials);
+                await client.Repository.Release.Delete(credentials.Username, productModel.GitRepositoryName, (int)versionModel.ID);
+                productModel.PopulateVersionsFromGit();
+                return true;
+            }
+            catch
+            {
+            }
+        }
+        return false;
+    }
+
+    public static async Task<bool> UpdateVersion(GitCredentials credentials, ProductModel product, VersionModel version, string name, ReleaseType type, string changelog)
+    {
+
+        if (CheckCredentials(credentials))
+        {
+            GitHubClient client = GetClient(credentials);
+            await client.Repository.Release.Edit(credentials.Username, product.GitRepositoryName, (int)version.ID, new()
+            {
+                Name = $"{type} - {name}",
+                TagName = name,
+                Body = changelog
+            });
+            Versions.UpdateVersion(version.ID, product.Id, name, (byte)type, changelog);
+            product.PopulateVersionsFromDB();
+            return true;
+        }
+
+        return false;
+    }
+
     public async static Task<bool> UploadReleaseAsset(GitCredentials credentials, Stream file, ProductModel product, Platform platform, int release_id)
     {
         if (CheckCredentials(credentials))
