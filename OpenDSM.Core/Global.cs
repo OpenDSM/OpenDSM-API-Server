@@ -2,11 +2,14 @@
 global using static OpenDSM.Core.Global;
 using ChaseLabs.CLLogger;
 using ChaseLabs.CLLogger.Interfaces;
+using Microsoft.AspNetCore.Http;
+using OpenDSM.Core.Models;
 
 namespace OpenDSM.Core;
 
 public static class Global
 {
+
     #region Public Fields
 
     public static ILog log = LogManager.Init().SetDumpMethod(1000).SetLogDirectory(LogsDirectory).SetPattern("[OPENDSM] (%TYPE%: %DATE%): %MESSAGE%");
@@ -40,6 +43,19 @@ public static class Global
 
     public static string GetUsersProfileDirectory(int id) => Directory.CreateDirectory(Path.Combine(ProfileDataDirectory, id.ToString())).FullName;
 
+    public static bool IsLoggedIn(IRequestCookieCollection cookies, out UserModel? user)
+    {
+        user = null;
+        string email = cookies["auth_email"] ?? "";
+        string token = cookies["auth_token"] ?? "";
+        if (!string.IsNullOrEmpty(email) && !string.IsNullOrWhiteSpace(token))
+        {
+            return UserModel.TryGetUserWithToken(email, token, out user);
+        }
+
+        return false;
+    }
 
     #endregion Public Methods
+
 }
