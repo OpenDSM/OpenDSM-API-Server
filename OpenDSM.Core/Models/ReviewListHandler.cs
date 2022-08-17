@@ -8,6 +8,20 @@ namespace OpenDSM.Core.Models;
 
 public static class ReviewListHandler
 {
+    #region Public Methods
+
+    public static byte GetProductAverageRating(ProductModel product)
+    {
+        ReviewModel[] reviews = GetProductReviews(product);
+        int ratings = 0;
+        foreach (ReviewModel review in reviews)
+        {
+            ratings += review.Rating;
+        }
+        byte rating = (byte)(Math.Round((ratings / reviews.Length) / 5.0) * 5);
+        return rating > 50 ? (byte)50 : rating;
+    }
+
     public static ReviewModel[] GetProductReviews(ProductModel product)
     {
         List<ReviewModel> Reviews = new();
@@ -28,15 +42,6 @@ public static class ReviewListHandler
         }
         return Reviews.ToArray();
     }
-    public static byte GetProductAverageRating(ProductModel product)
-    {
-        ReviewModel[] reviews = GetProductReviews(product);
-        int ratings = 0;
-        foreach (ReviewModel review in reviews)
-        {
-            ratings += review.Rating;
-        }
-        byte rating = (byte)(Math.Round((ratings / reviews.Length) / 5.0) * 5);
-        return rating > 50 ? (byte)50 : rating;
-    }
+
+    #endregion Public Methods
 }
