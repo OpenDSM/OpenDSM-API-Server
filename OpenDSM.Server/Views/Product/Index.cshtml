@@ -1,5 +1,6 @@
 ﻿@using OpenDSM.Core.Models
 @using OpenDSM.SQL
+@using System.Globalization
 @using UAParser
 @model OpenDSM.Core.Models.ProductModel
 
@@ -7,20 +8,6 @@
     UserModel? user = (UserModel)ViewData["user"] ?? null;
     bool IsPreview = (bool)ViewData["Preview"];
     bool IsOwner = !IsPreview && user != null && user.Equals(Model.User);
-    string OS = (string)ViewData["OS"];
-    bool HasOSDownload = Enum.TryParse(typeof(Platform), OS, true, out var p) && Model.Platforms.Any(i => i == (Platform)p);
-    long latest_version_id = -1;
-    if (HasOSDownload)
-    {
-        foreach ((_, VersionModel version) in Model.Versions)
-        {
-            if (version.Platforms.Any(i => i.platform == (Platform)p))
-            {
-                latest_version_id = version.ID;
-                break;
-            }
-        }
-    }
 }
 
 <section id="landing" class="product xl">
@@ -48,14 +35,28 @@
                 {
                     @if (Model.Price == 0)
                     {
-                        if (HasOSDownload)
-                        {
-                            <div class="btn" onclick="new DownloadPopup(@Model.Id, @latest_version_id, '@OS')">Download</div>
+                        @if(user == null){
+                            Html.ActionLink("Login To Add to Library", "Login", "Auth", new { @ref = this.Path }, new { @class = "btn" });
+                        }else{
+                            <div class="btn secondary" onclick="AddToLibrary()" id="add-to-library-button"><i class="fa fa-plus"></i> Add to Library</div>
                         }
                     }
                     else
                     {
-                        <div class="btn" onclick="new PurchasePopup('@Model.Id', false).open()">BUY - $9.99</div>
+                        if(Model.Subscription){
+                            if(user == null){
+                                Html.ActionLink($"Login To Subscibe - {(Model.Price / (float)100).ToString("C", CultureInfo.CurrentCulture)}/month", "Login", "Auth", new { @ref = this.Path }, new { @class = "btn" });
+                            }else{
+                                <div class="btn" onclick="new PurchasePopup('@Model.Id', false).open()">Subscribe - @((Model.Price / (float)100).ToString("C", CultureInfo.CurrentCulture))/month</div>
+                            }
+                        }else{
+
+                            if(user == null){
+                                Html.ActionLink($"Login To Purchase - {(Model.Price / (float)100).ToString("C", CultureInfo.CurrentCulture)}", "Login", "Auth", new { @ref = this.Path }, new { @class = "btn" });
+                            }else{
+                                <div class="btn" onclick="new PurchasePopup('@Model.Id', false).open()">BUY - @((Model.Price / (float)100).ToString("C", CultureInfo.CurrentCulture))</div>
+                            }
+                        }
                     }
                 }
                 @if (Model.HasYoutubeVideo)
@@ -195,7 +196,7 @@
                                 }
                                 else
                                 {
-                                    <button class="btn download" onclick="new DownloadPopup(`@Model.Name`,@Model.Id, @version.ID, '@OS', `@version.Name`).open()">Download</button>
+                                    <a class="btn download" href="dsm://">Download</a>
                                     @if (!string.IsNullOrWhiteSpace(version.Changelog))
                                     {
                                         <button class="btn secondary changelog" onclick="new ChangelogPopup(`@version.Type.ToString() - @version.Name`, `@version.Changelog`).open()">Changelog</button>
