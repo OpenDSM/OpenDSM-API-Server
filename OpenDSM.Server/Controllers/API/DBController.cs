@@ -13,7 +13,7 @@ public class DBController : ControllerBase
     [HttpGet("status")]
     public IActionResult Index()
     {
-        if (Connections.TestConnection(out string version))
+        if (Connections.Instance.TestConnection(out string version))
         {
             return new JsonResult(new
             {
