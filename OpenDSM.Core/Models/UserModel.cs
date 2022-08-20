@@ -1,16 +1,19 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
+using System.Linq;
+using System.Text.Json;
 
 namespace OpenDSM.Core.Models;
-
+public record UserProductStat(DateTime purchased, TimeSpan activeTime, float purchasePrice);
 public class UserModel
 {
 
     #region Protected Constructors
 
-    protected UserModel(int id, string username, string email, string token, AccountType type, bool use_git_readme, int[] ownedProducts)
+    protected UserModel(int id, string username, string email, string token, AccountType type, bool use_git_readme, Dictionary<int, UserProductStat> ownedProducts)
     {
         Id = id;
         Username = username;
@@ -53,7 +56,7 @@ public class UserModel
     public bool HasReadme => GitHandler.HasReadME(GitUsername, GitCredentials, out string _);
     public int Id { get; private set; }
     public bool IsDeveloperAccount => !string.IsNullOrEmpty(GitUsername) && !string.IsNullOrEmpty(GitToken) && GitCredentials != null && GitHandler.CheckCredentials(GitCredentials);
-    public int[] OwnedProducts { get; private set; }
+    public Dictionary<int, UserProductStat> OwnedProducts { get; private set; }
     public string ProfileBannerImage
     {
         get
@@ -94,7 +97,7 @@ public class UserModel
         {
             if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] _))
             {
-                return new(id, username, email, "", type, use_git_readme, Array.Empty<int>())
+                return new(id, username, email, "", type, use_git_readme, new())
                 {
                     GitUsername = git_username,
                     GitToken = git_token,
@@ -112,7 +115,7 @@ public class UserModel
     {
         if (Authoriztaion.GetUserFromUsername(username, out int id, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] products))
         {
-            return new(id, username, email, "", type, use_git_readme, Array.Empty<int>())
+            return new(id, username, email, "", type, use_git_readme, new())
             {
                 GitUsername = git_username,
                 GitToken = git_token,
@@ -122,9 +125,9 @@ public class UserModel
     }
     public static UserModel? GetUser(string username, string password, out FailedReason reason)
     {
-        if (Authoriztaion.Login(username, password, out reason, out AccountType type, out bool use_git_readme, out int id, out string email, out string uname, out string token, out int[] products, out string r_git_username, out string r_git_token))
+        if (Authoriztaion.Login(username, password, out reason, out AccountType type, out bool use_git_readme, out int id, out string email, out string uname, out string token, out string products, out string r_git_username, out string r_git_token))
         {
-            return new(id, uname, email, token, type, use_git_readme, products)
+            return new(id, uname, email, token, type, use_git_readme, JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
             {
                 GitToken = r_git_token,
                 GitUsername = r_git_username
@@ -147,9 +150,9 @@ public class UserModel
     public static bool TryGetUserWithToken(string email, string password, out UserModel? user)
     {
         user = null;
-        if (Authoriztaion.LoginWithToken(email, password, out var reason, out AccountType type, out bool use_git_readme, out int id, out string r_email, out string uname, out string token, out int[] products, out string r_git_username, out string r_git_token))
+        if (Authoriztaion.LoginWithToken(email, password, out var reason, out AccountType type, out bool use_git_readme, out int id, out string r_email, out string uname, out string token, out string products, out string r_git_username, out string r_git_token))
         {
-            user = new(id, uname, email, token, type, use_git_readme, products)
+            user = new(id, uname, email, token, type, use_git_readme, JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
             {
                 GitToken = r_git_token,
                 GitUsername = r_git_username
@@ -183,6 +186,29 @@ public class UserModel
     public void UpdateSetting(string name, dynamic value)
     {
         Authoriztaion.UpdateProperty(Id, Token, name, value);
+    }
+
+    public bool AddToLibrary(ProductModel product, float purchasedPrice = -1)
+    {
+        if (!OwnedProducts.ContainsKey(product.Id))
+        {
+            UserProductStat stat = new(DateTime.Now, new TimeSpan(0), purchasedPrice == -1 ? product.Price : purchasedPrice);
+            OwnedProducts.Add(product.Id, stat);
+            UpdateProductStat(product.Id, stat);
+            return true;
+        }
+        return false;
+    }
+
+    public bool UpdateProductStat(int productId, UserProductStat stat)
+    {
+        if (OwnedProducts.ContainsKey(productId))
+        {
+            OwnedProducts[productId] = stat;
+            Authoriztaion.UpdateProperty(Id, Token, "owned_products", JsonSerializer.Serialize(OwnedProducts));
+            return true;
+        }
+        return false;
     }
 
     #endregion Public Methods
