@@ -4,6 +4,8 @@ using ChaseLabs.CLLogger;
 using ChaseLabs.CLLogger.Interfaces;
 using Microsoft.AspNetCore.Http;
 using OpenDSM.Core.Models;
+using OpenDSM.Core.Handlers;
+using OpenDSM.SQL;
 
 namespace OpenDSM.Core;
 
@@ -54,6 +56,12 @@ public static class Global
         }
 
         return false;
+    }
+
+    public static void InitHandlers()
+    {
+        _ = PaymentHandler.Instance;
+        _ = Connections.Instance;
     }
 
     #endregion Public Methods
