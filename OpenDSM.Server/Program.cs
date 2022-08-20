@@ -1,6 +1,7 @@
 // LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 global using static OpenDSM.Core.Global;
 using Microsoft.AspNetCore.HttpOverrides;
+using OpenDSM.Core.Handlers;
 using System.Net;
 namespace OpenDSM.Server;
 
@@ -20,6 +21,9 @@ public class Program
 
         log.Info($"Welcome to {ApplicationName} Server");
         log.Debug(Copywrite);
+
+        InitHandlers();
+
         bool useKestrel = true;
         foreach (string arg in args)
         {
