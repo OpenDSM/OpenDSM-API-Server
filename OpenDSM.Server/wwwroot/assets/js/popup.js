@@ -157,7 +157,7 @@ class DownloadPopup extends CenteredPopup {
     async open() {
         let element = await super.open();
         let link = $(element).find("#download-link")[0];
-        link.href = `/api/product/download?product_id=${this.id}&version_id=${this.version_id}&platform=${this.platform}`;
+        link.href = `/api/product/${this.id}/version/${this.version_id}?platform=${this.platform}`;
         link.download = `${this.product_name}-${this.platform}-${this.version_name}.zip`
         link.click();
     }
@@ -441,11 +441,11 @@ class CreateVersionPopup extends Popup {
                 data.append("type", releaseType)
                 data.append("changelog", changelog);
 
-                let response = await fetch(`/api/product/create-version`, { method: "POST", body: data });
+                let response = await fetch(`/api/product/version`, { method: "POST", body: data });
                 let itemsUploaded = 0;
                 if (response.ok) {
                     let json = await response.json();
-                    let release_id = json["id"];
+                    let version_id = json["id"];
 
                     icon.classList.remove('throbber');
                     icon.classList.add('fa', 'fa-check');
@@ -467,7 +467,7 @@ class CreateVersionPopup extends Popup {
                         try {
                             let data = new FormData()
                             data.append("file", i.files[0]);
-                            let response = await fetch(`/api/product/upload-version-asset?id=${id}&release_id=${release_id}&platform=${name}`, { method: "POST", body: data })
+                            let response = await fetch(`/api/product/${this.product_id}/version/${version_id}/asset?platform=${name}`, { method: "POST", body: data })
                             itemsUploaded++;
                             icon.classList.remove('throbber');
                             if (response.ok) {
@@ -500,7 +500,7 @@ class CreateVersionPopup extends Popup {
                         header.appendChild(icon);
                         header.append(name);
                         uploadTasks.appendChild(header);
-                        await fetch(`/api/product/trigger-version-check?product_id=${id}`, { method: "POST" })
+                        await fetch(`/api/product/${id}/version/check`, { method: "POST" })
                         icon.classList.remove('throbber');
                         icon.classList.add('fa', 'fa-check');
 
@@ -550,7 +550,7 @@ class EditVersionPopup extends Popup {
             data.append('changelog', changelog)
             data.append('type', release)
 
-            let response = await fetch(`/api/product/update-version?id=${this.ID}&product=${this.ProductID}`, { method: "PATCH", body: data })
+            let response = await fetch(`/api/product/${this.ProductID}/version/${this.ID}`, { method: "PATCH", body: data })
             console.log(response)
             if (!response.ok) {
                 let json = await response.json();
@@ -579,7 +579,7 @@ class DeleteVersionPopup extends CenteredPopup {
             let loading = new LoadingScreen("Deleting Version", "Don't go anywhere!")
 
             this.close();
-            let response = await fetch(`/api/product/remove-version?id=${this.ID}&product=${this.ProductID}`, {method: "DELETE"})
+            let response = await fetch(`/api/product/${this.ProductID}/version/${this.ID}`, {method: "DELETE"})
 
             if (!response.ok) {
                 let json = await response.json();

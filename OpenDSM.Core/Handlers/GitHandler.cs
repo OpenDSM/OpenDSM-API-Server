@@ -58,11 +58,12 @@ public static class GitHandler
         if (CheckCredentials(credentials))
         {
             GitHubClient client = GetClient(credentials);
-            Dictionary<string, string> config = new Dictionary<string, string>();
-            config.Add("url", $"https://opendsm.tk/api/product/trigger-version-check?product_id={product.Id}");
-            config.Add("content_type", "application/json");
 
-            await client.Repository.Hooks.Create(credentials.Username, product.GitRepositoryName, new("opendsm", config)
+            await client.Repository.Hooks.Create(credentials.Username, product.GitRepositoryName, new("opendsm", new Dictionary<string, string>()
+            {
+                { "url", $"https://opendsm.tk/api/product/{product.Id}/version/check" },
+                { "content_type", "application/json" }
+            })
             {
                 Active = true,
                 Events = new string[] { "release" },

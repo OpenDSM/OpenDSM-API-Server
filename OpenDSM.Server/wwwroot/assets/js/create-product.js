@@ -111,7 +111,7 @@ $("#submit-btn").on('click', async () => {
             }
         }
         let loadingScreen = new LoadingScreen("Creating Product", "This may take a moment...");
-        let response = await fetch("/api/product/create", { method: "POST", body: data });
+        let response = await fetch("/api/product", { method: "POST", body: data });
         if (response.ok) {
             let json = await response.json();
             window.location.href = `/product/${json.id}`
