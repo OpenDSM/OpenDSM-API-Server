@@ -127,7 +127,7 @@ public class UserModel
     {
         if (Authoriztaion.Login(username, password, out reason, out AccountType type, out bool use_git_readme, out int id, out string email, out string uname, out string token, out string products, out string r_git_username, out string r_git_token))
         {
-            return new(id, uname, email, token, type, use_git_readme, JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
+            return new(id, uname, email, token, type, use_git_readme, string.IsNullOrWhiteSpace(products) ? new() : JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
             {
                 GitToken = r_git_token,
                 GitUsername = r_git_username
@@ -152,7 +152,7 @@ public class UserModel
         user = null;
         if (Authoriztaion.LoginWithToken(email, password, out var reason, out AccountType type, out bool use_git_readme, out int id, out string r_email, out string uname, out string token, out string products, out string r_git_username, out string r_git_token))
         {
-            user = new(id, uname, email, token, type, use_git_readme, JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
+            user = new(id, uname, email, token, type, use_git_readme, string.IsNullOrWhiteSpace(products) ? new() : JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
             {
                 GitToken = r_git_token,
                 GitUsername = r_git_username
