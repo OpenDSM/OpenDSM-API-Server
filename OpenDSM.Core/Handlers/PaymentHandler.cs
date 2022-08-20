@@ -6,9 +6,19 @@ namespace OpenDSM.Core.Handlers;
 
 public class PaymentHandler
 {
+    #region Public Fields
+
     public static PaymentHandler Instance = Instance ??= new();
 
+    #endregion Public Fields
+
+    #region Private Fields
+
     private ConfigManager manager;
+
+    #endregion Private Fields
+
+    #region Private Constructors
 
     private PaymentHandler()
     {
@@ -17,6 +27,11 @@ public class PaymentHandler
         StripeConfiguration.ApiKey = GetAPIKey();
         StripeConfiguration.MaxNetworkRetries = 2;
     }
+
+    #endregion Private Constructors
+
+    #region Private Methods
+
     private string GetAPIKey()
     {
         string key = manager.GetOrCreate("API_KEY", "").Value;
@@ -68,5 +83,7 @@ public class PaymentHandler
 
         return StripeAccount;
     }
+
+    #endregion Private Methods
 
 }

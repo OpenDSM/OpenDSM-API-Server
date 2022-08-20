@@ -13,10 +13,76 @@ public class ProductController : ControllerBase
 
     #region Public Methods
 
-    [HttpGet("{id}")]
-    public IActionResult GetProduct(int id)
+    [HttpPost("AddToLibrary")]
+    public async Task<IActionResult> AddToLibrary([FromQuery] int product_id, [FromQuery] string? coupon)
     {
-        return new JsonResult(ProductModel.GetByID(id));
+        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        {
+            if (!user.OwnedProducts.ContainsKey(product_id))
+            {
+                if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+                {
+                    if (product.Price == 0 || product.SalePrice == 0 || (!string.IsNullOrWhiteSpace(coupon) && product.Coupon.ContainsKey(coupon) && product.Coupon[coupon] == 0))
+                    {
+                        user.AddToLibrary(product);
+                    }
+
+                    return BadRequest(new
+                    {
+                        message = $"'{product.Name}' cost '{product.Price}' and requires payment method to be included"
+                    });
+                }
+                return BadRequest(new
+                {
+                    message = $"Product with id of '{product_id}' either never existed or no longer exists!"
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = $"User already owns product with id of '{product_id}'"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "User must be logged in!"
+        });
+    }
+
+    [HttpPost("AddToLibrary")]
+    public async Task<IActionResult> AddToLibrary([FromQuery] int product_id, [FromQuery] string? coupon, [FromForm] string card, [FromForm] string date, [FromForm] string cvv)
+    {
+        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        {
+            if (!user.OwnedProducts.ContainsKey(product_id))
+            {
+                if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+                {
+                    if (product.Price == 0 || product.SalePrice == 0 || (!string.IsNullOrWhiteSpace(coupon) && product.Coupon.ContainsKey(coupon) && product.Coupon[coupon] == 0))
+                    {
+                        user.AddToLibrary(product);
+                    }
+
+                    return BadRequest(new
+                    {
+                        message = $"'{product.Name}' cost '{product.Price}' and requires payment method to be included"
+                    });
+                }
+                return BadRequest(new
+                {
+                    message = $"Product with id of '{product_id}' either never existed or no longer exists!"
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = $"User already owns product with id of '{product_id}'"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "User must be logged in!"
+        });
     }
 
     [HttpPost()]
@@ -51,7 +117,37 @@ public class ProductController : ControllerBase
         }
         return BadRequest();
     }
-    #region Versions
+
+    [HttpPost("{product_id}/review")]
+    public async Task<IActionResult> CreateReview([FromRoute] int product_id, [FromForm] byte rating, [FromForm] string summery, [FromForm] string body)
+    {
+
+        if (IsLoggedIn(Request.Cookies, out UserModel user))
+        {
+            if (ProductModel.TryGetByID(product_id, out ProductModel product))
+            {
+                if (user.OwnedProducts[product_id] != null)
+                {
+
+                }
+
+                return BadRequest(new
+                {
+                    message = $"You must be a verified owner of '{product.Name}' to leave a review"
+                });
+            }
+            return BadRequest(new
+            {
+                message = $"No product with an id of {product_id} exists!"
+            });
+        }
+
+        return BadRequest(new
+        {
+            message = "User must be logged in to leave a review"
+        });
+    }
+
     [HttpPost("{id}/version")]
     public IActionResult CreateVersion([FromRoute] int id, [FromForm] string name, [FromForm] ReleaseType type, [FromForm] string changelog)
     {
@@ -93,6 +189,98 @@ public class ProductController : ControllerBase
             success = false,
             message = "Couldn't authorize user",
             id = -1
+        });
+    }
+
+    [HttpGet("{product_id}/version/{version_id}")]
+    public IActionResult DownloadVersion(int product_id, long version_id, Platform platform)
+    {
+        ProductModel? product = ProductModel.GetByID(product_id);
+        if (product != null)
+        {
+            VersionModel? version = product.Versions[version_id];
+            if (version != null)
+            {
+                PlatformVersion? platform_version = version.Platforms.FirstOrDefault(i => i.platform == platform);
+                if (platform_version != null)
+                {
+                    return Redirect(platform_version.downloadUrl);
+                }
+            }
+        }
+        return RedirectToAction("Index", "Error", 500);
+    }
+
+    [HttpGet("{id}")]
+    public IActionResult GetProduct(int id)
+    {
+        return new JsonResult(ProductModel.GetByID(id));
+    }
+    [HttpDelete("{product}/version/{id}")]
+    public async Task<IActionResult> RemoveVersion(int id, int product)
+    {
+        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        {
+            if (ProductModel.TryGetByID(product, out ProductModel? model))
+            {
+                if (model.User.Equals(user))
+                {
+                    if (model.Versions.ContainsKey(id))
+                    {
+                        if (await GitHandler.RemoveVersion(user.GitCredentials, model, model.Versions[id]))
+                        {
+                            return Ok(new
+                            {
+                                message = "Version removed successfully!"
+                            });
+                        }
+                        else
+                        {
+                            return BadRequest(new
+                            {
+                                message = "Unable to remove version"
+                            });
+                        }
+                    }
+
+                    return BadRequest(new
+                    {
+                        message = $"Could not find version with an id of {id} under product \"{model.Name}\""
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = "User is not authorized!"
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = $"Could not find product with an id of {product}"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "User not logged in!"
+        });
+
+    }
+
+    [HttpPost("{product_id}/version/check")]
+    public IActionResult TriggerVersionCheck([FromRoute] int product_id)
+    {
+        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
+        {
+            model.PopulateVersionsFromGit();
+            return Ok(new
+            {
+                model.Versions
+            });
+        }
+        return BadRequest(new
+        {
+            message = "Product Doesn't Exist"
         });
     }
 
@@ -145,76 +333,6 @@ public class ProductController : ControllerBase
             message = "User not logged in!"
         });
     }
-    [HttpGet("{product_id}/version/{version_id}")]
-    public IActionResult DownloadVersion(int product_id, long version_id, Platform platform)
-    {
-        ProductModel? product = ProductModel.GetByID(product_id);
-        if (product != null)
-        {
-            VersionModel? version = product.Versions[version_id];
-            if (version != null)
-            {
-                PlatformVersion? platform_version = version.Platforms.FirstOrDefault(i => i.platform == platform);
-                if (platform_version != null)
-                {
-                    return Redirect(platform_version.downloadUrl);
-                }
-            }
-        }
-        return RedirectToAction("Index", "Error", 500);
-    }
-
-    [HttpDelete("{product}/version/{id}")]
-    public async Task<IActionResult> RemoveVersion(int id, int product)
-    {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
-        {
-            if (ProductModel.TryGetByID(product, out ProductModel? model))
-            {
-                if (model.User.Equals(user))
-                {
-                    if (model.Versions.ContainsKey(id))
-                    {
-                        if (await GitHandler.RemoveVersion(user.GitCredentials, model, model.Versions[id]))
-                        {
-                            return Ok(new
-                            {
-                                message = "Version removed successfully!"
-                            });
-                        }
-                        else
-                        {
-                            return BadRequest(new
-                            {
-                                message = "Unable to remove version"
-                            });
-                        }
-                    }
-
-                    return BadRequest(new
-                    {
-                        message = $"Could not find version with an id of {id} under product \"{model.Name}\""
-                    });
-                }
-
-                return BadRequest(new
-                {
-                    message = "User is not authorized!"
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = $"Could not find product with an id of {product}"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "User not logged in!"
-        });
-
-    }
-
     [HttpPost("{product_id}/version/{version_id}/asset"), DisableRequestSizeLimit]
     public async Task<IActionResult> UploadAsset([FromRoute] int product_id, [FromRoute] int version_id, [FromQuery] Platform platform, [FromForm] IFormFile file)
     {
@@ -258,125 +376,5 @@ public class ProductController : ControllerBase
         });
     }
 
-    [HttpPost("{product_id}/version/check")]
-    public IActionResult TriggerVersionCheck([FromRoute] int product_id)
-    {
-        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
-        {
-            model.PopulateVersionsFromGit();
-            return Ok(new
-            {
-                model.Versions
-            });
-        }
-        return BadRequest(new
-        {
-            message = "Product Doesn't Exist"
-        });
-    }
-
-
-    #endregion
-
-    [HttpPost("{product_id}/review")]
-    public async Task<IActionResult> CreateReview([FromRoute] int product_id, [FromForm] byte rating, [FromForm] string summery, [FromForm] string body)
-    {
-
-        if(IsLoggedIn(Request.Cookies, out UserModel user))
-        {
-            if(ProductModel.TryGetByID(product_id, out ProductModel product))
-            {
-                if (user.OwnedProducts[product_id] != null)
-                {
-
-                }
-
-                return BadRequest(new
-                {
-                    message = $"You must be a verified owner of '{product.Name}' to leave a review"
-                });
-            }
-            return BadRequest(new
-            {
-                message = $"No product with an id of {product_id} exists!"
-            });
-        }
-
-        return BadRequest(new
-        {
-            message = "User must be logged in to leave a review"
-        });
-    }
-    [HttpPost("AddToLibrary")]
-    public async Task<IActionResult> AddToLibrary([FromQuery] int product_id, [FromQuery] string? coupon)
-    {
-        if(IsLoggedIn(Request.Cookies, out UserModel? user))
-        {
-            if (!user.OwnedProducts.ContainsKey(product_id))
-            {
-                if(ProductModel.TryGetByID(product_id, out ProductModel? product))
-                {
-                    if (product.Price == 0 || product.SalePrice == 0 || (!string.IsNullOrWhiteSpace(coupon) && product.Coupon.ContainsKey(coupon) && product.Coupon[coupon] == 0))
-                    {
-                        user.AddToLibrary(product);
-                    }
-
-                    return BadRequest(new
-                    {
-                        message = $"'{product.Name}' cost '{product.Price}' and requires payment method to be included"
-                    });
-                }
-                return BadRequest(new
-                {
-                    message = $"Product with id of '{product_id}' either never existed or no longer exists!"
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = $"User already owns product with id of '{product_id}'"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "User must be logged in!"
-        });
-    }
-    [HttpPost("AddToLibrary")]
-    public async Task<IActionResult> AddToLibrary([FromQuery] int product_id, [FromQuery] string? coupon, [FromForm] string card, [FromForm] string date, [FromForm] string cvv)
-    {
-        if(IsLoggedIn(Request.Cookies, out UserModel? user))
-        {
-            if (!user.OwnedProducts.ContainsKey(product_id))
-            {
-                if(ProductModel.TryGetByID(product_id, out ProductModel? product))
-                {
-                    if (product.Price == 0 || product.SalePrice == 0 || (!string.IsNullOrWhiteSpace(coupon) && product.Coupon.ContainsKey(coupon) && product.Coupon[coupon] == 0))
-                    {
-                        user.AddToLibrary(product);
-                    }
-
-                    return BadRequest(new
-                    {
-                        message = $"'{product.Name}' cost '{product.Price}' and requires payment method to be included"
-                    });
-                }
-                return BadRequest(new
-                {
-                    message = $"Product with id of '{product_id}' either never existed or no longer exists!"
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = $"User already owns product with id of '{product_id}'"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "User must be logged in!"
-        });
-    }
     #endregion Public Methods
-
 }

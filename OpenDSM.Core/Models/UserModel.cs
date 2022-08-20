@@ -162,6 +162,18 @@ public class UserModel
         return false;
     }
 
+    public bool AddToLibrary(ProductModel product, float purchasedPrice = -1)
+    {
+        if (!OwnedProducts.ContainsKey(product.Id))
+        {
+            UserProductStat stat = new(DateTime.Now, new TimeSpan(0), purchasedPrice == -1 ? product.Price : purchasedPrice);
+            OwnedProducts.Add(product.Id, stat);
+            UpdateProductStat(product.Id, stat);
+            return true;
+        }
+        return false;
+    }
+
     public override bool Equals(object? obj)
     {
         return obj != null && obj.GetType().Equals(typeof(UserModel)) && ((UserModel)obj).Id == Id && ((UserModel)obj).Email == Email && ((UserModel)obj).Username == Username;
@@ -183,23 +195,6 @@ public class UserModel
         }
     }
 
-    public void UpdateSetting(string name, dynamic value)
-    {
-        Authoriztaion.UpdateProperty(Id, Token, name, value);
-    }
-
-    public bool AddToLibrary(ProductModel product, float purchasedPrice = -1)
-    {
-        if (!OwnedProducts.ContainsKey(product.Id))
-        {
-            UserProductStat stat = new(DateTime.Now, new TimeSpan(0), purchasedPrice == -1 ? product.Price : purchasedPrice);
-            OwnedProducts.Add(product.Id, stat);
-            UpdateProductStat(product.Id, stat);
-            return true;
-        }
-        return false;
-    }
-
     public bool UpdateProductStat(int productId, UserProductStat stat)
     {
         if (OwnedProducts.ContainsKey(productId))
@@ -211,6 +206,10 @@ public class UserModel
         return false;
     }
 
-    #endregion Public Methods
+    public void UpdateSetting(string name, dynamic value)
+    {
+        Authoriztaion.UpdateProperty(Id, Token, name, value);
+    }
 
+    #endregion Public Methods
 }

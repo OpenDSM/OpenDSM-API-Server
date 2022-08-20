@@ -45,6 +45,12 @@ public static class Global
 
     public static string GetUsersProfileDirectory(int id) => Directory.CreateDirectory(Path.Combine(ProfileDataDirectory, id.ToString())).FullName;
 
+    public static void InitHandlers()
+    {
+        _ = PaymentHandler.Instance;
+        _ = Connections.Instance;
+    }
+
     public static bool IsLoggedIn(IRequestCookieCollection cookies, out UserModel? user)
     {
         user = null;
@@ -58,12 +64,5 @@ public static class Global
         return false;
     }
 
-    public static void InitHandlers()
-    {
-        _ = PaymentHandler.Instance;
-        _ = Connections.Instance;
-    }
-
     #endregion Public Methods
-
 }

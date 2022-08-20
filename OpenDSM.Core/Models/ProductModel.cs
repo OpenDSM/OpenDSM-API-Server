@@ -64,10 +64,6 @@ public class ProductModel
         }
     }
 
-    public Dictionary<string, float> Coupon { get; private set; }
-    public float SalePrice { get; private set; } = -1;
-    public bool OnSale => SalePrice != -1;
-
     public string BannerImage
     {
         get
@@ -80,6 +76,7 @@ public class ProductModel
         }
     }
 
+    public Dictionary<string, float> Coupon { get; private set; }
     public string[] GalleryImages
     {
         get
@@ -94,6 +91,7 @@ public class ProductModel
             }
         }
     }
+
     public string GitRepositoryName { get; private set; }
     public bool HasYoutubeVideo => YTHandler.IsValidYoutubeKey(YoutubeKey);
     public string IconUrl
@@ -111,11 +109,13 @@ public class ProductModel
     public int Id { get; private set; }
     public string[] Keywords { get; set; }
     public string Name { get; private set; }
+    public bool OnSale => SalePrice != -1;
     public Platform[] Platforms { get; set; }
     public DateTime Posted { get; set; }
     public uint Price { get; private set; }
     public byte Rating { get; private set; }
     public List<ReviewModel> Reviews { get; private set; }
+    public float SalePrice { get; private set; } = -1;
     public string ShortSummery { get; set; }
     public bool Subscription { get; private set; }
     public int[] Tags { get; set; }
