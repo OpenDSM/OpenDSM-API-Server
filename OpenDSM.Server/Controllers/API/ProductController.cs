@@ -343,7 +343,7 @@ public class ProductController : ControllerBase
         });
     }
     [HttpPost("AddToLibrary")]
-    public async Task<IActionResult> AddToLibrary([FromQuery] int product_id, [FromQuery] string? coupon, [FromForm] int card, [FromForm])
+    public async Task<IActionResult> AddToLibrary([FromQuery] int product_id, [FromQuery] string? coupon, [FromForm] string card, [FromForm] string date, [FromForm] string cvv)
     {
         if(IsLoggedIn(Request.Cookies, out UserModel? user))
         {
