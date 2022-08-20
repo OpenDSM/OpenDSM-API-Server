@@ -43,7 +43,7 @@ async function Login(username, password) {
                     document.cookie = `auth_email=${json.user.email}; path=/`
                     document.cookie = `auth_token=${json.user.token}; path=/`
                 }
-                window.location.href = "/";
+                window.location.href = `/${ref}`;
             }
         } else
             error("Unknown Server Error")

@@ -1,6 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
 using OpenDSM.Core.Models;
+using Org.BouncyCastle.Ocsp;
 
 namespace OpenDSM.Server.Controllers.VIEWS;
 
@@ -11,13 +12,14 @@ public class AuthController : Controller
     #region Public Methods
 
     [Route("login")]
-    public IActionResult Login()
+    public IActionResult Login([FromQuery] string? @ref)
     {
         ViewData["Title"] = "Login";
         if (IsLoggedIn(Request.Cookies, out UserModel? user))
         {
             return RedirectToAction("Index", "Home");
         }
+        ViewData["ref"] = @ref ?? "";
         return View();
     }
 
@@ -47,13 +49,14 @@ public class AuthController : Controller
     }
 
     [Route("signup")]
-    public IActionResult Signup()
+    public IActionResult Signup([FromQuery] string? @ref)
     {
         ViewData["Title"] = "Signup";
         if (IsLoggedIn(Request.Cookies, out UserModel? _))
         {
             return RedirectToAction("Index", "Home");
         }
+        ViewData["ref"] = @ref ?? "";
         return View();
     }
 

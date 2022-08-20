@@ -15,12 +15,18 @@
         <span class="separator vertical"></span>
         @if (isLoggedIn)
         {
-            <a href="/profile/" class="profile-image" style="background-image: url('/api/auth/image/profile?id=@user.Id');"></a>
+                <a href="/profile/" class="profile-image" style="background-image: url('/api/auth/image/profile?id=@user.Id');"></a>
         }
         else
         {
-            @Html.ActionLink("Sign Up", "Signup", "Auth", new {}, new{@class="btn secondary"})
-            @Html.ActionLink("Login", "Login", "Auth", new {}, new{@class="btn"})
+            @if (ViewData["ref"] != null)
+            {
+                @Html.ActionLink("Sign Up", "Signup", "Auth", new {@ref=ViewData["ref"]}, new{@class="btn secondary"})
+                @Html.ActionLink("Login", "Login", "Auth", new {@ref=ViewData["ref"]}, new{@class="btn"})
+            }else{
+                @Html.ActionLink("Sign Up", "Signup", "Auth", new {}, new{@class="btn secondary"})
+                @Html.ActionLink("Login", "Login", "Auth", new {}, new{@class="btn"})
+            }
         }
     </div>
 </nav>
