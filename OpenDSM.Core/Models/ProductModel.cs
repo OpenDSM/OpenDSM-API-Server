@@ -64,6 +64,10 @@ public class ProductModel
         }
     }
 
+    public Dictionary<string, float> Coupon { get; private set; }
+    public float SalePrice { get; private set; } = -1;
+    public bool OnSale => SalePrice != -1;
+
     public string BannerImage
     {
         get
