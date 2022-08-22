@@ -441,7 +441,7 @@ class CreateVersionPopup extends Popup {
                 data.append("type", releaseType)
                 data.append("changelog", changelog);
 
-                let response = await fetch(`/api/product/version`, { method: "POST", body: data });
+                let response = await fetch(`/api/product/${this.product_id}/version`, { method: "POST", body: data });
                 let itemsUploaded = 0;
                 if (response.ok) {
                     let json = await response.json();
@@ -501,11 +501,12 @@ class CreateVersionPopup extends Popup {
                         header.append(name);
                         uploadTasks.appendChild(header);
                         await fetch(`/api/product/${id}/version/check`, { method: "POST" })
+                        await LoadVersions()
                         icon.classList.remove('throbber');
                         icon.classList.add('fa', 'fa-check');
 
                         $(element).find('button.btn#done-button').on('click', () => {
-                            window.location.reload()
+                            this.close();
                         })
                         window.onbeforeunload = null;
                         $(element).find('button.btn#done-button')[0].disabled = false;
@@ -557,8 +558,9 @@ class EditVersionPopup extends Popup {
                 alert(json["message"]);
             }
 
+            this.close();
+            await LoadVersions()
             loading.unload();
-            window.location.reload();
         })
     }
 }
@@ -579,7 +581,7 @@ class DeleteVersionPopup extends CenteredPopup {
             let loading = new LoadingScreen("Deleting Version", "Don't go anywhere!")
 
             this.close();
-            let response = await fetch(`/api/product/${this.ProductID}/version/${this.ID}`, {method: "DELETE"})
+            let response = await fetch(`/api/product/${this.ProductID}/version/${this.ID}`, { method: "DELETE" })
 
             if (!response.ok) {
                 let json = await response.json();
