@@ -376,5 +376,53 @@ public class ProductController : ControllerBase
         });
     }
 
+    [HttpGet("{product_id}/reviews")]
+    public IActionResult GetReviews([FromRoute] int product_id)
+    {
+        if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+        {
+            return new JsonResult(ReviewListHandler.GetProductReviews(product));
+        }
+
+        return BadRequest(new
+        {
+            message = $"Unable to find product with id of {product_id}"
+        });
+    }
+
+    [HttpPost("{product_id}/reviews")]
+    public IActionResult CreateReview([FromRoute] int product_id, [FromForm] string summery, [FromForm] string body, [FromForm] byte rating)
+    {
+        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        {
+            if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+            {
+                if (user.OwnedProducts.ContainsKey(product_id))
+                {
+                    ReviewListHandler.CreateReview(user, product, rating, summery, body);
+                    return Ok(new
+                    {
+                        message = "Review successfully submitted"
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    message = $"User is not a verified owner of '{product.Name}' and therefore can not leave a review"
+                });
+            }
+
+            return BadRequest(new
+            {
+                message = $"Unable to find product with id of {product_id}"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "User couldn't be authenticated"
+        });
+    }
+
+
     #endregion Public Methods
 }
