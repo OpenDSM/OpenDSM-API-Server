@@ -118,36 +118,6 @@ public class ProductController : ControllerBase
         return BadRequest();
     }
 
-    [HttpPost("{product_id}/review")]
-    public async Task<IActionResult> CreateReview([FromRoute] int product_id, [FromForm] byte rating, [FromForm] string summery, [FromForm] string body)
-    {
-
-        if (IsLoggedIn(Request.Cookies, out UserModel user))
-        {
-            if (ProductModel.TryGetByID(product_id, out ProductModel product))
-            {
-                if (user.OwnedProducts[product_id] != null)
-                {
-
-                }
-
-                return BadRequest(new
-                {
-                    message = $"You must be a verified owner of '{product.Name}' to leave a review"
-                });
-            }
-            return BadRequest(new
-            {
-                message = $"No product with an id of {product_id} exists!"
-            });
-        }
-
-        return BadRequest(new
-        {
-            message = "User must be logged in to leave a review"
-        });
-    }
-
     [HttpPost("{id}/version")]
     public IActionResult CreateVersion([FromRoute] int id, [FromForm] string name, [FromForm] ReleaseType type, [FromForm] string changelog)
     {
@@ -397,6 +367,13 @@ public class ProductController : ControllerBase
         {
             if (ProductModel.TryGetByID(product_id, out ProductModel? product))
             {
+                if (user.Equals(product.User))
+                {
+                    return BadRequest(new
+                    {
+                        message = $"You cannot leave a review on your own product!"
+                    });
+                }
                 if (user.OwnedProducts.ContainsKey(product_id))
                 {
                     ReviewListHandler.CreateReview(user, product, rating, summery, body);
@@ -404,9 +381,9 @@ public class ProductController : ControllerBase
                     {
                         message = "Review successfully submitted"
                     });
-                }
+            }
 
-                return BadRequest(new
+            return BadRequest(new
                 {
                     message = $"User is not a verified owner of '{product.Name}' and therefore can not leave a review"
                 });
