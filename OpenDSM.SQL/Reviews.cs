@@ -1,10 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using CLMath;
 namespace OpenDSM.SQL;
 
 public static class Reviews
@@ -15,7 +10,7 @@ public static class Reviews
     public static bool CreateReview(int product_id, byte rating, string summery, string body, int user_id)
     {
         using MySqlConnection conn = new(Instance.ConnectionString);
-        using MySqlCommand cmd = new($"insert into `review` (`product_id`, `rating`, `summery`, `body`, `user_id`) values ('{product_id}', '{rating}', '{summery}', '{body}', '{user_id}')", conn);
+        using MySqlCommand cmd = new($"insert into `review` (`product_id`, `rating`, `summery`, `body`, `user_id`) values ('{product_id}', '{rating}', '{summery}', '{CLConverter.EncodeBase64(body)}', '{user_id}')", conn);
         return cmd.ExecuteNonQuery() > 0;
     }
 
@@ -38,7 +33,7 @@ public static class Reviews
                 product_id = reader.GetInt32("product_id");
                 user_id = reader.GetInt32("user_id");
                 summery = reader.GetString("summery");
-                body = reader.GetString("body");
+                body = CLConverter.DecodeBase64(reader.GetString("body"));
                 posted = reader.GetDateTime("posted");
                 return true;
             }
@@ -52,11 +47,15 @@ public static class Reviews
         List<int> reviews = new();
         using (MySqlConnection conn = new(Instance.ConnectionString))
         {
+            conn.Open();
             using MySqlCommand cmd = new($"select `id` from `review` where `product_id`='{product_id}'", conn);
             using MySqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            if (reader.HasRows)
             {
-                reviews.Add(reader.GetInt32(0));
+                while (reader.Read())
+                {
+                    reviews.Add(reader.GetInt32(0));
+                }
             }
         }
 
