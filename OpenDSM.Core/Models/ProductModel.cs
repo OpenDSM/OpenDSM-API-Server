@@ -184,7 +184,7 @@ public class ProductModel
                     Posted = posted,
                     Product = this,
                     Rating = rating,
-                    Summery = summery,
+                    Subject = summery,
                     User = UserModel.GetByID(user_id)
                 });
             }
