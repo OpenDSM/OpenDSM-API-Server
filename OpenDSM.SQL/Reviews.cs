@@ -10,6 +10,7 @@ public static class Reviews
     public static bool CreateReview(int product_id, byte rating, string summery, string body, int user_id)
     {
         using MySqlConnection conn = new(Instance.ConnectionString);
+        conn.Open();
         using MySqlCommand cmd = new($"insert into `review` (`product_id`, `rating`, `summery`, `body`, `user_id`) values ('{product_id}', '{rating}', '{summery}', '{CLConverter.EncodeBase64(body)}', '{user_id}')", conn);
         return cmd.ExecuteNonQuery() > 0;
     }
@@ -25,6 +26,7 @@ public static class Reviews
 
         using (MySqlConnection conn = new(Instance.ConnectionString))
         {
+            conn.Open();
             using MySqlCommand cmd = new($"select * from `review` where `id`='{id}'", conn);
             using MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
