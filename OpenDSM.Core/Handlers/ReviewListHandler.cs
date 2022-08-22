@@ -7,7 +7,7 @@ using OpenDSM.Core.Models;
 
 namespace OpenDSM.Core.Handlers;
 
-public record RatingDenominations(byte five, byte four, byte three, byte two, byte one, byte zero, byte average, int count);
+public record RatingDenominations(byte five, byte four, byte three, byte two, byte one, byte average, int count);
 public static class ReviewListHandler
 {
 
@@ -17,7 +17,7 @@ public static class ReviewListHandler
         ReviewModel[] reviews = GetProductReviews(product);
         if (!reviews.Any())
         {
-            return new(0, 0, 0, 0, 0, 0, 0, 0);
+            return new(0, 0, 0, 0, 0, 0, 0);
         }
         int ratings = 0;
         byte five = 0;
@@ -25,39 +25,41 @@ public static class ReviewListHandler
         byte three = 0;
         byte two = 0;
         byte one = 0;
-        byte zero = 0;
         foreach (ReviewModel review in reviews)
         {
             ratings += review.Rating;
-            if (review.Rating >= 50)
+            int whole = 10 * (int)Math.Round(review.Rating / 10.0);
+
+            if (whole >= 50)
             {
                 five++;
             }
-            else if (review.Rating >= 40)
+            else if (whole >= 40)
             {
                 four++;
             }
-            else if (review.Rating >= 30)
+            else if (whole >= 30)
             {
                 three++;
             }
-            else if (review.Rating >= 20)
+            else if (whole >= 20)
             {
                 two++;
             }
-            else if (review.Rating >= 10)
-            {
-                one++;
-            }
             else
             {
-                zero++;
+                one++;
             }
         }
 
         byte rating = (byte)(Math.Round(ratings / reviews.Length / 5.0) * 5);
         rating = rating > 50 ? (byte)50 : rating;
-        return new((byte)(five / reviews.Length * 100), (byte)(four / reviews.Length * 100), (byte)(three / reviews.Length * 100), (byte)(two / reviews.Length * 100), (byte)(one / reviews.Length * 100), (byte)(zero / reviews.Length * 100), rating, reviews.Length);
+        five = (byte)((float)five / reviews.Length * 100);
+        four = (byte)((float)four / reviews.Length * 100);
+        three = (byte)((float)three / reviews.Length * 100);
+        two = (byte)((float)two / reviews.Length * 100);
+        one = (byte)((float)one / reviews.Length * 100);
+        return new(five, four, three, two, one, rating, reviews.Length);
     }
 
     public static ReviewModel[] GetProductReviews(ProductModel product)
@@ -73,12 +75,13 @@ public static class ReviewListHandler
                     Posted = posted,
                     Product = product,
                     Rating = rating,
-                    Summery = summery,
-                    User = UserModel.GetByID(user_id)
+                    Subject = summery,
+                    User = UserModel.GetByID(user_id),
+                    Body = body
                 });
             }
         }
-        return Reviews.ToArray();
+        return Reviews.OrderByDescending(x => x.Posted).ToArray();
     }
 
     public static void CreateReview(UserModel user, ProductModel product, byte rating, string summery, string body)
