@@ -113,6 +113,25 @@ public class ProductController : Controller
         return RedirectToAction("Index", "Error", new { code = 500 });
     }
 
+    [Route("{product_id}/element/{name}")]
+    public IActionResult GetPageElement(int product_id, string name)
+    {
+        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
+        {
+            ViewData["IsOwner"] = false;
+            ViewData["HasProduct"] = false;
+            if (IsLoggedIn(Request.Cookies, out UserModel? user))
+            {
+                if (user.Equals(model.User))
+                    ViewData["IsOwner"] = true;
+                if (user.OwnedProducts.ContainsKey(product_id))
+                    ViewData["HasProduct"] = true;
+            }
+            return View($"Elements/{name}", model);
+        }
+        return RedirectToAction("index", "error", new { code = 404 });
+    }
+
     #endregion Public Methods
 
 }
