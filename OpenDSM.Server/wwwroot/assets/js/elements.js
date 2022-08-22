@@ -10,6 +10,28 @@ Array.from(document.cookie.split(';')).forEach(item => {
     }
 })
 InitElements()
+function KickStars(stars) {
+
+    let i = 0
+    let kick = setInterval(() => {
+        stars[i].classList.add("kick")
+
+        i++;
+        if (i == stars.length) {
+            clearInterval(kick);
+
+            i = 0;
+            kick = setInterval(() => {
+                stars[i].classList.remove("kick")
+
+                i++;
+                if (i == stars.length) {
+                    clearInterval(kick);
+                }
+            }, 50)
+        }
+    }, 50);
+}
 function InitElements() {
 
     $(".star-input").on('mousemove', e => {
@@ -73,7 +95,7 @@ function InitElements() {
         let index = Number.parseInt($(current.parentElement.parentElement).attr('value')) / 10.0;
         let half = index - Math.floor(index) !== 0;
 
-        let arr = current.parentElement.querySelectorAll('.star-input');
+        let arr = Array.from(current.parentElement.querySelectorAll('.star-input'));
         let star = Math.floor(index) - (half ? 0 : 1);
         for (let i = 0; i < arr.length; i++) {
             if (i <= star) {
@@ -94,6 +116,8 @@ function InitElements() {
                 arr[i].classList.add('fa-regular')
             }
         }
+
+        KickStars(arr.slice(0, star+1))
 
     })
 
