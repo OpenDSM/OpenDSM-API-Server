@@ -153,6 +153,10 @@ a {
             box-shadow: none;
         }
 
+    .btn i {
+        margin-right: 10px;
+    }
+
 toggle {
     position: relative;
     padding-left: 50px;
@@ -631,6 +635,43 @@ section:not(#landing) {
 }
 /*#endregion Layout */
 /*#region Ratings and Reviews */
+#leave-review-form{
+    position: relative;
+}
+    #leave-review-form.ineligible:after {
+        content: 'Unable to leave a review!';
+        opacity: 0;
+        z-index: 10;
+        position: absolute;
+        transition: opacity 500ms;
+        font-size: 4rem;
+        text-align: center;
+        color: var(--primary);
+        display: flex;
+        justify-content: center;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        align-items: center;
+    }
+    #leave-review-form.ineligible:before {
+        content: '';
+        opacity: 0;
+        z-index: 9;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgb(0 0 0 / 0.95);
+        transition: opacity 300ms;
+    }
+    #leave-review-form.ineligible:hover:before, #leave-review-form.ineligible:hover:after {
+        opacity: 1;
+        cursor: pointer;
+    }
+
 .reviews > .list.vertical {
     margin: 2rem 0;
 }
@@ -655,8 +696,27 @@ section:not(#landing) {
         margin: 1rem;
     }
 
-/*#region Testimonial */
+.stars-input {
+    margin: 2rem 0;
+}
 
+    .stars-input div {
+        margin: 1rem 0;
+    }
+
+.star-input {
+    height: 50px;
+    width: 50px;
+    font-size: 35px;
+    transition: transform 200ms;
+    cursor: pointer;
+}
+
+    .star-input.active {
+        color: var(--primary);
+        transform: scale(1.09);
+    }
+/*#region Testimonial */
 .testimonials {
     margin-top: 5rem;
     min-height: 600px;
