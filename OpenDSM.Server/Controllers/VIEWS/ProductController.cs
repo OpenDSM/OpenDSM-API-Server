@@ -113,8 +113,8 @@ public class ProductController : Controller
         return RedirectToAction("Index", "Error", new { code = 500 });
     }
 
-    [Route("{product_id}/element/{name}")]
-    public IActionResult GetPageElement(int product_id, string name)
+    [Route("{product_id}/element/Versions")]
+    public IActionResult GetVersionsElement(int product_id)
     {
         if (ProductModel.TryGetByID(product_id, out ProductModel? model))
         {
@@ -127,7 +127,27 @@ public class ProductController : Controller
                 if (user.OwnedProducts.ContainsKey(product_id))
                     ViewData["HasProduct"] = true;
             }
-            return View($"Elements/{name}", model);
+            return View($"Elements/Versions", model);
+        }
+        return RedirectToAction("index", "error", new { code = 404 });
+    }
+
+    [Route("{product_id}/element/Reviews")]
+    public IActionResult GetReviewsElement(int product_id, [FromQuery] int? filter = -1)
+    {
+        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
+        {
+            ViewData["IsOwner"] = false;
+            ViewData["HasProduct"] = false;
+            ViewData["Filter"] = filter.GetValueOrDefault(-1);
+            if (IsLoggedIn(Request.Cookies, out UserModel? user))
+            {
+                if (user.Equals(model.User))
+                    ViewData["IsOwner"] = true;
+                if (user.OwnedProducts.ContainsKey(product_id))
+                    ViewData["HasProduct"] = true;
+            }
+            return View($"Elements/Reviews", model);
         }
         return RedirectToAction("index", "error", new { code = 404 });
     }
