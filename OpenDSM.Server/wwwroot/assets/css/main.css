@@ -421,6 +421,57 @@ input[type=number] {
         opacity: 1;
         color: var(--primary)
     }
+
+.shake {
+    animation: shake 0.5s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(1px);
+    }
+
+    10% {
+        transform: translate(-1px);
+    }
+
+    20% {
+        transform: translate(-3px);
+    }
+
+    30% {
+        transform: translate(3px);
+    }
+
+    40% {
+        transform: translate(1px);
+    }
+
+    50% {
+        transform: translate(-1px);
+    }
+
+    60% {
+        transform: translate(-3px);
+    }
+
+    70% {
+        transform: translate(3px);
+    }
+
+    80% {
+        transform: translate(-1px);
+    }
+
+    90% {
+        transform: translate(1px);
+    }
+
+    100% {
+        transform: translate(1px);
+    }
+}
 /*#endregion Elements */
 
 /*#region DSMPlayer */
@@ -635,9 +686,10 @@ section:not(#landing) {
 }
 /*#endregion Layout */
 /*#region Ratings and Reviews */
-#leave-review-form{
+#leave-review-form {
     position: relative;
 }
+
     #leave-review-form.ineligible:after {
         content: 'Unable to leave a review!';
         opacity: 0;
@@ -655,6 +707,7 @@ section:not(#landing) {
         right: 0;
         align-items: center;
     }
+
     #leave-review-form.ineligible:before {
         content: '';
         opacity: 0;
@@ -667,6 +720,7 @@ section:not(#landing) {
         background-color: rgb(0 0 0 / 0.95);
         transition: opacity 300ms;
     }
+
     #leave-review-form.ineligible:hover:before, #leave-review-form.ineligible:hover:after {
         opacity: 1;
         cursor: pointer;
@@ -687,14 +741,23 @@ section:not(#landing) {
     margin: 0 auto;
 }
 
-    .reviews .bars > .list.horizontal {
-        display: flex;
-        align-items: center;
+.ratings-bar {
+    display: flex;
+    align-items: center;
+    transition: transform 200ms;
+}
+
+    .ratings-bar:hover {
+        transform: scale(1.01);
+        cursor: pointer;
+    }
+    .ratings-bar.active {
+/*        filter: brightness(0.1)*/
     }
 
-    .reviews .bars p {
-        margin: 1rem;
-    }
+.reviews .bars p {
+    margin: 1rem;
+}
 
 .stars-input {
     margin: 2rem 0;
@@ -715,6 +778,10 @@ section:not(#landing) {
     .star-input.active {
         color: var(--primary);
         transform: scale(1.09);
+    }
+
+    .star-input.kick {
+        transform: translateY(-10px);
     }
 /*#region Testimonial */
 .testimonials {
