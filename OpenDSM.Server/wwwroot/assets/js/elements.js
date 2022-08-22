@@ -11,6 +11,92 @@ Array.from(document.cookie.split(';')).forEach(item => {
 })
 InitElements()
 function InitElements() {
+
+    $(".star-input").on('mousemove', e => {
+        let half = e.originalEvent.layerX <= 20;
+        let current = e.currentTarget;
+        let index = Number.parseInt($(current).attr("star"));
+        $(current.parentElement.parentElement).attr('tmp-value', (index + (half ? 0.5 : 1)) * 10);
+        let arr = current.parentElement.querySelectorAll('.star-input');
+        for (let i = 0; i < arr.length; i++) {
+            if (i <= index) {
+                if (half && i == index) {
+                    arr[i].classList.add('fa-star-half-stroke')
+                } else {
+                    arr[i].classList.remove('fa-star-half-stroke')
+                }
+                arr[i].classList.add('active');
+                arr[i].classList.add('fa-solid')
+                arr[i].classList.remove('fa-regular')
+            }
+            else {
+                arr[i].classList.remove('active');
+                arr[i].classList.remove('fa-solid')
+                arr[i].classList.remove('fa-star-half-stroke')
+                arr[i].classList.add('fa-star')
+                arr[i].classList.add('fa-regular')
+            }
+        }
+    })
+
+    $(".star-input").on('mouseleave', e => {
+        let current = e.currentTarget;
+        let index = Number.parseInt($(current.parentElement.parentElement).attr('value')) / 10.0;
+        let half = index - Math.floor(index) !== 0;
+
+        let arr = current.parentElement.querySelectorAll('.star-input');
+        let star = Math.floor(index) - (half ? 0 : 1);
+        for (let i = 0; i < arr.length; i++) {
+            if (i <= star) {
+                if (half && i == star) {
+                    arr[i].classList.add('fa-star-half-stroke')
+                } else {
+                    arr[i].classList.remove('fa-star-half-stroke')
+                }
+                arr[i].classList.add('active');
+                arr[i].classList.add('fa-solid')
+                arr[i].classList.remove('fa-regular')
+            }
+            else {
+                arr[i].classList.remove('active');
+                arr[i].classList.remove('fa-solid')
+                arr[i].classList.remove('fa-star-half-stroke')
+                arr[i].classList.add('fa-star')
+                arr[i].classList.add('fa-regular')
+            }
+        }
+    })
+
+    $(".star-input").on('click', e => {
+        let current = e.currentTarget;
+        $(current.parentElement.parentElement).attr('value', $(current.parentElement.parentElement).attr('tmp-value'))
+        let index = Number.parseInt($(current.parentElement.parentElement).attr('value')) / 10.0;
+        let half = index - Math.floor(index) !== 0;
+
+        let arr = current.parentElement.querySelectorAll('.star-input');
+        let star = Math.floor(index) - (half ? 0 : 1);
+        for (let i = 0; i < arr.length; i++) {
+            if (i <= star) {
+                if (half && i == star) {
+                    arr[i].classList.add('fa-star-half-stroke')
+                } else {
+                    arr[i].classList.remove('fa-star-half-stroke')
+                }
+                arr[i].classList.add('active');
+                arr[i].classList.add('fa-solid')
+                arr[i].classList.remove('fa-regular')
+            }
+            else {
+                arr[i].classList.remove('active');
+                arr[i].classList.remove('fa-solid')
+                arr[i].classList.remove('fa-star-half-stroke')
+                arr[i].classList.add('fa-star')
+                arr[i].classList.add('fa-regular')
+            }
+        }
+
+    })
+
     $("toggle").on('click', e => $(e.target).attr('value', $(e.target).attr('value') == "false"));
 
     $("#minimum-price-search-filter, #maximum-price-search-filter").on('keyup', e => {
