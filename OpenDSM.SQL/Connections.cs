@@ -32,6 +32,7 @@ public class Connections
 
     private Connections()
     {
+        log = LogManager.Init().SetDumpMethod(DumpType.NoDump).SetPattern("[DATABASE] (%TYPE%: %DATE%): %MESSAGE%");
         manager = new("db", Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LFInteractive", "OpenDSM")).FullName);
         ConnectionString = GetConnectionString();
     }
@@ -45,10 +46,9 @@ public class Connections
         string username = GetUsername();
         string password = GetDatabasePassword();
         int port = GetPort();
-        string connection = $"datasource=127.0.0.1;port={port};username={username};password={password};database=opendsm;";
+        string connection = $"datasource=localhost;port={port};username={username};password={password};database=opendsm;";
         if (!TestConnection(connection))
         {
-
             log.Error($"Invalid Connection String: `{connection}`");
             return GetConnectionString();
         }
