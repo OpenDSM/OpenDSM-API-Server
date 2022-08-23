@@ -685,6 +685,7 @@ section:not(#landing) {
     width: 100%;
 }
 /*#endregion Layout */
+
 /*#region Ratings and Reviews */
 #leave-review-form {
     position: relative;
@@ -750,9 +751,6 @@ section:not(#landing) {
     .ratings-bar:hover {
         transform: scale(1.01);
         cursor: pointer;
-    }
-    .ratings-bar.active {
-/*        filter: brightness(0.1)*/
     }
 
 .reviews .bars p {
@@ -1242,7 +1240,7 @@ body.popup-active {
 }
 
 #popup .title {
-    z-index: 1;
+    z-index: 999;
     position: absolute;
     height: 72px;
     display: flex;
@@ -1314,48 +1312,125 @@ body.popup-active {
 }
 
 #search-category-page {
-    height: 100vh;
     min-height: 500px;
     display: flex;
     margin-top: 8rem;
     margin-bottom: 8rem;
-    max-height: 100vh;
     justify-content: flex-start;
     align-items: center;
     width: 80%;
 }
 
 .search-category {
+    position: relative;
     aspect-ratio: 9/16;
     width: 33%;
     min-width: 300px;
     margin: 2rem;
     background: black;
+    background-position-x: 0%;
+    background-position-y: 0%;
+    background-image: none;
+    background-size: auto;
     background-size: cover;
     background-position: center;
-    filter: contrast(0.5);
     transition: transform 500ms, filter 500ms;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    overflow: hidden;
+    text-decoration: none;
+    max-width: 476px;
 }
 
-    .search-category:hover, .search-category.active {
-        transform: translateY(-15px);
-        filter: contrast(1);
+    .search-category > * {
+        z-index: 2;
     }
 
-    .search-category[category="Applications"] {
-        background-image: url("/assets/images/search-categories/Applications.jpg");
+    .search-category i {
+        font-size: 200px;
+        transition: transform 500ms;
     }
 
-    .search-category[category="Games"] {
-        background-image: url("/assets/images/search-categories/Gaming.jpg");
+    .search-category p {
+        font-size: 3rem;
+        transform: translateY(200px);
+        text-decoration: none;
+        opacity: 0;
+        transition: opacity 500ms, transform 500ms;
     }
 
-    .search-category[category="Users"] {
-        background-image: url("/assets/images/search-categories/Users.jpg");
+    .search-category img {
+        z-index: 1;
+        position: absolute;
+        width: 110%;
+        height: 110%;
+        transition: filter 500ms;
     }
+
+    .search-category:hover img {
+        filter: blur(5px) brightness(.5);
+    }
+
+    .search-category:hover i {
+        transform: translateY(-80px) !important;
+    }
+
+    .search-category:hover p {
+        opacity: 1;
+        transform: translateY(-30px);
+    }
+
+.search-item {
+    width: 70vw;
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    transition: transform 200ms;
+    text-decoration:none;
+    color:white;
+}
+
+    .search-item > * {
+        z-index: 2;
+    }
+
+.search-item-icon {
+    height: 50%;
+    aspect-ratio: 1/1;
+    background-size: contain;
+    overflow: hidden;
+    border-radius: 100%;
+    margin: 0 2rem;
+}
+
+.search-item img.search-item-bg {
+    position: absolute;
+    z-index: 1;
+    min-width: 115%;
+    min-height: 115%;
+    filter: blur(5px) brightness(.25) contrast(1.2);
+    transform: translate(-10px, -10px);
+    transition: filter 200ms;
+}
+
+.search-item:hover img.search-item-bg {
+    filter: blur(5px) brightness(.5) contrast(1.0);
+    cursor: pointer;
+}
+.search-item .platforms{
+    font-size: 2rem;
+}
+.search-item:hover {
+    transform: scale(1.02);
+}
 /*#endregion Search */
-
 /*#region Profile Page */
 #landing.profile {
     position: relative;
