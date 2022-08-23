@@ -29,13 +29,27 @@ public class ProductListHandler
         }
         int[] productIds = Products.GetAllProductsWithTags(tagIds);
 
-        foreach(int id in productIds)
+        foreach (int id in productIds)
         {
-            if(ProductModel.TryGetByID(id, out ProductModel model))
+            if (ProductModel.TryGetByID(id, out ProductModel model))
             {
                 products.Add(model);
             }
         }
+
+        return products.ToArray();
+    }
+
+    public static ProductModel[] GetProductsFromPartial(int maxSize, string query, params int[] tags)
+    {
+        List<ProductModel> products = new();
+        int[] ids = SQL.Products.GetProductsFromQuery(query, maxSize, tags);
+
+        Parallel.ForEach(ids, id =>
+        {
+            if (ProductModel.TryGetByID(id, out ProductModel? model))
+                products.Add(model);
+        });
 
         return products.ToArray();
     }
