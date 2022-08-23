@@ -36,9 +36,7 @@ public static class Authoriztaion
     {
         try
         {
-            using MySqlConnection conn = new(Instance.ConnectionString);
-            conn.Open();
-            MySqlCommand cmd = new($"select * from users where `username` = '{username}' or `email` = '{username}'", conn);
+            MySqlCommand cmd = new($"select * from users where `username` = '{username}' or `email` = '{username}'", Instance.Connection);
             return cmd.ExecuteReader().HasRows;
         }
         catch (Exception ex)
@@ -59,10 +57,7 @@ public static class Authoriztaion
         use_git_readme = false;
         try
         {
-
-            using MySqlConnection conn = new(Instance.ConnectionString);
-            conn.Open();
-            MySqlCommand cmd = new($"select * from users where id = '{id}'", conn);
+            using MySqlCommand cmd = new($"select * from users where id = '{id}'", Instance.Connection);
             MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.HasRows)
             {
@@ -103,11 +98,10 @@ public static class Authoriztaion
                     {
                         owned_products = Array.Empty<int>();
                     }
-                    conn.Close();
                     return true;
                 }
             }
-            conn.Close();
+            
         }
         catch (Exception e)
         {
@@ -125,9 +119,7 @@ public static class Authoriztaion
         type = AccountType.User;
         owned_products = Array.Empty<int>();
         use_git_readme = false;
-        using MySqlConnection conn = new(Instance.ConnectionString);
-        conn.Open();
-        MySqlCommand cmd = new($"select * from users where username = '{username}'", conn);
+        MySqlCommand cmd = new($"select * from users where username = '{username}'", Instance.Connection);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
@@ -145,11 +137,9 @@ public static class Authoriztaion
                     _ => AccountType.User
                 };
                 owned_products = Array.ConvertAll(reader.GetString("owned_product_ids").Split(";", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries), i => Convert.ToInt32(i));
-                conn.Close();
                 return true;
             }
         }
-        conn.Close();
         return false;
     }
     public static bool Login(string username, string password, out FailedReason reason, out AccountType type, out bool use_git_readme, out int r_id, out string r_email, out string r_username, out string r_token, out string r_owned_products, out string r_git_username, out string r_git_token)
@@ -164,78 +154,73 @@ public static class Authoriztaion
         r_git_token = "";
         r_git_username = "";
         use_git_readme = false;
-        using (MySqlConnection conn = new(Instance.ConnectionString))
+        MySqlCommand cmd = new($"select * from users where username = '{username}' or email = '{username}'", Instance.Connection);
+        MySqlDataReader reader = cmd.ExecuteReader();
+        if (!reader.HasRows)
         {
-            conn.Open();
-            MySqlCommand cmd = new($"select * from users where username = '{username}' or email = '{username}'", conn);
-            MySqlDataReader reader = cmd.ExecuteReader();
-            if (!reader.HasRows)
+            reason = FailedReason.InvalidUsernameOrEmail;
+            return false;
+        }
+        else
+        {
+            try
             {
-                reason = FailedReason.InvalidUsernameOrEmail;
-                return false;
-            }
-            else
-            {
+                reader.Read();
+                r_id = reader.GetInt32("id");
+                r_email = reader.GetString("email");
+                r_username = reader.GetString("username");
+                type = reader.GetInt16("type") switch
+                {
+                    1 => AccountType.Seller,
+                    2 => AccountType.Admin,
+                    _ => AccountType.User
+                };
                 try
                 {
-                    reader.Read();
-                    r_id = reader.GetInt32("id");
-                    r_email = reader.GetString("email");
-                    r_username = reader.GetString("username");
-                    type = reader.GetInt16("type") switch
-                    {
-                        1 => AccountType.Seller,
-                        2 => AccountType.Admin,
-                        _ => AccountType.User
-                    };
-                    try
-                    {
-                        r_owned_products = reader.GetString("owned_products");
-                    }
-                    catch (SqlNullValueException)
-                    {
-                        r_owned_products = "";
-                    }
-                    try
-                    {
-                        r_git_username = !reader.IsDBNull(6) ? reader.GetString("git_username") : "";
-                    }
-                    catch (SqlNullValueException)
-                    {
-                        r_git_username = "";
-                    }
-                    try
-                    {
-                        r_git_token = !reader.IsDBNull(7) ? reader.GetString("git_token") : "";
-
-                    }
-                    catch (SqlNullValueException)
-                    {
-                        r_git_token = "";
-                    }
-                    use_git_readme = reader.GetBoolean("use_git_readme");
-                    string enc_pwd = reader.GetString("password");
-                    string pwd = CLAESMath.DecryptStringAES(enc_pwd);
-
-                    if (!string.IsNullOrEmpty(pwd))
-                    {
-                        if (pwd.Equals(password))
-                        {
-                            r_token = enc_pwd;
-                            return true;
-                        }
-                        else
-                        {
-                            reason = FailedReason.InvalidPassword;
-                        }
-                    }
+                    r_owned_products = reader.GetString("owned_products");
                 }
-                catch (Exception ex)
+                catch (SqlNullValueException)
                 {
-                    log.Error($"Unable to log user in", ex);
+                    r_owned_products = "";
+                }
+                try
+                {
+                    r_git_username = !reader.IsDBNull(6) ? reader.GetString("git_username") : "";
+                }
+                catch (SqlNullValueException)
+                {
+                    r_git_username = "";
+                }
+                try
+                {
+                    r_git_token = !reader.IsDBNull(7) ? reader.GetString("git_token") : "";
+
+                }
+                catch (SqlNullValueException)
+                {
+                    r_git_token = "";
+                }
+                use_git_readme = reader.GetBoolean("use_git_readme");
+                string enc_pwd = reader.GetString("password");
+                string pwd = CLAESMath.DecryptStringAES(enc_pwd);
+
+                if (!string.IsNullOrEmpty(pwd))
+                {
+                    if (pwd.Equals(password))
+                    {
+                        r_token = enc_pwd;
+                        return true;
+                    }
+                    else
+                    {
+                        reason = FailedReason.InvalidPassword;
+                    }
                 }
             }
-            conn.Close();
+            catch (Exception ex)
+            {
+                log.Error($"Unable to log user in", ex);
+            }
         }
 
         return false;
@@ -262,11 +247,8 @@ public static class Authoriztaion
         {
             try
             {
-                using MySqlConnection conn = new(Instance.ConnectionString);
-                conn.Open();
-                //string sql = $"INSERT INTO `users`(`username`, `email`, `type`, `owned_product_ids`, `git_username`, `git_token`, `password`, `use_git_readme`) VALUES ('{username}','{email}','{(byte)AccountType.User}','','','','{CLAESMath.EncryptStringAES(password)}','0')";
                 string sql = $"INSERT INTO `users`(`username`, `email`, `type`, `password`) VALUES ('{username}','{email}','{(byte)AccountType.User}','{CLAESMath.EncryptStringAES(password)}')";
-                MySqlCommand cmd = new(sql, conn);
+                MySqlCommand cmd = new(sql, Instance.Connection);
                 log.Debug(sql);
                 return cmd.ExecuteNonQuery() > 0;
             }
@@ -279,14 +261,19 @@ public static class Authoriztaion
         return false;
     }
 
+    public static int[] GetUsers()
+    {
+        using MySqlCommand cmd = new($"", Instance.Connection);
+
+        return Array.Empty<int>();
+
+    }
+
     public static bool UpdateProperty(int id, string token, string name, dynamic value)
     {
-        using MySqlConnection conn = new(Instance.ConnectionString);
-        conn.Open();
         if (value == "true" || value == "false")
             value = value == "true" ? 1 : 0;
-        string query = $"update users set {name}='{value}' where `id`='{id}' and `password`='{token}'";
-        MySqlCommand cmd = new(query, conn);
+        MySqlCommand cmd = new($"update users set {name}='{value}' where `id`='{id}' and `password`='{token}'", Instance.Connection);
         return cmd.ExecuteNonQuery() > 1;
     }
 

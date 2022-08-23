@@ -9,9 +9,8 @@ public static class Reviews
 
     public static bool CreateReview(int product_id, byte rating, string summery, string body, int user_id)
     {
-        using MySqlConnection conn = new(Instance.ConnectionString);
-        conn.Open();
-        using MySqlCommand cmd = new($"insert into `review` (`product_id`, `rating`, `summery`, `body`, `user_id`) values ('{product_id}', '{rating}', '{summery}', '{CLConverter.EncodeBase64(body)}', '{user_id}')", conn);
+
+        using MySqlCommand cmd = new($"insert into `review` (`product_id`, `rating`, `summery`, `body`, `user_id`) values ('{product_id}', '{rating}', '{summery}', '{CLConverter.EncodeBase64(body)}', '{user_id}')", Instance.Connection);
         return cmd.ExecuteNonQuery() > 0;
     }
 
@@ -24,21 +23,18 @@ public static class Reviews
         body = "";
         posted = DateTime.Now;
 
-        using (MySqlConnection conn = new(Instance.ConnectionString))
+
+        using MySqlCommand cmd = new($"select * from `review` where `id`='{id}'", Instance.Connection);
+        using MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.Read())
         {
-            conn.Open();
-            using MySqlCommand cmd = new($"select * from `review` where `id`='{id}'", conn);
-            using MySqlDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
-            {
-                rating = reader.GetByte("rating");
-                product_id = reader.GetInt32("product_id");
-                user_id = reader.GetInt32("user_id");
-                summery = reader.GetString("summery");
-                body = CLConverter.DecodeBase64(reader.GetString("body"));
-                posted = reader.GetDateTime("posted");
-                return true;
-            }
+            rating = reader.GetByte("rating");
+            product_id = reader.GetInt32("product_id");
+            user_id = reader.GetInt32("user_id");
+            summery = reader.GetString("summery");
+            body = CLConverter.DecodeBase64(reader.GetString("body"));
+            posted = reader.GetDateTime("posted");
+            return true;
         }
 
         return false;
@@ -47,17 +43,14 @@ public static class Reviews
     public static int[] GetReviewsByProductID(int product_id)
     {
         List<int> reviews = new();
-        using (MySqlConnection conn = new(Instance.ConnectionString))
+
+        using MySqlCommand cmd = new($"select `id` from `review` where `product_id`='{product_id}'", Instance.Connection);
+        using MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
         {
-            conn.Open();
-            using MySqlCommand cmd = new($"select `id` from `review` where `product_id`='{product_id}'", conn);
-            using MySqlDataReader reader = cmd.ExecuteReader();
-            if (reader.HasRows)
+            while (reader.Read())
             {
-                while (reader.Read())
-                {
-                    reviews.Add(reader.GetInt32(0));
-                }
+                reviews.Add(reader.GetInt32(0));
             }
         }
 

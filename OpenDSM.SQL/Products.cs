@@ -23,11 +23,10 @@ public static class Products
 
     public static void AddPageView(int id)
     {
-        using MySqlConnection conn = new(Instance.ConnectionString);
-        conn.Open();
+
         MySqlCommand cmd;
         int page_views = 0;
-        using (cmd = new($"select `page_views` from `products` where `id` = {id} limit 1", conn))
+        using (cmd = new($"select `page_views` from `products` where `id` = {id} limit 1", Instance.Connection))
         {
             using MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
@@ -35,7 +34,7 @@ public static class Products
                 page_views = reader.GetInt32("page_views");
             }
         }
-        using (cmd = new($"UPDATE `products` SET `page_views` = {page_views + 1} WHERE `id` = {id} LIMIT 1", conn))
+        using (cmd = new($"UPDATE `products` SET `page_views` = {page_views + 1} WHERE `id` = {id} LIMIT 1", Instance.Connection))
         {
             cmd.ExecuteNonQuery();
         }
@@ -45,9 +44,7 @@ public static class Products
     {
         try
         {
-            using MySqlConnection conn = new(Instance.ConnectionString);
-            conn.Open();
-            MySqlCommand cmd = new($"select * from `products` where `id` = '{id}'", conn);
+            MySqlCommand cmd = new($"select * from `products` where `id` = '{id}'", Instance.Connection);
             return cmd.ExecuteReader().HasRows;
         }
         catch
@@ -61,8 +58,6 @@ public static class Products
         product_id = -1;
         try
         {
-            using MySqlConnection conn = new(Instance.ConnectionString);
-            conn.Open();
             StringBuilder builder = new();
             StringBuilder s_keyword = new();
             foreach (string word in keywords)
@@ -77,10 +72,10 @@ public static class Products
                 s_tag.Append(";");
             }
             Console.WriteLine($"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}')");
-            MySqlCommand cmd = new($"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}')", conn);
+            MySqlCommand cmd = new($"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}')", Instance.Connection);
             if (cmd.ExecuteNonQuery() > 0)
             {
-                MySqlCommand cmdf = new($"select id from products where user_id = '{user_id}' and name = '{name}'", conn);
+                MySqlCommand cmdf = new($"select id from products where user_id = '{user_id}' and name = '{name}'", Instance.Connection);
                 MySqlDataReader reader = cmdf.ExecuteReader();
                 if (reader.Read())
                 {
@@ -109,16 +104,13 @@ public static class Products
             tagBuilder.Append($"where tags contains {tags[i]}");
         }
 
-        using (MySqlConnection conn = new(Instance.ConnectionString))
+        using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", Instance.Connection);
+        MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
         {
-            using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", conn);
-            MySqlDataReader reader = cmd.ExecuteReader();
-            if (reader.HasRows)
+            while (reader.Read())
             {
-                while (reader.Read())
-                {
-                    products.Add(reader.GetInt32("id"));
-                }
+                products.Add(reader.GetInt32("id"));
             }
         }
 
@@ -139,10 +131,8 @@ public static class Products
         price = 0;
         yt_key = "";
         owner_id = 0;
-        using MySqlConnection conn = new(Instance.ConnectionString);
-        conn.Open();
 
-        MySqlCommand cmd = new($"select * from products where id = '{id}'", conn);
+        MySqlCommand cmd = new($"select * from products where id = '{id}'", Instance.Connection);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.Read())
         {
@@ -160,24 +150,21 @@ public static class Products
             price = reader.GetInt32("price");
             return true;
         }
-        conn.Close();
+        Instance.Connection.Close();
         return false;
     }
 
     public static int[] GetProductsByOwner(int id)
     {
         List<int> products = new();
-        using (MySqlConnection conn = new(Instance.ConnectionString))
+
+        MySqlCommand cmd = new($"select id from products where user_id = '{id}'", Instance.Connection);
+        MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
         {
-            conn.Open();
-            MySqlCommand cmd = new($"select id from products where user_id = '{id}'", conn);
-            MySqlDataReader reader = cmd.ExecuteReader();
-            if (reader.HasRows)
+            while (reader.Read())
             {
-                while (reader.Read())
-                {
-                    products.Add(reader.GetInt32("id"));
-                }
+                products.Add(reader.GetInt32("id"));
             }
         }
         return products.ToArray();
@@ -197,27 +184,24 @@ public static class Products
         }
 
         string[] keywords = query.Split(' ');
-        using (MySqlConnection conn = new(Instance.ConnectionString))
+        using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", Instance.Connection);
+        MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
         {
-            using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", conn);
-            MySqlDataReader reader = cmd.ExecuteReader();
-            if (reader.HasRows)
+            while (reader.Read())
             {
-                while (reader.Read())
+                int matches = 0;
+                string[] key = reader.GetString("keywords").Split(";", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                foreach (string s in keywords)
                 {
-                    int matches = 0;
-                    string[] key = reader.GetString("keywords").Split(";", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string s in keywords)
+                    if (key.Contains(s))
                     {
-                        if (key.Contains(s))
-                        {
-                            matches++;
-                        }
+                        matches++;
                     }
-                    if (matches > 0)
-                    {
-                        products.Add(reader.GetInt32("id"), matches);
-                    }
+                }
+                if (matches > 0)
+                {
+                    products.Add(reader.GetInt32("id"), matches);
                 }
             }
         }
