@@ -138,7 +138,7 @@
             </div>
     }
     <!--ineligible-->
-        <div id="leave-review-form" class="list vertical @((IsOwner || !HasProduct)?"":"")" style="margin: 100px 0">
+        <div id="leave-review-form" class="list vertical @((IsOwner || !HasProduct)?"ineligible":"")" style="margin: 100px 0">
         @if (!reviews.Any())
         {
             <h3>No Reviews?</h3>
