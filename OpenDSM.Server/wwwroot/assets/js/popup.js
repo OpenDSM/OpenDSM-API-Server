@@ -333,16 +333,17 @@ class YoutubeSearchPopup extends CenteredPopup {
 }
 
 class SearchFilterPopup extends Popup {
-    constructor() {
-        super("search-filter")
+    category;
+    constructor(category) {
+        super(`${category}-search-filter`)
+        this.category = category;
     }
 
     async open() {
-        super.open();
+       await super.open();
         setTimeout(() => {
             $(".search-category").on('click', e => {
                 let parts = window.location.search.split("?category=").pop().split("&");
-                let category = parts[0]
                 let tags = "";
                 if (parts.length > 1) {
                     tags = parts.pop().split("tags=").pop();
@@ -356,7 +357,7 @@ class SearchFilterPopup extends Popup {
                 } else {
                     tags += `${$(e.currentTarget).attr("filter")};`
                 }
-                window.history.pushState("", "", `search?category=${category}&tags=${tags}`)
+                window.history.pushState("", "", `search?category=${this.category}&tags=${tags}`)
                 e.currentTarget.classList.toggle("active");
             })
         }, 500)
