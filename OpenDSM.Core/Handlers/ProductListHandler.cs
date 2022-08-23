@@ -15,9 +15,22 @@ public class ProductListHandler
 
     public static ProductModel[] GetPopularProducts(int count = 20)
     {
-        ProductModel[] products = new ProductModel[count];
+        List<ProductModel> list = new ();
 
-        return products;
+        return list.ToArray() ;
+    }
+    public static ProductModel[] GetLatestProducts(int count = 20)
+    {
+        List<ProductModel> list = new ();
+        int[] ids = SQL.Products.GetLatestProducts(count);
+        Parallel.ForEach(ids, id =>
+        {
+            if(ProductModel.TryGetByID(id, out ProductModel? porduct))
+            {
+                list.Add(porduct);
+            }
+        });
+        return list.ToArray() ;
     }
     public static ProductModel[] GetProductsByTag(params Tag[] tags)
     {
