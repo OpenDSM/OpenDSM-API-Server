@@ -26,7 +26,8 @@ public static class Products
 
         MySqlCommand cmd;
         int page_views = 0;
-        using (cmd = new($"select `page_views` from `products` where `id` = {id} limit 1", Instance.Connection))
+        using MySqlConnection conn = GetConnection();
+        using (cmd = new($"select `page_views` from `products` where `id` = {id} limit 1", conn))
         {
             using MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
@@ -34,7 +35,7 @@ public static class Products
                 page_views = reader.GetInt32("page_views");
             }
         }
-        using (cmd = new($"UPDATE `products` SET `page_views` = {page_views + 1} WHERE `id` = {id} LIMIT 1", Instance.Connection))
+        using (cmd = new($"UPDATE `products` SET `page_views` = {page_views + 1} WHERE `id` = {id} LIMIT 1", conn))
         {
             cmd.ExecuteNonQuery();
         }
@@ -44,7 +45,8 @@ public static class Products
     {
         try
         {
-            MySqlCommand cmd = new($"select * from `products` where `id` = '{id}'", Instance.Connection);
+            using MySqlConnection conn = GetConnection();
+            MySqlCommand cmd = new($"select * from `products` where `id` = '{id}'", conn);
             return cmd.ExecuteReader().HasRows;
         }
         catch
@@ -71,11 +73,11 @@ public static class Products
                 s_tag.Append(tag);
                 s_tag.Append(";");
             }
-            Console.WriteLine($"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}')");
-            MySqlCommand cmd = new($"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}')", Instance.Connection);
+            using MySqlConnection conn = GetConnection();
+            MySqlCommand cmd = new($"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}')", conn);
             if (cmd.ExecuteNonQuery() > 0)
             {
-                MySqlCommand cmdf = new($"select id from products where user_id = '{user_id}' and name = '{name}'", Instance.Connection);
+                MySqlCommand cmdf = new($"select id from products where user_id = '{user_id}' and name = '{name}'", conn);
                 MySqlDataReader reader = cmdf.ExecuteReader();
                 if (reader.Read())
                 {
@@ -104,7 +106,8 @@ public static class Products
             tagBuilder.Append($"where tags contains {tags[i]}");
         }
 
-        using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
@@ -132,7 +135,8 @@ public static class Products
         yt_key = "";
         owner_id = 0;
 
-        MySqlCommand cmd = new($"select * from products where id = '{id}'", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        MySqlCommand cmd = new($"select * from products where id = '{id}'", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.Read())
         {
@@ -150,7 +154,7 @@ public static class Products
             price = reader.GetInt32("price");
             return true;
         }
-        Instance.Connection.Close();
+        conn.Close();
         return false;
     }
 
@@ -158,7 +162,8 @@ public static class Products
     {
         List<int> products = new();
 
-        MySqlCommand cmd = new($"select id from products where user_id = '{id}'", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        MySqlCommand cmd = new($"select id from products where user_id = '{id}'", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
@@ -170,7 +175,7 @@ public static class Products
         return products.ToArray();
     }
 
-    public static int[] GetProductsFromQuery(string query, params int[] tags)
+    public static int[] GetProductsFromQuery(string query, int max, params int[] tags)
     {
         Dictionary<int, int> products = new();
         StringBuilder tagBuilder = new();
@@ -183,20 +188,23 @@ public static class Products
             tagBuilder.Append($"where tags contains {tags[i]}");
         }
 
-        string[] keywords = query.Split(' ');
-        using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", Instance.Connection);
+        string[] keywords = query.ToLower().Split(' ');
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
-            while (reader.Read())
+            int count = 0;
+            while (reader.Read() && (count <= max && max != -1))
             {
                 int matches = 0;
                 string[] key = reader.GetString("keywords").Split(";", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                 foreach (string s in keywords)
                 {
-                    if (key.Contains(s))
+                    foreach (string k in key)
                     {
-                        matches++;
+                        if (k.StartsWith(s))
+                            matches++;
                     }
                 }
                 if (matches > 0)
@@ -205,7 +213,7 @@ public static class Products
                 }
             }
         }
-        products = (Dictionary<int, int>)products.OrderBy(i => i.Value);
+        products = products.OrderBy(i => i.Value).ToDictionary(i => i.Key, i => i.Value);
         return products.Keys.ToArray();
     }
 

@@ -12,14 +12,15 @@ public static class Versions
 
     public static void CreatePlatformVersion(Platform platform, string download_url, long version_id, long filesize)
     {
-        using MySqlCommand cmd = new($"insert into `platforms` (`version_id`, `platform_id`, `download_url`, `filesize`) values ('{version_id}', '{(byte)platform}', '{download_url}', '{filesize}')", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"insert into `platforms` (`version_id`, `platform_id`, `download_url`, `filesize`) values ('{version_id}', '{(byte)platform}', '{download_url}', '{filesize}')", conn);
         cmd.ExecuteNonQuery();
     }
 
     public static void CreateVersion(long git_id, int product_id, string name, byte releaseType, string changelog, DateTime posted)
     {
-
-        using MySqlCommand cmd = new($"INSERT INTO `versions` (`id`, `product_id`, `name`, `type`, `changelog`, `posted`) VALUES ('{git_id}','{product_id}', '{name}', '{releaseType}', '{CLConverter.EncodeBase64(changelog)}', '{posted:yyyy-MM-dd HH:mm:ss.fffffff}')", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"INSERT INTO `versions` (`id`, `product_id`, `name`, `type`, `changelog`, `posted`) VALUES ('{git_id}','{product_id}', '{name}', '{releaseType}', '{CLConverter.EncodeBase64(changelog)}', '{posted:yyyy-MM-dd HH:mm:ss.fffffff}')", conn);
         cmd.ExecuteNonQuery();
     }
 
@@ -29,8 +30,8 @@ public static class Versions
         total_downloads = weekly_downloads = 0;
         filesize = 0;
 
-
-        using MySqlCommand cmd = new($"select * from `platforms` where `platform_id`='{platform_type}' and `version_id`='{version_id}'", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"select * from `platforms` where `platform_id`='{platform_type}' and `version_id`='{version_id}'", conn);
 
         using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.Read())
@@ -52,7 +53,8 @@ public static class Versions
         releaseType = 0;
         posted = DateTime.Now;
 
-        using (MySqlCommand cmd = new($"select * from `versions` where `id`='{id}' and `product_id`='{product_id}'", Instance.Connection))
+        using MySqlConnection conn = GetConnection();
+        using (MySqlCommand cmd = new($"select * from `versions` where `id`='{id}' and `product_id`='{product_id}'", conn))
         {
             using MySqlDataReader reader = cmd.ExecuteReader();
 
@@ -64,7 +66,7 @@ public static class Versions
                 changelog = CLConverter.DecodeBase64(reader.GetString("changelog"));
             }
         }
-        using (MySqlCommand cmd = new($"select `platform_id` from `platforms` where `version_id`='{id}'", Instance.Connection))
+        using (MySqlCommand cmd = new($"select `platform_id` from `platforms` where `version_id`='{id}'", conn))
         {
             using MySqlDataReader reader = cmd.ExecuteReader();
             List<byte> platform_list = new();
@@ -81,8 +83,9 @@ public static class Versions
     {
         try
         {
+            using MySqlConnection conn = GetConnection();
             List<long> versions = new();
-            using MySqlCommand cmd = new($"select id from versions where `product_id`='{product_id}'", Instance.Connection);
+            using MySqlCommand cmd = new($"select id from versions where `product_id`='{product_id}'", conn);
 
             using MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -105,14 +108,16 @@ public static class Versions
 
     public static bool RemoveVersion(int product_id, long version_id)
     {
-        using MySqlCommand cmd = new($"delete from versions where id={version_id} and product_id={product_id}", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"delete from versions where id={version_id} and product_id={product_id}", conn);
 
         return cmd.ExecuteNonQuery() > 0;
     }
 
     public static void UpdateVersion(long git_id, int product_id, string name, byte releaseType, string changelog)
     {
-        using MySqlCommand cmd = new($"update versions set name = '{name}', type = '{releaseType}', changelog = '{CLConverter.EncodeBase64(changelog)}' where id = {git_id} and product_id = {product_id}", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"update versions set name = '{name}', type = '{releaseType}', changelog = '{CLConverter.EncodeBase64(changelog)}' where id = {git_id} and product_id = {product_id}", conn);
         cmd.ExecuteNonQuery();
     }
     public static bool VersionExists(long id, int product_id)

@@ -12,12 +12,13 @@ public static class Tags
     {
         Dictionary<int, string> tags = new();
 
-            using MySqlCommand cmd = new("select * from tags", Instance.Connection);
-            MySqlDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                tags.Add(reader.GetInt32("id"), reader.GetString("name"));
-            }
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new("select * from tags", conn);
+        MySqlDataReader reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            tags.Add(reader.GetInt32("id"), reader.GetString("name"));
+        }
 
         return tags;
     }

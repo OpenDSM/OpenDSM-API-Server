@@ -14,8 +14,6 @@ public class Connections
     public static Connections Instance = Instance ??= new();
     public static ILog log = LogManager.Init().SetDumpMethod(DumpType.NoDump).SetPattern("[DATABASE] (%TYPE%: %DATE%): %MESSAGE%");
 
-    public MySqlConnection Connection;
-
     #endregion Public Fields
 
     #region Internal Fields
@@ -37,8 +35,13 @@ public class Connections
         log = LogManager.Init().SetDumpMethod(DumpType.NoDump).SetPattern("[DATABASE] (%TYPE%: %DATE%): %MESSAGE%");
         manager = new("db", Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LFInteractive", "OpenDSM")).FullName);
         ConnectionString = GetConnectionString();
-        Connection = new(ConnectionString);
-        Connection.Open();
+    }
+
+    public static MySqlConnection GetConnection()
+    {
+        MySqlConnection conn = new(Instance.ConnectionString);
+        conn.Open();
+        return conn;
     }
 
     #endregion Private Constructors
@@ -74,9 +77,10 @@ public class Connections
         try
         {
             conn = new(connection_string);
+            conn.Open();
             
-            MySqlCommand cmd = new("select version()", conn);
-            object? scalar = cmd.ExecuteScalar();
+            using MySqlCommand cmd = new("select version()", conn);
+            object scalar = cmd.ExecuteScalar();
             if (scalar != null && !string.IsNullOrWhiteSpace(scalar.ToString()))
             {
                 version = scalar.ToString() ?? "";

@@ -3,6 +3,7 @@ using MySql.Data.MySqlClient;
 using System.Data.SqlTypes;
 using CLMath;
 using System.Text.Json;
+using System.Text;
 
 namespace OpenDSM.SQL;
 
@@ -36,7 +37,8 @@ public static class Authoriztaion
     {
         try
         {
-            MySqlCommand cmd = new($"select * from users where `username` = '{username}' or `email` = '{username}'", Instance.Connection);
+            using MySqlConnection conn = GetConnection();
+            MySqlCommand cmd = new($"select * from users where `username` = '{username}' or `email` = '{username}'", conn);
             return cmd.ExecuteReader().HasRows;
         }
         catch (Exception ex)
@@ -57,7 +59,8 @@ public static class Authoriztaion
         use_git_readme = false;
         try
         {
-            using MySqlCommand cmd = new($"select * from users where id = '{id}'", Instance.Connection);
+            using MySqlConnection conn = GetConnection();
+            using MySqlCommand cmd = new($"select * from users where id = '{id}'", conn);
             MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.HasRows)
             {
@@ -101,7 +104,7 @@ public static class Authoriztaion
                     return true;
                 }
             }
-            
+
         }
         catch (Exception e)
         {
@@ -119,7 +122,8 @@ public static class Authoriztaion
         type = AccountType.User;
         owned_products = Array.Empty<int>();
         use_git_readme = false;
-        MySqlCommand cmd = new($"select * from users where username = '{username}'", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        MySqlCommand cmd = new($"select * from users where username = '{username}'", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
@@ -154,7 +158,8 @@ public static class Authoriztaion
         r_git_token = "";
         r_git_username = "";
         use_git_readme = false;
-        MySqlCommand cmd = new($"select * from users where username = '{username}' or email = '{username}'", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        MySqlCommand cmd = new($"select * from users where username = '{username}' or email = '{username}'", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (!reader.HasRows)
         {
@@ -248,7 +253,8 @@ public static class Authoriztaion
             try
             {
                 string sql = $"INSERT INTO `users`(`username`, `email`, `type`, `password`) VALUES ('{username}','{email}','{(byte)AccountType.User}','{CLAESMath.EncryptStringAES(password)}')";
-                MySqlCommand cmd = new(sql, Instance.Connection);
+                using MySqlConnection conn = GetConnection();
+                MySqlCommand cmd = new(sql, conn);
                 log.Debug(sql);
                 return cmd.ExecuteNonQuery() > 0;
             }
@@ -263,17 +269,54 @@ public static class Authoriztaion
 
     public static int[] GetUsers()
     {
-        using MySqlCommand cmd = new($"", Instance.Connection);
+        List<int> users = new();
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"select id from users", conn);
+        using MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
+        {
+            while (reader.Read())
+            {
+                users.Add(reader.GetInt32(0));
+            }
+        }
+        return users.ToArray();
 
-        return Array.Empty<int>();
+    }
 
+    public static int[] GetUsersWithPartialUsername(int maxSize, params string[] partials)
+    {
+        List<int> users = new();
+        StringBuilder partialBuilder = new();
+        for (int i = 0; i < partials.Length; i++)
+        {
+            partialBuilder.Append($"`username` like '%{partials[i]}%'");
+            if (i != partials.Length - 1)
+            {
+                partialBuilder.Append(" or ");
+            }
+        }
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"select id from users where {partialBuilder}", conn);
+        using MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
+        {
+            int current = 0;
+            while (reader.Read() && (maxSize != -1 && current <= maxSize))
+            {
+                users.Add(reader.GetInt32(0));
+                current++;
+            }
+        }
+        return users.ToArray();
     }
 
     public static bool UpdateProperty(int id, string token, string name, dynamic value)
     {
         if (value == "true" || value == "false")
             value = value == "true" ? 1 : 0;
-        MySqlCommand cmd = new($"update users set {name}='{value}' where `id`='{id}' and `password`='{token}'", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        MySqlCommand cmd = new($"update users set {name}='{value}' where `id`='{id}' and `password`='{token}'", conn);
         return cmd.ExecuteNonQuery() > 1;
     }
 

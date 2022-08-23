@@ -9,8 +9,8 @@ public static class Reviews
 
     public static bool CreateReview(int product_id, byte rating, string summery, string body, int user_id)
     {
-
-        using MySqlCommand cmd = new($"insert into `review` (`product_id`, `rating`, `summery`, `body`, `user_id`) values ('{product_id}', '{rating}', '{summery}', '{CLConverter.EncodeBase64(body)}', '{user_id}')", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"insert into `review` (`product_id`, `rating`, `summery`, `body`, `user_id`) values ('{product_id}', '{rating}', '{summery}', '{CLConverter.EncodeBase64(body)}', '{user_id}')", conn);
         return cmd.ExecuteNonQuery() > 0;
     }
 
@@ -24,7 +24,8 @@ public static class Reviews
         posted = DateTime.Now;
 
 
-        using MySqlCommand cmd = new($"select * from `review` where `id`='{id}'", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"select * from `review` where `id`='{id}'", conn);
         using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.Read())
         {
@@ -44,7 +45,8 @@ public static class Reviews
     {
         List<int> reviews = new();
 
-        using MySqlCommand cmd = new($"select `id` from `review` where `product_id`='{product_id}'", Instance.Connection);
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"select `id` from `review` where `product_id`='{product_id}'", conn);
         using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
