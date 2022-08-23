@@ -120,6 +120,25 @@ public static class Products
         return products.ToArray();
     }
 
+    public static int[] GetLatestProducts(int count)
+    {
+        Dictionary<int, DateTime> products = new();
+        using MySqlConnection conn = GetConnection();
+        using MySqlCommand cmd = new($"select id, posted from products", conn);
+        using MySqlDataReader reader = cmd.ExecuteReader();
+        if (reader.HasRows)
+        {
+            int current = 0;
+            while(reader.Read() && current <= count)
+            {
+                products.Add(reader.GetInt32(0), reader.GetDateTime(1));
+                current++;
+            }
+        }
+        
+        return products.OrderByDescending(i => i.Value).ToDictionary(i => i.Key, i => i.Value).Keys.ToArray();
+    }
+
     public static bool GetProductFromID(int id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted)
     {
         gitRepoName = "";
