@@ -252,7 +252,7 @@ public static class Authoriztaion
         {
             try
             {
-                string sql = $"INSERT INTO `users`(`username`, `email`, `type`, `password`) VALUES ('{username}','{email}','{(byte)AccountType.User}','{CLAESMath.EncryptStringAES(password)}')";
+                string sql = $"INSERT INTO `users`(`username`, `email`, `type`, `password`, `owned_products`) VALUES ('{username}','{email}','{(byte)AccountType.User}','{CLAESMath.EncryptStringAES(password)}','')";
                 using MySqlConnection conn = GetConnection();
                 MySqlCommand cmd = new(sql, conn);
                 log.Debug(sql);
@@ -260,7 +260,7 @@ public static class Authoriztaion
             }
             catch (Exception ex)
             {
-                log.Error($"Unable to create user", ex);
+                log.Error($"Unable to create user", ex.Message, ex.StackTrace);
                 return false;
             }
         }
