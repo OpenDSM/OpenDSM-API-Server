@@ -91,24 +91,44 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> TryLogin([FromForm] string username, [FromForm] string password)
+    public async Task<IActionResult> TryLogin([FromForm] string username, [FromForm] string password, [FromQuery] bool? useToken)
     {
         return await Task.Run(() =>
         {
-            if (UserModel.TryGetUser(username, password, out UserModel? user, out var reason))
+            if (useToken.GetValueOrDefault(false))
             {
+                if (UserModel.TryGetUserWithToken(username, password, out UserModel? user))
+                {
+                    return new JsonResult(new
+                    {
+                        success = true,
+                        message = "Logged in Successfully",
+                        user = user.ToObject(),
+                    });
+                }
                 return new JsonResult(new
                 {
-                    success = true,
-                    message = "Logged in Successfully",
-                    user,
+                    success = false,
+                    message = "Unable to login with token provided!"
                 });
             }
-            return new JsonResult(new
+            else
             {
-                success = false,
-                message = string.Concat(reason.ToString().Select(x => char.IsUpper(x) ? " " + x : x.ToString())).Trim()
-            });
+                if (UserModel.TryGetUser(username, password, out UserModel? user, out var reason))
+                {
+                    return new JsonResult(new
+                    {
+                        success = true,
+                        message = "Logged in Successfully",
+                        user = user.ToObject(),
+                    });
+                }
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = string.Concat(reason.ToString().Select(x => char.IsUpper(x) ? " " + x : x.ToString())).Trim()
+                });
+            }
         });
     }
 
