@@ -38,7 +38,6 @@ public class Program
             if (useKestrel)
             {
                 log.Debug($"Starting server on port {port}");
-                builder.UseIISIntegration();
                 builder.UseKestrel(options =>
                     {
                         options.ListenAnyIP(port);
