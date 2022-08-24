@@ -210,6 +210,46 @@ public class UserModel
     {
         Authoriztaion.UpdateProperty(Id, Token, name, value);
     }
+    public object ToObject()
+    {
+        string profile = "", banner = "";
+        using (FileStream fs = new(ProfileImage, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            using MemoryStream ms = new();
+            fs.CopyTo(ms);
+            profile = Convert.ToBase64String(ms.ToArray());
+        }
+        using (FileStream fs = new(ProfileBannerImage, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            using MemoryStream ms = new();
+            fs.CopyTo(ms);
+            banner = Convert.ToBase64String(ms.ToArray());
+        }
+        return new
+        {
+            Id,
+            Username,
+            Email,
+            Token,
+            About,
+            CreatedProducts,
+            OwnedProducts,
+            HasReadme,
+            git = new
+            {
+                useReadme = UseGitReadme,
+                IsDeveloperAccount,
+                readme = GitReadme,
+                credentials = GitCredentials,
+            },
+            images = new
+            {
+                profile,
+                banner,
+            },
+
+        };
+    }
 
     #endregion Public Methods
 }
