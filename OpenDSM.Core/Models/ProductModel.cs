@@ -283,6 +283,47 @@ public class ProductModel
         Versions = versions_list.OrderByDescending(i => i.Posted).ToDictionary(i => i.ID);
     }
 
+    public object ToObject()
+    {
+        return new
+        {
+            this.Id,
+            this.Name,
+            this.About,
+            this.ShortSummery,
+            this.Keywords,
+            this.Tags,
+            this.Platforms,
+
+            market = new
+            {
+                this.Price,
+                this.SalePrice,
+                this.OnSale,
+                this.Subscription,
+            },
+            user = this.User.Id,
+            stats = new
+            {
+                this.Rating,
+                this.TotalDownloads,
+                this.TotalWeeklyDownloads,
+                this.TotalPageViews,
+            },
+            youtube = new
+            {
+                this.HasYoutubeVideo,
+                this.YoutubeKey,
+            },
+            git = new
+            {
+                Username = this.User.GitUsername,
+                Repository = this.GitRepositoryName,
+                UseReadme = this.UseGitReadME,
+            }
+        };
+    }
+
     #endregion Public Methods
 
 }
