@@ -87,7 +87,7 @@ public static class GitHandler
         return repos.ToArray();
     }
 
-    public static bool GetVersionFromID(string git_repo, int git_version_id, int product_id, GitCredentials credentials, out VersionModel version)
+    public static bool GetVersionFromID(string git_repo, int git_version_id, int product_id, GitCredentials credentials, out VersionModel? version)
     {
         ReleaseType releaseType = ReleaseType.Unkown;
         List<PlatformVersion> platforms = new();
@@ -214,7 +214,7 @@ public static class GitHandler
             }
             catch (Exception e)
             {
-                log.Error("Unable to upload release assets", e.Message, e.StackTrace);
+                log.Error("Unable to upload release assets", e.Message, e.StackTrace??"");
             }
         }
 
