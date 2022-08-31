@@ -255,7 +255,6 @@ public static class Authoriztaion
                 string sql = $"INSERT INTO `users`(`username`, `email`, `type`, `password`, `owned_products`) VALUES ('{username}','{email}','{(byte)AccountType.User}','{CLAESMath.EncryptStringAES(password)}','')";
                 using MySqlConnection conn = GetConnection();
                 MySqlCommand cmd = new(sql, conn);
-                log.Debug(sql);
                 return cmd.ExecuteNonQuery() > 0;
             }
             catch (Exception ex)
