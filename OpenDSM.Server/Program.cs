@@ -18,7 +18,6 @@ public class Program
 
     private static void Main(string[] args)
     {
-
         log.Info($"Welcome to {ApplicationName} Server");
         log.Debug(Copywrite);
 
@@ -81,6 +80,7 @@ internal class Startup
             });
             app.UseHttpsRedirection();
         }
+        wwwroot = env.WebRootPath;
         app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().Build());
         app.UseMvc();
         app.UseRouting();
