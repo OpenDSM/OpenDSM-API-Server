@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using OpenDSM.Core.Models;
 using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
+using Microsoft.Extensions.Primitives;
 
 namespace OpenDSM.Core;
 
@@ -36,6 +37,8 @@ public static class Global
     public static string RootDirectory => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), CompanyName, ApplicationName)).FullName;
     public static string SalesLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Sales")).FullName;
     public static string UserLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Users")).FullName;
+    public static string InstallLocation = Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location)?.FullName ?? "";
+    public static string wwwroot = "";
 
     #endregion Public Properties
 
@@ -51,14 +54,24 @@ public static class Global
         _ = Connections.Instance;
     }
 
-    public static bool IsLoggedIn(IRequestCookieCollection cookies, out UserModel? user)
+    public static bool IsLoggedIn(HttpRequest request, out UserModel? user)
     {
         user = null;
-        string email = cookies["auth_email"] ?? "";
-        string token = cookies["auth_token"] ?? "";
-        if (!string.IsNullOrEmpty(email) && !string.IsNullOrWhiteSpace(token))
+        if (request.Cookies["auth_email"] != null && request.Cookies["auth_token"] != null)
         {
-            return UserModel.TryGetUserWithToken(email, token, out user);
+            try
+            {
+                return UserModel.TryGetUserWithToken(request.Cookies["auth_email"].ToString(), request.Cookies["auth_token"], out user);
+            }
+            catch { }
+        }
+        IHeaderDictionary headers = request.Headers;
+        if (headers.TryGetValue("auth_user", out StringValues email) && headers.TryGetValue("auth_token", out StringValues token))
+        {
+            if (!string.IsNullOrEmpty(email.ToString()) && !string.IsNullOrWhiteSpace(token))
+            {
+                return UserModel.TryGetUserWithToken(email.ToString(), token, out user);
+            }
         }
 
         return false;
