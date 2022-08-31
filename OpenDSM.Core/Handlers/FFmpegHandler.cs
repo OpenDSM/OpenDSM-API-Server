@@ -36,7 +36,9 @@ internal class FFmpegHandler
     public Task Resize(int width, int height, string file) => Task.Run(() =>
         {
             FileInfo info = new(file);
-            string tmp_file = Path.Combine(Directory.GetParent(file).FullName, $"{info.Name.Replace(info.Extension, "")}_tmp{info.Extension}");
+            DirectoryInfo? dir = Directory.GetParent(file);
+            if (dir == null) return;
+            string tmp_file = Path.Combine(dir.FullName, $"{info.Name.Replace(info.Extension, "")}_tmp{info.Extension}");
             Process process = new()
             {
                 StartInfo = new()
