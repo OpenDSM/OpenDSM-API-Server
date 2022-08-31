@@ -120,22 +120,22 @@ public static class Products
         return products.ToArray();
     }
 
-    public static int[] GetLatestProducts(int count)
+    public static int[] GetLatestProducts(int page, int count)
     {
         Dictionary<int, DateTime> products = new();
         using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select id, posted from products", conn);
+        using MySqlCommand cmd = new($"select id, posted from products order by posted offset {page * count} rows;", conn);
         using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
             int current = 0;
-            while(reader.Read() && current <= count)
+            while (reader.Read() && current <= count)
             {
                 products.Add(reader.GetInt32(0), reader.GetDateTime(1));
                 current++;
             }
         }
-        
+
         return products.OrderByDescending(i => i.Value).ToDictionary(i => i.Key, i => i.Value).Keys.ToArray();
     }
 
