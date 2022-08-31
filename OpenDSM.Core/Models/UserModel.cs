@@ -1,6 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.StaticFiles;
 using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
 using System.Linq;
@@ -61,7 +62,10 @@ public class UserModel
     {
         get
         {
-            return Path.Combine(GetUsersProfileDirectory(Id), "banner.jpg");
+            string path = Path.Combine(GetUsersProfileDirectory(Id), "banner.jpg");
+            if (!File.Exists(path))
+                path = Path.Combine(wwwroot, "assets", "images", "missing-banner.jpg");
+            return path;
         }
         set
         {
@@ -73,7 +77,10 @@ public class UserModel
     {
         get
         {
-            return Path.Combine(GetUsersProfileDirectory(Id), "profile.jpg");
+            string path = Path.Combine(GetUsersProfileDirectory(Id), "profile.jpg");
+            if (!File.Exists(path))
+                path = Path.Combine(wwwroot, "assets", "images", "missing-profile-image.svg");
+            return path;
         }
         set
         {
@@ -90,7 +97,10 @@ public class UserModel
     #endregion Public Properties
 
     #region Public Methods
-
+    public static bool TryGetByID(int id, out UserModel? user)
+    {
+        return (user = GetByID(id)) != null;
+    }
     public static UserModel? GetByID(int id)
     {
         try
@@ -210,20 +220,23 @@ public class UserModel
     {
         Authoriztaion.UpdateProperty(Id, Token, name, value);
     }
-    public object ToObject()
+    public object ToObject(bool includeImages = false)
     {
         string profile = "", banner = "";
-        using (FileStream fs = new(ProfileImage, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        if (includeImages)
         {
-            using MemoryStream ms = new();
-            fs.CopyTo(ms);
-            profile = Convert.ToBase64String(ms.ToArray());
-        }
-        using (FileStream fs = new(ProfileBannerImage, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-        {
-            using MemoryStream ms = new();
-            fs.CopyTo(ms);
-            banner = Convert.ToBase64String(ms.ToArray());
+            using (FileStream fs = new(ProfileImage, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                using MemoryStream ms = new();
+                fs.CopyTo(ms);
+                profile = Convert.ToBase64String(ms.ToArray());
+            }
+            using (FileStream fs = new(ProfileBannerImage, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                using MemoryStream ms = new();
+                fs.CopyTo(ms);
+                banner = Convert.ToBase64String(ms.ToArray());
+            }
         }
         return new
         {
@@ -240,12 +253,21 @@ public class UserModel
                 useReadme = UseGitReadme,
                 IsDeveloperAccount,
                 readme = GitReadme,
-                credentials = GitCredentials,
             },
             images = new
             {
-                profile,
-                banner,
+                profile = new
+                {
+                    base64 = profile,
+                    path = $"/api/auth/image/profile?id={Id}",
+                    mime = new FileExtensionContentTypeProvider().TryGetContentType(ProfileImage, out var contentType) ? contentType : "image/png"
+                },
+                banner = new
+                {
+                    base64 = banner,
+                    path = $"/api/auth/image/banner?id={Id}",
+                    mime = new FileExtensionContentTypeProvider().TryGetContentType(ProfileBannerImage, out contentType) ? contentType : "image/png"
+                },
             },
 
         };
