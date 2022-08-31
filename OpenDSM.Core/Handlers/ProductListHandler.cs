@@ -1,36 +1,54 @@
 ﻿using OpenDSM.Core.Models;
 using OpenDSM.SQL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OpenDSM.Core.Handlers;
+
+public enum ProductListType
+{
+    Latest,
+    Popular,
+    Tag
+}
 
 public class ProductListHandler
 {
 
     #region Public Methods
 
-    public static ProductModel[] GetPopularProducts(int count = 20)
+    public static ProductModel[] GetProducts(int count = 20, int page = 0, ProductListType type = ProductListType.Latest)
     {
-        List<ProductModel> list = new ();
-
-        return list.ToArray() ;
+        switch (type)
+        {
+            case ProductListType.Latest:
+                return GetLatestProducts(page, count);
+            case ProductListType.Popular:
+                return GetPopularProducts(page, count);
+            case ProductListType.Tag:
+                return GetPopularProducts(page, count);
+            default:
+                return GetLatestProducts(page, count);
+        }
     }
-    public static ProductModel[] GetLatestProducts(int count = 20)
+
+    public static ProductModel[] GetPopularProducts(int page = 0, int count = 20)
     {
-        List<ProductModel> list = new ();
-        int[] ids = SQL.Products.GetLatestProducts(count);
+        List<ProductModel> list = new();
+
+        return list.ToArray();
+    }
+    public static ProductModel[] GetLatestProducts(int count = 0, int page = 20)
+    {
+        List<ProductModel> list = new();
+        int[] ids = SQL.Products.GetLatestProducts(page, count);
         Parallel.ForEach(ids, id =>
         {
-            if(ProductModel.TryGetByID(id, out ProductModel? porduct))
+            if (ProductModel.TryGetByID(id, out ProductModel? product))
             {
-                list.Add(porduct);
+                if (product != null)
+                    list.Add(product);
             }
         });
-        return list.ToArray() ;
+        return list.ToArray();
     }
     public static ProductModel[] GetProductsByTag(params Tag[] tags)
     {
@@ -44,9 +62,10 @@ public class ProductListHandler
 
         foreach (int id in productIds)
         {
-            if (ProductModel.TryGetByID(id, out ProductModel model))
+            if (ProductModel.TryGetByID(id, out ProductModel? model))
             {
-                products.Add(model);
+                if (model != null)
+                    products.Add(model);
             }
         }
 
@@ -61,7 +80,10 @@ public class ProductListHandler
         Parallel.ForEach(ids, id =>
         {
             if (ProductModel.TryGetByID(id, out ProductModel? model))
-                products.Add(model);
+            {
+                if (model != null)
+                    products.Add(model);
+            }
         });
 
         return products.ToArray();
