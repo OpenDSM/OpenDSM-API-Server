@@ -15,7 +15,7 @@ public class ProductController : Controller
     [Route("create")]
     public IActionResult Create()
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             ViewData["Title"] = "Create Product";
             ViewData["User"] = user;
@@ -73,7 +73,7 @@ public class ProductController : Controller
     {
         if (ProductModel.TryGetByID(id, out ProductModel? model))
         {
-            if (IsLoggedIn(Request.Cookies, out UserModel? user))
+            if (IsLoggedIn(Request, out UserModel? user))
                 ViewData["User"] = user;
             ViewData["Title"] = model.Name;
             ViewData["Preview"] = preview.GetValueOrDefault(false);
@@ -93,7 +93,7 @@ public class ProductController : Controller
     [Route("modify")]
     public IActionResult Modify(int id)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             ViewData["Title"] = "Modify Product";
             ViewData["User"] = user;
@@ -120,7 +120,7 @@ public class ProductController : Controller
         {
             ViewData["IsOwner"] = false;
             ViewData["HasProduct"] = false;
-            if (IsLoggedIn(Request.Cookies, out UserModel? user))
+            if (IsLoggedIn(Request, out UserModel? user))
             {
                 if (user.Equals(model.User))
                     ViewData["IsOwner"] = true;
@@ -140,7 +140,7 @@ public class ProductController : Controller
             ViewData["IsOwner"] = false;
             ViewData["HasProduct"] = false;
             ViewData["Filter"] = filter.GetValueOrDefault(-1);
-            if (IsLoggedIn(Request.Cookies, out UserModel? user))
+            if (IsLoggedIn(Request, out UserModel? user))
             {
                 if (user.Equals(model.User))
                     ViewData["IsOwner"] = true;

@@ -14,7 +14,7 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         ViewData["Title"] = "The Open Digital Software Marketplace";
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             ViewData["User"] = user;
         }
@@ -24,7 +24,7 @@ public class HomeController : Controller
     [Route("search")]
     public IActionResult Search(string? query, SearchCategory? category)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? loggedin))
+        if (IsLoggedIn(Request, out UserModel? loggedin))
         {
             ViewData["User"] = loggedin;
         }

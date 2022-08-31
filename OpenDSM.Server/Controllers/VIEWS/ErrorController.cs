@@ -15,7 +15,7 @@ public class ErrorController : Controller
     {
         ViewData["Title"] = $"{code}";
 
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             ViewData["User"] = user;
         }

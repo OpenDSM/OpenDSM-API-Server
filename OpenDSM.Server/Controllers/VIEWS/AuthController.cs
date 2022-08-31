@@ -15,7 +15,7 @@ public class AuthController : Controller
     public IActionResult Login([FromQuery] string? @ref)
     {
         ViewData["Title"] = "Login";
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             return RedirectToAction("Index", "Home");
         }
@@ -27,7 +27,7 @@ public class AuthController : Controller
     public IActionResult Profile(int? id)
     {
         ViewData["is_personal"] = false;
-        if (IsLoggedIn(Request.Cookies, out UserModel? loggedin))
+        if (IsLoggedIn(Request, out UserModel? loggedin))
         {
             ViewData["User"] = loggedin;
         }
@@ -52,7 +52,7 @@ public class AuthController : Controller
     public IActionResult Signup([FromQuery] string? @ref)
     {
         ViewData["Title"] = "Signup";
-        if (IsLoggedIn(Request.Cookies, out UserModel? _))
+        if (IsLoggedIn(Request, out UserModel? _))
         {
             return RedirectToAction("Index", "Home");
         }
