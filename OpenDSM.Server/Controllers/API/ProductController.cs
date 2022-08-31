@@ -1,6 +1,5 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
 using OpenDSM.SQL;
@@ -16,7 +15,7 @@ public class ProductController : ControllerBase
     [HttpPost("AddToLibrary")]
     public async Task<IActionResult> AddToLibrary([FromQuery] int product_id, [FromQuery] string? coupon)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             if (!user.OwnedProducts.ContainsKey(product_id))
             {
@@ -52,7 +51,7 @@ public class ProductController : ControllerBase
     [HttpPost("AddToLibrary")]
     public async Task<IActionResult> AddToLibrary([FromQuery] int product_id, [FromQuery] string? coupon, [FromForm] string card, [FromForm] string date, [FromForm] string cvv)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             if (!user.OwnedProducts.ContainsKey(product_id))
             {
@@ -83,6 +82,20 @@ public class ProductController : ControllerBase
         {
             message = "User must be logged in!"
         });
+    }
+
+    [HttpGet()]
+    public IActionResult GetProducts(int? page, int? items_per_page)
+    {
+        ProductModel[] productModels = ProductListHandler.GetLatestProducts(page.GetValueOrDefault(0), items_per_page.GetValueOrDefault(20));
+        object[] products = new object[productModels.Count()];
+
+        Parallel.For(0, products.Count(), i =>
+        {
+            products[i] = productModels[i].ToObject();
+        });
+
+        return new JsonResult(products);
     }
 
     [HttpPost()]
@@ -121,7 +134,7 @@ public class ProductController : ControllerBase
     [HttpPost("{id}/version")]
     public IActionResult CreateVersion([FromRoute] int id, [FromForm] string name, [FromForm] ReleaseType type, [FromForm] string changelog)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel user))
+        if (IsLoggedIn(Request, out UserModel user))
         {
             if (ProductModel.TryGetByID(id, out ProductModel? model))
             {
@@ -189,7 +202,7 @@ public class ProductController : ControllerBase
     [HttpDelete("{product}/version/{id}")]
     public async Task<IActionResult> RemoveVersion(int id, int product)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             if (ProductModel.TryGetByID(product, out ProductModel? model))
             {
@@ -257,7 +270,7 @@ public class ProductController : ControllerBase
     [HttpPatch("{product}/version/{id}")]
     public async Task<IActionResult> UpdateVersion([FromRoute] int id, [FromRoute] int product, [FromForm] string name, [FromForm] string changelog, [FromForm] ReleaseType type)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             if (ProductModel.TryGetByID(product, out ProductModel? model))
             {
@@ -306,7 +319,7 @@ public class ProductController : ControllerBase
     [HttpPost("{product_id}/version/{version_id}/asset"), DisableRequestSizeLimit]
     public async Task<IActionResult> UploadAsset([FromRoute] int product_id, [FromRoute] int version_id, [FromQuery] Platform platform, [FromForm] IFormFile file)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel user))
+        if (IsLoggedIn(Request, out UserModel user))
         {
             if (ProductModel.TryGetByID(product_id, out ProductModel product))
             {
@@ -363,7 +376,7 @@ public class ProductController : ControllerBase
     [HttpPost("{product_id}/reviews")]
     public IActionResult CreateReview([FromRoute] int product_id, [FromForm] string summery, [FromForm] string body, [FromForm] byte rating)
     {
-        if (IsLoggedIn(Request.Cookies, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             if (ProductModel.TryGetByID(product_id, out ProductModel? product))
             {
@@ -381,9 +394,9 @@ public class ProductController : ControllerBase
                     {
                         message = "Review successfully submitted"
                     });
-            }
+                }
 
-            return BadRequest(new
+                return BadRequest(new
                 {
                     message = $"User is not a verified owner of '{product.Name}' and therefore can not leave a review"
                 });
@@ -399,7 +412,6 @@ public class ProductController : ControllerBase
             message = "User couldn't be authenticated"
         });
     }
-
 
     #endregion Public Methods
 }
