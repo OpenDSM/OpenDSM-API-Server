@@ -1,5 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
 using OpenDSM.SQL;
 
@@ -12,10 +14,23 @@ public class AuthController : ControllerBase
 
     #region Public Methods
 
-    [HttpPost("activate-dev-account")]
-    public IActionResult ActivateDevAccount([FromForm] string email, [FromForm] string token, [FromForm] string git_username, [FromForm] string git_token)
+    [HttpGet("user")]
+    public IActionResult GetUser([FromQuery] int id, [FromQuery] bool? includeImages)
     {
-        if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
+        if (UserModel.TryGetByID(id, out UserModel? user))
+        {
+            return new JsonResult(user.ToObject(includeImages.GetValueOrDefault(false)));
+        }
+        return BadRequest(new
+        {
+            message = $"No user exists with id of {id}"
+        });
+    }
+
+    [HttpPost("activate-dev-account")]
+    public IActionResult ActivateDevAccount([FromForm] string git_username, [FromForm] string git_token)
+    {
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             user.GitUsername = git_username;
             user.GitToken = git_token;
@@ -49,7 +64,7 @@ public class AuthController : ControllerBase
             };
             if (System.IO.File.Exists(path))
             {
-                return new FileStreamResult(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), "image/png");
+                return new FileStreamResult(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), new FileExtensionContentTypeProvider().TryGetContentType(path, out var contentType) ? contentType : "image/png");
             }
             if (type == "profile")
             {
@@ -172,9 +187,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPatch("settings")]
-    public IActionResult UpdateSettings([FromForm] string email, [FromForm] string token, [FromForm] string name, [FromForm] string value)
+    public IActionResult UpdateSettings([FromForm] string name, [FromForm] string value)
     {
-        if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             switch (name)
             {
@@ -199,9 +214,9 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("image/{type}")]
-    public async Task<IActionResult> UploadImage(string type, [FromForm] string base64, [FromForm] string email, [FromForm] string token)
+    public async Task<IActionResult> UploadImage(string type, [FromForm] string base64)
     {
-        if (UserModel.TryGetUserWithToken(email, token, out UserModel? user))
+        if (IsLoggedIn(Request, out UserModel? user))
         {
             if (type == "profile")
             {
