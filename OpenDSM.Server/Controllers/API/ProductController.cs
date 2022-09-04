@@ -84,10 +84,10 @@ public class ProductController : ControllerBase
         });
     }
 
-    [HttpGet()]
-    public IActionResult GetProducts(int? page, int? items_per_page)
+    [HttpGet("{type?}")]
+    public IActionResult GetProducts(ProductListType? type, int? page, int? items_per_page)
     {
-        ProductModel[] productModels = ProductListHandler.GetLatestProducts(page.GetValueOrDefault(0), items_per_page.GetValueOrDefault(20));
+        ProductModel[] productModels = ProductListHandler.GetProducts(page.GetValueOrDefault(0), items_per_page.GetValueOrDefault(20), type.GetValueOrDefault(ProductListType.Latest));
         object[] products = new object[productModels.Count()];
 
         Parallel.For(0, products.Count(), i =>
