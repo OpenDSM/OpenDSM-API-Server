@@ -13,6 +13,7 @@
             "program": "${workspaceFolder}/OpenDSM.Server/bin/Debug/net6.0/OpenDSM.Server.dll",
             "args": [],
             "cwd": "${workspaceFolder}/OpenDSM.Server",
+            "console": "integratedTerminal",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
             "serverReadyAction": {
