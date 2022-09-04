@@ -247,9 +247,9 @@ public class UserModel
             About,
             CreatedProducts,
             OwnedProducts,
-            HasReadme,
             git = new
             {
+                HasGitReadme = HasReadme,
                 useReadme = UseGitReadme,
                 IsDeveloperAccount,
                 readme = GitReadme,
