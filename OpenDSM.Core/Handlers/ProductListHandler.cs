@@ -23,11 +23,13 @@ public class ProductListHandler
                 return GetLatestProducts(page, count);
             case ProductListType.Popular:
                 return GetPopularProducts(page, count);
-            case ProductListType.Tag:
-                return GetPopularProducts(page, count);
             default:
                 return GetLatestProducts(page, count);
         }
+    }
+    public static ProductModel[] GetProducts(int tag, int count = 20, int page = 0)
+    {
+        return GetPopularProducts(page, count);
     }
 
     public static ProductModel[] GetPopularProducts(int page = 0, int count = 20)
