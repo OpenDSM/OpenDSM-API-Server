@@ -59,7 +59,7 @@ public class AuthController : ControllerBase
             string path = type switch
             {
                 "profile" => user.ProfileImage,
-                "banner" => user.ProfileBannerImage,
+                "banner" => user.BannerImage,
                 _ => user.ProfileImage
             };
             if (System.IO.File.Exists(path))
@@ -246,7 +246,7 @@ public class AuthController : ControllerBase
             }
             else if (type == "banner")
             {
-                user.ProfileBannerImage = base64;
+                user.BannerImage = base64;
             }
             return Ok(new
             {
