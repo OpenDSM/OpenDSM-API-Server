@@ -25,7 +25,7 @@
 ###############################################################################
 *.sln       merge=binary
 *.csproj    merge=binary
-*.cshtml    merge=csharp
+# *.cshtml    merge=csharp
 #*.vbproj    merge=binary
 #*.vcxproj   merge=binary
 #*.vcproj    merge=binary
