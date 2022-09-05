@@ -10,14 +10,14 @@ public class ProductModel
 
     #region Protected Constructors
 
-    protected ProductModel(int id, int userID, string gitRepoName, string name, string summery, bool useGitReademe, string videoKey, uint price, int[] tags, string[] keywords, bool subscription, int pageViews, DateTime posted)
+    internal ProductModel(int id, int userID, string gitRepoName, string name, string summery, bool useGitReademe, string videoKey, uint price, int[] tags, string[] keywords, bool subscription, int pageViews, DateTime posted)
     {
         Id = id;
         Name = name;
         UseGitReadME = useGitReademe;
         TotalDownloads = 0;
         TotalWeeklyDownloads = 0;
-        User = UserModel.GetByID(userID);
+        User = UserListHandler.GetByID(userID);
         Price = price;
         YoutubeKey = videoKey;
         Tags = tags;
@@ -94,7 +94,7 @@ public class ProductModel
 
     public string GitRepositoryName { get; private set; }
     public bool HasYoutubeVideo => YTHandler.IsValidYoutubeKey(YoutubeKey);
-    public string IconUrl
+    public string IconImage
     {
         get
         {
@@ -132,40 +132,6 @@ public class ProductModel
 
     #region Public Methods
 
-    public static ProductModel? GetByID(int id)
-    {
-        try
-        {
-            if (Products.GetProductFromID(id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted))
-            {
-                return new(id, owner_id, gitRepoName, name, summery, useGitReadme, yt_key, (uint)price, tags, keywords, subscription, pageViews, posted);
-            }
-        }
-        catch
-        {
-
-        }
-        return null;
-    }
-
-    public static bool TryCreateProduct(string gitRepoName, string shortSummery, UserModel user, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out ProductModel model)
-    {
-        model = null;
-        if (Products.Create(user.Id, gitRepoName, shortSummery, name, yt_key, subscription, use_git_readme, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model))
-        {
-            GitHandler.CreateWebHook(user.GitCredentials, model);
-            model.PopulateVersionsFromGit();
-            return true;
-        }
-        return false;
-    }
-
-    public static bool TryGetByID(int id, out ProductModel? model)
-    {
-        model = GetByID(id);
-        return model != null;
-    }
-
     public void AddPageView()
     {
         Products.AddPageView(Id);
@@ -185,7 +151,7 @@ public class ProductModel
                     Product = this,
                     Rating = rating,
                     Subject = summery,
-                    User = UserModel.GetByID(user_id)
+                    User = UserListHandler.GetByID(user_id)
                 });
             }
         }

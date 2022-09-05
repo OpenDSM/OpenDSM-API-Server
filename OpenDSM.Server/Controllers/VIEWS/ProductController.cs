@@ -71,7 +71,7 @@ public class ProductController : Controller
     [Route("{id}")]
     public IActionResult Index(int id, bool? preview)
     {
-        if (ProductModel.TryGetByID(id, out ProductModel? model))
+        if (ProductListHandler.TryGetByID(id, out ProductModel? model))
         {
             if (IsLoggedIn(Request, out UserModel? user))
                 ViewData["User"] = user;
@@ -99,7 +99,7 @@ public class ProductController : Controller
             ViewData["User"] = user;
             if (user.IsDeveloperAccount)
             {
-                if (ProductModel.TryGetByID(id, out ProductModel product) && product.User.Equals(user))
+                if (ProductListHandler.TryGetByID(id, out ProductModel product) && product.User.Equals(user))
                 {
                     ViewData["Product"] = product;
                     return View("Create");
@@ -116,7 +116,7 @@ public class ProductController : Controller
     [Route("{product_id}/element/Versions")]
     public IActionResult GetVersionsElement(int product_id)
     {
-        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
+        if (ProductListHandler.TryGetByID(product_id, out ProductModel? model))
         {
             ViewData["IsOwner"] = false;
             ViewData["HasProduct"] = false;
@@ -135,7 +135,7 @@ public class ProductController : Controller
     [Route("{product_id}/element/Reviews")]
     public IActionResult GetReviewsElement(int product_id, [FromQuery] int? filter = -1)
     {
-        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
+        if (ProductListHandler.TryGetByID(product_id, out ProductModel? model))
         {
             ViewData["IsOwner"] = false;
             ViewData["HasProduct"] = false;

@@ -19,7 +19,7 @@ public class ProductController : ControllerBase
         {
             if (!user.OwnedProducts.ContainsKey(product_id))
             {
-                if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+                if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
                 {
                     if (product.Price == 0 || product.SalePrice == 0 || (!string.IsNullOrWhiteSpace(coupon) && product.Coupon.ContainsKey(coupon) && product.Coupon[coupon] == 0))
                     {
@@ -55,7 +55,7 @@ public class ProductController : ControllerBase
         {
             if (!user.OwnedProducts.ContainsKey(product_id))
             {
-                if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+                if (ProductListHandler.TryGetByID(product_id, out ProductModel product))
                 {
                     if (product.Price == 0 || product.SalePrice == 0 || (!string.IsNullOrWhiteSpace(coupon) && product.Coupon.ContainsKey(coupon) && product.Coupon[coupon] == 0))
                     {
@@ -113,9 +113,9 @@ public class ProductController : ControllerBase
                 }
 
             }
-            if (ProductModel.TryCreateProduct(gitRepoName, shortSummery, UserModel.GetByID(user_id), name, yt_key ?? "", subscription, use_git_readme, (int)(price * 100), keywords.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), ts.ToArray(), out ProductModel model))
+            if (ProductListHandler.TryCreateProduct(gitRepoName, shortSummery, UserListHandler.GetByID(user_id), name, yt_key ?? "", subscription, use_git_readme, (int)(price * 100), keywords.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), ts.ToArray(), out ProductModel model))
             {
-                model.IconUrl = icon;
+                model.IconImage = icon;
                 model.BannerImage = banner;
                 if (gallery != null && gallery.Any())
                 {
@@ -136,7 +136,7 @@ public class ProductController : ControllerBase
     {
         if (IsLoggedIn(Request, out UserModel user))
         {
-            if (ProductModel.TryGetByID(id, out ProductModel? model))
+            if (ProductListHandler.TryGetByID(id, out ProductModel? model))
             {
                 int release_id = GitHandler.CreateRelease(user.GitCredentials, model, name, type, changelog).Result;
                 if (release_id != -1)
@@ -178,8 +178,7 @@ public class ProductController : ControllerBase
     [HttpGet("{product_id}/version/{version_id}")]
     public IActionResult DownloadVersion(int product_id, long version_id, Platform platform)
     {
-        ProductModel? product = ProductModel.GetByID(product_id);
-        if (product != null)
+        if (ProductListHandler.TryGetByID(product_id, out ProductModel product))
         {
             VersionModel? version = product.Versions[version_id];
             if (version != null)
@@ -197,14 +196,14 @@ public class ProductController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetProduct(int id)
     {
-        return new JsonResult(ProductModel.GetByID(id).ToObject());
+        return new JsonResult(ProductListHandler.GetByID(id).ToObject());
     }
     [HttpDelete("{product}/version/{id}")]
     public async Task<IActionResult> RemoveVersion(int id, int product)
     {
         if (IsLoggedIn(Request, out UserModel? user))
         {
-            if (ProductModel.TryGetByID(product, out ProductModel? model))
+            if (ProductListHandler.TryGetByID(product, out ProductModel? model))
             {
                 if (model.User.Equals(user))
                 {
@@ -253,7 +252,7 @@ public class ProductController : ControllerBase
     [HttpPost("{product_id}/version/check")]
     public IActionResult TriggerVersionCheck([FromRoute] int product_id)
     {
-        if (ProductModel.TryGetByID(product_id, out ProductModel? model))
+        if (ProductListHandler.TryGetByID(product_id, out ProductModel? model))
         {
             model.PopulateVersionsFromGit();
             return Ok(new
@@ -272,7 +271,7 @@ public class ProductController : ControllerBase
     {
         if (IsLoggedIn(Request, out UserModel? user))
         {
-            if (ProductModel.TryGetByID(product, out ProductModel? model))
+            if (ProductListHandler.TryGetByID(product, out ProductModel? model))
             {
                 if (model.User.Equals(user))
                 {
@@ -321,7 +320,7 @@ public class ProductController : ControllerBase
     {
         if (IsLoggedIn(Request, out UserModel user))
         {
-            if (ProductModel.TryGetByID(product_id, out ProductModel product))
+            if (ProductListHandler.TryGetByID(product_id, out ProductModel product))
             {
                 try
                 {
@@ -362,7 +361,7 @@ public class ProductController : ControllerBase
     [HttpGet("{product_id}/reviews")]
     public IActionResult GetReviews([FromRoute] int product_id)
     {
-        if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+        if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
         {
             return new JsonResult(ReviewListHandler.GetProductReviews(product));
         }
@@ -378,7 +377,7 @@ public class ProductController : ControllerBase
     {
         if (IsLoggedIn(Request, out UserModel? user))
         {
-            if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+            if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
             {
                 if (user.Equals(product.User))
                 {

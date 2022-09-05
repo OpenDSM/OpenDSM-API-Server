@@ -1,4 +1,5 @@
-﻿@using OpenDSM.Core.Models
+﻿@using OpenDSM.Core.Handlers
+@using OpenDSM.Core.Models
 @model UserModel
 @{
     bool is_personal = (bool)ViewData["is_personal"];
@@ -119,7 +120,7 @@
         <div class="list horizontal">
             @foreach (int product_id in Model.CreatedProducts)
             {
-                if (ProductModel.TryGetByID(product_id, out ProductModel? product))
+                if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
                 {
                     @Html.PartialAsync("Elements/LargeProductItem", product).Result
                 }
