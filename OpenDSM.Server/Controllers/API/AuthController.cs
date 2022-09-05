@@ -17,7 +17,7 @@ public class AuthController : ControllerBase
     [HttpGet("user")]
     public IActionResult GetUser([FromQuery] int id, [FromQuery] bool? includeImages)
     {
-        if (UserModel.TryGetByID(id, out UserModel? user))
+        if (UserListHandler.TryGetByID(id, out UserModel? user))
         {
             return new JsonResult(user.ToObject(includeImages.GetValueOrDefault(false)));
         }
@@ -53,7 +53,7 @@ public class AuthController : ControllerBase
     [HttpGet("image/{type}")]
     public IActionResult GetProfileImage(string type, int id)
     {
-        UserModel? user = UserModel.GetByID(id);
+        UserModel? user = UserListHandler.GetByID(id);
         if (user != null)
         {
             string path = type switch
@@ -91,7 +91,7 @@ public class AuthController : ControllerBase
     [HttpGet("readme/{id}")]
     public IActionResult GetReadme(int id, bool? git)
     {
-        UserModel? user = UserModel.GetByID(id);
+        UserModel? user = UserListHandler.GetByID(id);
         if (user != null)
         {
             return Ok(new
@@ -112,7 +112,7 @@ public class AuthController : ControllerBase
         {
             if (useToken.GetValueOrDefault(false))
             {
-                if (UserModel.TryGetUserWithToken(username, password, out UserModel? user))
+                if (UserListHandler.TryGetUserWithToken(username, password, out UserModel? user))
                 {
                     return new JsonResult(new
                     {
@@ -129,7 +129,7 @@ public class AuthController : ControllerBase
             }
             else
             {
-                if (UserModel.TryGetUser(username, password, out UserModel? user, out var reason))
+                if (UserListHandler.TryGetUser(username, password, out UserModel? user, out var reason))
                 {
                     return new JsonResult(new
                     {
@@ -155,9 +155,9 @@ public class AuthController : ControllerBase
             try
             {
 
-                if (Authoriztaion.Register(username, email, password, out var reason))
+                if (Authorization.Register(username, email, password, out var reason))
                 {
-                    if (UserModel.TryGetUser(username, password, out UserModel? user))
+                    if (UserListHandler.TryGetUser(username, password, out UserModel? user))
                     {
                         return new JsonResult(new
                         {

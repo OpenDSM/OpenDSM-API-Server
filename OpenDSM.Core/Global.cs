@@ -61,7 +61,7 @@ public static class Global
         {
             try
             {
-                return UserModel.TryGetUserWithToken(request.Cookies["auth_email"].ToString(), request.Cookies["auth_token"], out user);
+                return UserListHandler.TryGetUserWithToken(request.Cookies["auth_email"].ToString(), request.Cookies["auth_token"], out user);
             }
             catch { }
         }
@@ -70,7 +70,7 @@ public static class Global
         {
             if (!string.IsNullOrEmpty(email.ToString()) && !string.IsNullOrWhiteSpace(token))
             {
-                return UserModel.TryGetUserWithToken(email.ToString(), token, out user);
+                return UserListHandler.TryGetUserWithToken(email.ToString(), token, out user);
             }
         }
 

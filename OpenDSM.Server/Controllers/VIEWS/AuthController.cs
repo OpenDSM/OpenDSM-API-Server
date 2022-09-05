@@ -1,5 +1,6 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
+using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
 using Org.BouncyCastle.Ocsp;
 
@@ -33,7 +34,7 @@ public class AuthController : Controller
         }
         if (id.HasValue)
         {
-            UserModel? user = UserModel.GetByID(id.Value);
+            UserModel? user = UserListHandler.GetByID(id.Value);
             if (user == null)
                 return RedirectToAction("Index", "Error", new { code = 404 });
             ViewData["Title"] = $"{user?.Username}'s Profile";

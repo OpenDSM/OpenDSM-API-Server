@@ -71,7 +71,7 @@ public static class ReviewListHandler
                     Product = product,
                     Rating = rating,
                     Subject = summery,
-                    User = UserModel.GetByID(user_id),
+                    User = UserListHandler.GetByID(user_id),
                     Body = body
                 });
             }

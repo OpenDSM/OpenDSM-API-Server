@@ -14,7 +14,7 @@ public class UserModel
 
     #region Protected Constructors
 
-    protected UserModel(int id, string username, string email, string token, AccountType type, bool use_git_readme, Dictionary<int, UserProductStat> ownedProducts)
+    internal UserModel(int id, string username, string email, string token, AccountType type, bool use_git_readme, Dictionary<int, UserProductStat> ownedProducts)
     {
         Id = id;
         Username = username;
@@ -97,81 +97,6 @@ public class UserModel
     #endregion Public Properties
 
     #region Public Methods
-    public static bool TryGetByID(int id, out UserModel? user)
-    {
-        return (user = GetByID(id)) != null;
-    }
-    public static UserModel? GetByID(int id)
-    {
-        try
-        {
-            if (Authoriztaion.GetUserFromID(id, out string username, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] _))
-            {
-                return new(id, username, email, "", type, use_git_readme, new())
-                {
-                    GitUsername = git_username,
-                    GitToken = git_token,
-                };
-            }
-        }
-        catch (Exception e)
-        {
-            log.Error($"Unable to GetuserFromID: {id}", e.Message, e.StackTrace ?? "");
-        }
-        return null;
-    }
-
-    public static UserModel? GetByUsername(string username)
-    {
-        if (Authoriztaion.GetUserFromUsername(username, out int id, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] products))
-        {
-            return new(id, username, email, "", type, use_git_readme, new())
-            {
-                GitUsername = git_username,
-                GitToken = git_token,
-            };
-        }
-        return null;
-    }
-    public static UserModel? GetUser(string username, string password, out FailedReason reason)
-    {
-        if (Authoriztaion.Login(username, password, out reason, out AccountType type, out bool use_git_readme, out int id, out string email, out string uname, out string token, out string products, out string r_git_username, out string r_git_token))
-        {
-            return new(id, uname, email, token, type, use_git_readme, string.IsNullOrWhiteSpace(products) ? new() : JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
-            {
-                GitToken = r_git_token,
-                GitUsername = r_git_username
-            };
-        }
-        return null;
-    }
-
-    public static bool TryGetUser(string username, string password, out UserModel? user)
-    {
-        return TryGetUser(username, password, out user, out FailedReason _);
-    }
-
-    public static bool TryGetUser(string username, string password, out UserModel? user, out FailedReason reason)
-    {
-        user = GetUser(username, password, out reason);
-        return user != null;
-    }
-
-    public static bool TryGetUserWithToken(string email, string password, out UserModel? user)
-    {
-        user = null;
-        if (Authoriztaion.LoginWithToken(email, password, out var reason, out AccountType type, out bool use_git_readme, out int id, out string r_email, out string uname, out string token, out string products, out string r_git_username, out string r_git_token))
-        {
-            user = new(id, uname, email, token, type, use_git_readme, string.IsNullOrWhiteSpace(products) ? new() : JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
-            {
-                GitToken = r_git_token,
-                GitUsername = r_git_username
-            }; ;
-            return true;
-        }
-        return false;
-    }
-
     public bool AddToLibrary(ProductModel product, float purchasedPrice = -1)
     {
         if (!OwnedProducts.ContainsKey(product.Id))
@@ -210,7 +135,7 @@ public class UserModel
         if (OwnedProducts.ContainsKey(productId))
         {
             OwnedProducts[productId] = stat;
-            Authoriztaion.UpdateProperty(Id, Token, "owned_products", JsonSerializer.Serialize(OwnedProducts));
+            Authorization.UpdateProperty(Id, Token, "owned_products", JsonSerializer.Serialize(OwnedProducts));
             return true;
         }
         return false;
@@ -218,7 +143,7 @@ public class UserModel
 
     public void UpdateSetting(string name, dynamic value)
     {
-        Authoriztaion.UpdateProperty(Id, Token, name, value);
+        Authorization.UpdateProperty(Id, Token, name, value);
     }
     public object ToObject(bool includeImages = false)
     {
