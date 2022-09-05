@@ -99,7 +99,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost()]
-    public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm]string shortSummery, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner, [FromForm] string[]? gallery)
+    public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm] string shortSummery, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner)
     {
         try
         {
@@ -117,10 +117,6 @@ public class ProductController : ControllerBase
             {
                 model.IconImage = icon;
                 model.BannerImage = banner;
-                if (gallery != null && gallery.Any())
-                {
-                    model.GalleryImages = gallery;
-                }
                 return new JsonResult(model);
             }
         }
@@ -413,7 +409,8 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet("tags")]
-    public IActionResult GetTags(){
+    public IActionResult GetTags()
+    {
 
         return new JsonResult(OpenDSM.Core.Models.Tags.GetTags());
     }
