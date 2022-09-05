@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace OpenDSM.Core.Handlers;
 
-internal class FFmpegHandler
+public class FFmpegHandler
 {
 
     #region Public Fields
@@ -27,6 +27,7 @@ internal class FFmpegHandler
             Xabe.FFmpeg.Downloader.FFmpegDownloader.GetLatestVersion(Xabe.FFmpeg.Downloader.FFmpegVersion.Official, FFMpegDirectory).Wait();
         }
         ffmpeg_exe = Directory.GetFiles(FFMpegDirectory, "*ffmpeg*", SearchOption.AllDirectories).First();
+        Xabe.FFmpeg.FFmpeg.SetExecutablesPath(FFMpegDirectory);
     }
 
     #endregion Protected Constructors
@@ -59,6 +60,13 @@ internal class FFmpegHandler
                 log.Error($"FFmpeg exited with code {process.ExitCode}");
             }
         });
+
+    public (int, int) GetSize(string file)
+    {
+        Xabe.FFmpeg.IMediaInfo info = Xabe.FFmpeg.FFmpeg.GetMediaInfo(file).Result;
+        var stream = info.VideoStreams.First();
+        return (stream.Width, stream.Height);
+    }
 
     #endregion Public Methods
 
