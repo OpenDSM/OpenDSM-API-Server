@@ -39,6 +39,11 @@ public class HomeController : Controller
         return View();
     }
 
+    [Route("tos")]
+    public IActionResult TOS(){
+        return View();
+    }
+
     #endregion Public Methods
 
 }
