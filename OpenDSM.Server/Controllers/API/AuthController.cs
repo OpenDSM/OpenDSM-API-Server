@@ -186,6 +186,27 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpGet("repositories")]
+    public IActionResult GetUserRepositories()
+    {
+        if (IsLoggedIn(Request, out UserModel? user))
+        {
+            if (user.IsDeveloperAccount)
+            {
+                return new JsonResult(user.Repositories);
+            }
+
+            return BadRequest(new
+            {
+                message = "Developer account not activated!"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "User is not authorized!"
+        });
+    }
+
     [HttpPatch("settings")]
     public IActionResult UpdateSettings([FromForm] string name, [FromForm] string value)
     {
