@@ -84,7 +84,7 @@ public class ProductController : ControllerBase
         });
     }
 
-    [HttpGet("{type?}")]
+    [HttpGet()]
     public IActionResult GetProducts(ProductListType? type, int? page, int? items_per_page)
     {
         ProductModel[] productModels = ProductListHandler.GetProducts(page.GetValueOrDefault(0), items_per_page.GetValueOrDefault(20), type.GetValueOrDefault(ProductListType.Latest));
@@ -99,7 +99,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost()]
-    public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner, [FromForm] string[]? gallery)
+    public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm]string shortSummery, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner, [FromForm] string[]? gallery)
     {
         try
         {
@@ -113,7 +113,7 @@ public class ProductController : ControllerBase
                 }
 
             }
-            if (ProductModel.TryCreateProduct(gitRepoName, UserModel.GetByID(user_id), name, yt_key ?? "", subscription, use_git_readme, (int)(price * 100), keywords.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), ts.ToArray(), out ProductModel model))
+            if (ProductModel.TryCreateProduct(gitRepoName, shortSummery, UserModel.GetByID(user_id), name, yt_key ?? "", subscription, use_git_readme, (int)(price * 100), keywords.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), ts.ToArray(), out ProductModel model))
             {
                 model.IconUrl = icon;
                 model.BannerImage = banner;
@@ -197,7 +197,7 @@ public class ProductController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetProduct(int id)
     {
-        return new JsonResult(ProductModel.GetByID(id));
+        return new JsonResult(ProductModel.GetByID(id).ToObject());
     }
     [HttpDelete("{product}/version/{id}")]
     public async Task<IActionResult> RemoveVersion(int id, int product)
@@ -411,6 +411,12 @@ public class ProductController : ControllerBase
         {
             message = "User couldn't be authenticated"
         });
+    }
+
+    [HttpGet("tags")]
+    public IActionResult GetTags(){
+
+        return new JsonResult(OpenDSM.Core.Models.Tags.GetTags());
     }
 
     #endregion Public Methods

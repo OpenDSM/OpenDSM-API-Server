@@ -55,7 +55,7 @@ public static class Products
         }
     }
 
-    public static bool Create(int user_id, string gitRepoName, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out int product_id)
+    public static bool Create(int user_id, string gitRepoName, string shortSummery, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out int product_id)
     {
         product_id = -1;
         try
@@ -74,7 +74,9 @@ public static class Products
                 s_tag.Append(";");
             }
             using MySqlConnection conn = GetConnection();
-            MySqlCommand cmd = new($"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}')", conn);
+            string sql = $"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`, `short_summery`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}', '{shortSummery}')";
+            log.Debug(sql);
+            MySqlCommand cmd = new(sql, conn);
             if (cmd.ExecuteNonQuery() > 0)
             {
                 MySqlCommand cmdf = new($"select id from products where user_id = '{user_id}' and name = '{name}'", conn);
