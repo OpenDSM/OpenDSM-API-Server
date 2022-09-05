@@ -125,7 +125,7 @@ public class ProductModel
     public bool UseGitReadME { get; }
     public UserModel User { get; private set; }
     public Dictionary<long, VersionModel> Versions { get; private set; }
-    public float ViewDownloadRatio => TotalDownloads / TotalPageViews;
+    public float ViewDownloadRatio => TotalDownloads / TotalPageViews + 1;
     public string YoutubeKey { get; private set; }
 
     #endregion Public Properties
@@ -148,10 +148,10 @@ public class ProductModel
         return null;
     }
 
-    public static bool TryCreateProduct(string gitRepoName, UserModel user, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out ProductModel model)
+    public static bool TryCreateProduct(string gitRepoName, string shortSummery, UserModel user, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out ProductModel model)
     {
         model = null;
-        if (Products.Create(user.Id, gitRepoName, name, yt_key, subscription, use_git_readme, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model))
+        if (Products.Create(user.Id, gitRepoName, shortSummery, name, yt_key, subscription, use_git_readme, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model))
         {
             GitHandler.CreateWebHook(user.GitCredentials, model);
             model.PopulateVersionsFromGit();
@@ -302,7 +302,11 @@ public class ProductModel
                 this.OnSale,
                 this.Subscription,
             },
-            user = this.User.Id,
+            user = new
+            {
+                id = this.User.Id,
+                name = this.User.Username
+            },
             stats = new
             {
                 this.Rating,
