@@ -16,7 +16,7 @@
     }
 }
 <div class="product md">
-    <img src="@Model.IconUrl" alt="" onclick="window.location.href='/product/@Model.Id'">
+    <img src="@Model.IconImage" alt="" onclick="window.location.href='/product/@Model.Id'">
     <div class="content">
         <h4 class="name" onclick="window.location.href='/product/@Model.Id'">@Model.Name</h4>
         <a href="/profile/@Model.User.Id" class="author paragraph-4">@Model.User.Username</a>
