@@ -52,6 +52,10 @@ public static class FileHandler
         return false;
     }
 
+    public static bool IsValidBase64(string base64){
+        return Convert.TryFromBase64String(base64, Encoding.UTF8.GetBytes(base64), out _);
+    }
+
     #endregion Public Methods
 
 }
