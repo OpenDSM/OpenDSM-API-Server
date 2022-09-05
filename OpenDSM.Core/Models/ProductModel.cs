@@ -77,20 +77,7 @@ public class ProductModel
     }
 
     public Dictionary<string, float> Coupon { get; private set; }
-    public string[] GalleryImages
-    {
-        get
-        {
-            return Directory.GetFiles(Directory.CreateDirectory(Path.Combine(GetProductDirectory(Id), "gallery")).FullName, "*.jpg", SearchOption.TopDirectoryOnly);
-        }
-        set
-        {
-            for (int i = 0; i < value.Length; i++)
-            {
-                FileHandler.CreateImageFromBase64(value[i], Path.Combine(GetProductDirectory(Id), "gallery"), $"gallery_{i}", 1280);
-            }
-        }
-    }
+    public string[] GalleryImages => Directory.GetFiles(Directory.CreateDirectory(Path.Combine(GetProductDirectory(Id), "gallery")).FullName, "*.jpg", SearchOption.TopDirectoryOnly);
 
     public string GitRepositoryName { get; private set; }
     public bool HasYoutubeVideo => YTHandler.IsValidYoutubeKey(YoutubeKey);
@@ -248,6 +235,19 @@ public class ProductModel
         Platforms = platforms.ToArray();
         Versions = versions_list.OrderByDescending(i => i.Posted).ToDictionary(i => i.ID);
     }
+
+    public void UploadGalleryImage(string name, string base64)
+    {
+        FileHandler.CreateImageFromBase64(base64, Path.Combine(GetProductDirectory(Id), "gallery"), name, 1280);
+    }
+
+    public string GetGalleryImage(string name) =>
+    GalleryImages.FirstOrDefault(i =>
+        {
+            FileInfo info = new FileInfo(i);
+            string file = info.Name.Replace(info.Extension, "");
+            return name.ToLower().Equals(file.ToLower());
+        }, "");
 
     public object ToObject()
     {
