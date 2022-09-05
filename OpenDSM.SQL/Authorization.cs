@@ -28,7 +28,7 @@ public enum FailedReason
     AccountDisabled,
 }
 
-public static class Authoriztaion
+public static class Authorization
 {
 
     #region Public Methods
