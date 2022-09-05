@@ -80,7 +80,7 @@ public static class GitHandler
             IReadOnlyList<Repository> repositories = client.Repository.GetAllForCurrent().Result;
             foreach (Repository repository in repositories)
             {
-                repos.Add(new(repository.Id, repository.FullName));
+                repos.Add(new(repository.Id, repository.Name));
             }
         }
 
