@@ -58,7 +58,7 @@ public class UserModel
     public int Id { get; private set; }
     public bool IsDeveloperAccount => !string.IsNullOrEmpty(GitUsername) && !string.IsNullOrEmpty(GitToken) && GitCredentials != null && GitHandler.CheckCredentials(GitCredentials);
     public Dictionary<int, UserProductStat> OwnedProducts { get; private set; }
-    public string ProfileBannerImage
+    public string BannerImage
     {
         get
         {
@@ -87,6 +87,9 @@ public class UserModel
             FileHandler.CreateImageFromBase64(value, GetUsersProfileDirectory(Id), "profile", 300);
         }
     }
+
+    public bool HasProfileImage => File.Exists(Path.Combine(GetUsersProfileDirectory(Id), "profile.jpg"));
+    public bool HasBannerImage => File.Exists(Path.Combine(GetUsersProfileDirectory(Id), "banner.jpg"));
 
     public GitRepository[] Repositories => GitHandler.GetRepositories(GitCredentials);
     public string Token { get; private set; }
@@ -156,7 +159,7 @@ public class UserModel
                 fs.CopyTo(ms);
                 profile = Convert.ToBase64String(ms.ToArray());
             }
-            using (FileStream fs = new(ProfileBannerImage, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (FileStream fs = new(BannerImage, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 using MemoryStream ms = new();
                 fs.CopyTo(ms);
@@ -191,7 +194,7 @@ public class UserModel
                 {
                     base64 = banner,
                     path = $"/api/auth/image/banner?id={Id}",
-                    mime = new FileExtensionContentTypeProvider().TryGetContentType(ProfileBannerImage, out contentType) ? contentType : "image/png"
+                    mime = new FileExtensionContentTypeProvider().TryGetContentType(BannerImage, out contentType) ? contentType : "image/png"
                 },
             },
 
