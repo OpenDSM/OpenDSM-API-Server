@@ -3,8 +3,8 @@
 @model UserModel
 @{
     bool is_personal = (bool)ViewData["is_personal"];
-    bool hasProfileImage = File.Exists(Model.ProfileImage);
-    bool hasBannerImage = File.Exists(Model.ProfileBannerImage);
+    bool hasProfileImage = Model.HasProfileImage;
+    bool hasBannerImage = Model.HasBannerImage;
 }
 
 <script>
@@ -22,85 +22,85 @@
 
 @if (is_personal)
 {
-                                        <section class="ad"></section>
-                                        <section>
-                                            <h2>Settings</h2>
-                                            <div class="list vertical">
-                                                <div class="list horizontal">
-                                                    <div class="list vertical" style="width: 300px;min-width: 300px;">
-                                                        <h4>Profile Image</h4>
-                                                        <div id="upload-profile-image" class="file-upload" style="@(hasProfileImage?$"background-image: url('/api/auth/image/profile?id={Model.Id}')":"")">
-                                                            <div class="content">
-                                                                <i class="fas fa-plus"></i>
-                                                            </div>
-                                                        </div>
-                                                        <h4>Banner Image</h4>
-                                                        <div id="upload-profile-banner" class="file-upload" style="@(hasBannerImage?$"background-image: url('/api/auth/image/banner?id={Model.Id}')":"")">
-                                                            <div class="content">
-                                                                <i class="fas fa-plus"></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="list vertical" style="width: 100%;">
-                                                        <div class="input" title="Your Username">
-                                                            <label for="username-box">Username</label>
-                                                            <input type="text" id="username-box" autocomplete="false" placeholder="@Model.Username" setting="username">
-                                                        </div>
-                                                        <div class="large-input list vertical" id="about-section">
-                                                            <h4 for="about-box">About</h4>
-                                                            <p class="paragraph-2">This is using markdown language.  For more information view our <a href="#">profile docs</a></p>
-                                                            <textarea type="text" id="about-box" autocomplete="false" setting="about">@Model.About</textarea>
-                        @if (Model.IsDeveloperAccount && Model.HasReadme)
+    <section class="ad"></section>
+    <section>
+    <h2>Settings</h2>
+    <div class="list vertical">
+        <div class="list horizontal">
+            <div class="list vertical" style="width: 300px;min-width: 300px;">
+                <h4>Profile Image</h4>
+                <div id="upload-profile-image" class="file-upload" style="@(hasProfileImage?$"background-image: url('/api/auth/image/profile?id={Model.Id}')":"")">
+                    <div class="content">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
+                <h4>Banner Image</h4>
+                <div id="upload-profile-banner" class="file-upload" style="@(hasBannerImage?$"background-image: url('/api/auth/image/banner?id={Model.Id}')":"")">
+                    <div class="content">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="list vertical" style="width: 100%;">
+                <div class="input" title="Your Username">
+                    <label for="username-box">Username</label>
+                    <input type="text" id="username-box" autocomplete="false" placeholder="@Model.Username" setting="username">
+                </div>
+                <div class="large-input list vertical" id="about-section">
+                    <h4 for="about-box">About</h4>
+                    <p class="paragraph-2">This is using markdown language. For more information view our <a href="#">profile docs</a></p>
+                    <textarea type="text" id="about-box" autocomplete="false" setting="about">@Model.About</textarea>
+                    @if (Model.IsDeveloperAccount && Model.HasReadme)
                         {
-                                                                                                    <toggle id="use-git-about" value="@Model.UseGitReadme.ToString().ToLower()" setting="use_git_readme">Use GitHub About?</toggle>
+                            <toggle id="use-git-about" value="@Model.UseGitReadme.ToString().ToLower()" setting="use_git_readme">Use GitHub About?</toggle>
                         }
-                                                        </div>
-                                                        <button class="btn" id="save-profile-btn" disabled>Save</button>
-                                                    </div>
-                                                </div>
-                                                <div class="list horizontal centered" style="width: 100%; justify-content: center;">
+                    </div>
+                    <button class="btn" id="save-profile-btn" disabled>Save</button>
+                </div>
+            </div>
+            <div class="list horizontal centered" style="width: 100%; justify-content: center;">
                 @if (Model.IsDeveloperAccount)
                 {
-                                                                                            <a href="/product/create/" class="btn" style="width: 20%;">Create Product</a>
+                    <a href="/product/create/" class="btn" style="width: 20%;">Create Product</a>
                 }
                 else
                 {
-                                                                                            <div class="btn" onclick="new ActivateDeveloperAccountPopup().open()" style="width: 20%;">Activate Developer Account</div>
+                    <div class="btn" onclick="new ActivateDeveloperAccountPopup().open()" style="width: 20%;">Activate Developer Account</div>
                 }
-                                                    <div class="btn secondary" style="width: 20%;" id="logout-btn">Logout</div>
-                                                </div>
-                                            </div>
-                                        </section>
+                <div class="btn secondary" style="width: 20%;" id="logout-btn">Logout</div>
+            </div>
+        </div>
+    </section>
     @if (Model.CreatedProducts.Any())
     {
-                                                                                <section style="margin: 12rem auto;">
-                                                                                    <h2>Analytics</h2>
-                                                                                    <div class="list vertical">
-                                                                                        <div class="list vertical">
-                                                                                            <h3>Held Balance</h3>
-                                                                                            <h4>$4,587.67</h4>
-                                                                                            <button class="btn" style="width: 300px;">Transfer</button>
-                                                                                        </div>
-                                                                                        <div class="centered list horizontal">
-                                                                                            <i class="fa-solid fa-up-long" style="font-size: 12rem;"></i>
-                                                                                            <div class="list vertical" style="margin-right: 100px;">
-                                                                                                <h1>250K<br />Downloads</h1>
-                                                                                                <h4>Up 12%</h4>
-                                                                                                <p class="paragraph-2">Values are calculated Monthly<br />View our documentation on <a href="/docs/analytics">analytics</a></p>
-                                                                                            </div>
-                                                                                            <img src="/assets/images/Chart.svg" style="width: 100%; height: 659px;">
-                                                                                        </div>
-                                                                                        <div class="centered list horizontal">
-                                                                                            <i class="fa-solid fa-down-long" style="font-size: 12rem;"></i>
-                                                                                            <div class="list vertical" style="margin-right: 100px;">
-                                                                                                <h1>$1.5K<br />Revenue</h1>
-                                                                                                <h4>Down 12%</h4>
-                                                                                                <p class="paragraph-2">Values are calculated Monthly<br />View our documentation on <a href="/docs/analytics">analytics</a></p>
-                                                                                            </div>
-                                                                                            <img src="/assets/images/Chart.svg" style="width: 100%; height: 659px;transform: scaleX(-1)">
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </section>
+        <section style="margin: 12rem auto;">
+    <h2>Analytics</h2>
+    <div class="list vertical">
+        <div class="list vertical">
+            <h3>Held Balance</h3>
+            <h4>$4,587.67</h4>
+            <button class="btn" style="width: 300px;">Transfer</button>
+        </div>
+        <div class="centered list horizontal">
+            <i class="fa-solid fa-up-long" style="font-size: 12rem;"></i>
+            <div class="list vertical" style="margin-right: 100px;">
+                <h1>250K<br />Downloads</h1>
+                <h4>Up 12%</h4>
+                <p class="paragraph-2">Values are calculated Monthly<br />View our documentation on <a href="/docs/analytics">analytics</a></p>
+            </div>
+            <img src="/assets/images/Chart.svg" style="width: 100%; height: 659px;">
+        </div>
+        <div class="centered list horizontal">
+            <i class="fa-solid fa-down-long" style="font-size: 12rem;"></i>
+            <div class="list vertical" style="margin-right: 100px;">
+                <h1>$1.5K<br />Revenue</h1>
+                <h4>Down 12%</h4>
+                <p class="paragraph-2">Values are calculated Monthly<br />View our documentation on <a href="/docs/analytics">analytics</a></p>
+            </div>
+            <img src="/assets/images/Chart.svg" style="width: 100%; height: 659px;transform: scaleX(-1)">
+        </div>
+    </div>
+</section>
     }
 }
 
@@ -112,13 +112,13 @@
 {
     <section class="ad"></section>
     <section id="popular-products" class="carousel">
-        <h3>Latest</h3>
-        <div class="navigation">
-            <div class="carousel-nav-item fas fa-chevron-left"></div>
-            <div class="carousel-nav-item fas fa-chevron-right"></div>
-        </div>
-        <div class="list horizontal">
-            @foreach (int product_id in Model.CreatedProducts)
+    <h3>Latest</h3>
+    <div class="navigation">
+        <div class="carousel-nav-item fas fa-chevron-left"></div>
+        <div class="carousel-nav-item fas fa-chevron-right"></div>
+    </div>
+    <div class="list horizontal">
+        @foreach (int product_id in Model.CreatedProducts)
             {
                 if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
                 {
@@ -139,5 +139,5 @@
 <script src="/assets/js/profile.js"></script>
 
 <script>
-    loadAbout(@Model.UseGitReadme.ToString().ToLower());
+        loadAbout(@Model.UseGitReadme.ToString().ToLower());
 </script>
