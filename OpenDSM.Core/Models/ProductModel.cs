@@ -1,7 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using System.Net;
 using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
-using System.Net;
 
 namespace OpenDSM.Core.Models;
 
@@ -191,8 +191,9 @@ public class ProductModel
         }
     }
 
-    public void PopulateVersionsFromGit()
+    public int PopulateVersionsFromGit()
     {
+        int found = 0;
         TotalDownloads = TotalWeeklyDownloads = 0;
         List<VersionModel> versions_list = new();
         List<Platform> platforms = new();
@@ -220,11 +221,13 @@ public class ProductModel
                         if (!SQL.Versions.PlatformExists(version_id, (byte)platform.platform))
                         {
                             SQL.Versions.CreatePlatformVersion(platform.platform, platform.downloadUrl, version_id, platform.file_size);
+                            found++;
                         }
                     }
                     if (!SQL.Versions.VersionExists(version_id, Id))
                     {
                         SQL.Versions.CreateVersion(version_id, Id, version.Name, (byte)version.Type, version.Changelog, version.Posted);
+                        found++;
                     }
                     TotalDownloads += version.TotalDownloads;
                     TotalWeeklyDownloads += version.WeeklyDownloads;
@@ -234,6 +237,7 @@ public class ProductModel
         catch { }
         Platforms = platforms.ToArray();
         Versions = versions_list.OrderByDescending(i => i.Posted).ToDictionary(i => i.ID);
+        return found;
     }
 
     public void UploadGalleryImage(string name, string base64)
