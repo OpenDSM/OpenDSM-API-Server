@@ -5,7 +5,7 @@ using OpenDSM.Core.Models;
 namespace OpenDSM.Server.Controllers.API
 {
     [ApiController]
-    [Route("api/reviews/{product_id}")]
+    [Route("api/products/{product_id}/reviews")]
     public class ReviewsController : ControllerBase
     {
 
@@ -20,6 +20,27 @@ namespace OpenDSM.Server.Controllers.API
             if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
             {
                 return new JsonResult(ReviewListHandler.GetProductReviews(product));
+            }
+
+            return BadRequest(new
+            {
+                message = $"Unable to find product with id of {product_id}"
+            });
+        }
+
+        /// <summary>
+        /// Gets a single review item
+        /// </summary>
+        /// <param name="product_id">The id of the product</param>
+        /// <param name="id">The id of the review</param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public IActionResult GetReview([FromRoute] int product_id, [FromRoute] long id)
+        {
+            if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
+            {
+                if (ReviewListHandler.GetProductReviews(product).TryGetValue(id, out ReviewModel review))
+                    return new JsonResult(review);
             }
 
             return BadRequest(new
