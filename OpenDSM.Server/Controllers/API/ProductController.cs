@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
-using OpenDSM.SQL;
 using Tags = OpenDSM.Core.Models.Tags;
 namespace OpenDSM.Server.Controllers.API;
 
@@ -12,6 +11,13 @@ public class ProductController : ControllerBase
 
     #region Public Methods
 
+    /// <summary>
+    /// Gets a list of all products base on parameters
+    /// </summary>
+    /// <param name="type">The sorting method <see cref="ProductListType" /></param>
+    /// <param name="page">The page offset of the list</param>
+    /// <param name="items_per_page">The number of items to show</param>
+    /// <returns></returns>
     [HttpGet()]
     public IActionResult GetProducts(ProductListType? type, int? page, int? items_per_page)
     {
@@ -26,6 +32,22 @@ public class ProductController : ControllerBase
         return new JsonResult(products);
     }
 
+    /// <summary>
+    /// Creates a product listing
+    /// </summary>
+    /// <param name="name">The name of the product</param>
+    /// <param name="gitRepoName">The repository name</param>
+    /// <param name="shortSummery">A short summery of the product</param>
+    /// <param name="user_id">The user creating the product</param>
+    /// <param name="yt_key">The youtube key of the trailer/video</param>
+    /// <param name="subscription">If the product uses a subscription payment system</param>
+    /// <param name="use_git_readme">If the product should use the readme from the github repository</param>
+    /// <param name="price">the overall price of the product </param>
+    /// <param name="keywords">any keywords for the product separated by semi-colon, this is used primarily for search engine optimization</param>
+    /// <param name="tags">The tags/categories of the product separated by semi-colon, this is used primarily for search engine optimization</param>
+    /// <param name="icon">The base64 of the icon/logo image</param>
+    /// <param name="banner">The base64 of the banner/hero image</param>
+    /// <returns></returns>
     [HttpPost()]
     public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm] string shortSummery, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner)
     {
@@ -55,292 +77,25 @@ public class ProductController : ControllerBase
         return BadRequest();
     }
 
-    [HttpPost("{id}/version")]
-    public IActionResult CreateVersion([FromRoute] int id, [FromForm] string name, [FromForm] ReleaseType type, [FromForm] string changelog)
-    {
-        if (IsLoggedIn(Request, out UserModel user))
-        {
-            if (ProductListHandler.TryGetByID(id, out ProductModel? model))
-            {
-                int release_id = GitHandler.CreateRelease(user.GitCredentials, model, name, type, changelog).Result;
-                if (release_id != -1)
-                {
-                    return Ok(new
-                    {
-                        success = true,
-                        message = $"Release created with id: {release_id}",
-                        id = release_id,
-                        repo = model.GitRepositoryName,
-                        owner = user.GitUsername,
-                        git_token = user.GitToken,
-                    });
-                }
-
-                return BadRequest(new
-                {
-                    success = false,
-                    message = $"Couldn't create release",
-                    id = -1
-                });
-            }
-
-            return BadRequest(new
-            {
-                success = false,
-                message = $"Couldn't get product from id: {id}",
-                id = -1
-            });
-        }
-        return BadRequest(new
-        {
-            success = false,
-            message = "Couldn't authorize user",
-            id = -1
-        });
-    }
-
-    [HttpGet("{product_id}/version/{version_id}")]
-    public IActionResult DownloadVersion(int product_id, long version_id, Platform platform)
-    {
-        if (ProductListHandler.TryGetByID(product_id, out ProductModel product))
-        {
-            VersionModel? version = product.Versions[version_id];
-            if (version != null)
-            {
-                PlatformVersion? platform_version = version.Platforms.FirstOrDefault(i => i.platform == platform);
-                if (platform_version != null)
-                {
-                    return Redirect(platform_version.downloadUrl);
-                }
-            }
-        }
-        return RedirectToAction("Index", "Error", 500);
-    }
-
+    /// <summary>
+    /// Gets information on a specific product based on the product id
+    /// </summary>
+    /// <param name="id">The id of the product</param>
+    /// <returns></returns>
     [HttpGet("{id}")]
     public IActionResult GetProduct(int id)
     {
         return new JsonResult(ProductListHandler.GetByID(id).ToObject());
     }
-    [HttpDelete("{product}/version/{id}")]
-    public async Task<IActionResult> RemoveVersion(int id, int product)
-    {
-        if (IsLoggedIn(Request, out UserModel? user))
-        {
-            if (ProductListHandler.TryGetByID(product, out ProductModel? model))
-            {
-                if (model.User.Equals(user))
-                {
-                    if (model.Versions.ContainsKey(id))
-                    {
-                        if (await GitHandler.RemoveVersion(user.GitCredentials, model, model.Versions[id]))
-                        {
-                            return Ok(new
-                            {
-                                message = "Version removed successfully!"
-                            });
-                        }
-                        else
-                        {
-                            return BadRequest(new
-                            {
-                                message = "Unable to remove version"
-                            });
-                        }
-                    }
 
-                    return BadRequest(new
-                    {
-                        message = $"Could not find version with an id of {id} under product \"{model.Name}\""
-                    });
-                }
-
-                return BadRequest(new
-                {
-                    message = "User is not authorized!"
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = $"Could not find product with an id of {product}"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "User not logged in!"
-        });
-
-    }
-
-    [HttpPost("{product_id}/version/check")]
-    public IActionResult TriggerVersionCheck([FromRoute] int product_id)
-    {
-        if (ProductListHandler.TryGetByID(product_id, out ProductModel? model))
-        {
-            model.PopulateVersionsFromGit();
-            return Ok(new
-            {
-                model.Versions
-            });
-        }
-        return BadRequest(new
-        {
-            message = "Product Doesn't Exist"
-        });
-    }
-
-    [HttpPatch("{product}/version/{id}")]
-    public async Task<IActionResult> UpdateVersion([FromRoute] int id, [FromRoute] int product, [FromForm] string name, [FromForm] string changelog, [FromForm] ReleaseType type)
-    {
-        if (IsLoggedIn(Request, out UserModel? user))
-        {
-            if (ProductListHandler.TryGetByID(product, out ProductModel? model))
-            {
-                if (model.User.Equals(user))
-                {
-                    if (model.Versions.ContainsKey(id))
-                    {
-                        if (await GitHandler.UpdateVersion(user.GitCredentials, model, model.Versions[id], name, type, changelog))
-                        {
-                            return Ok(new
-                            {
-                                message = "Version updated successfully!"
-                            });
-                        }
-                        else
-                        {
-                            return BadRequest(new
-                            {
-                                message = "Unable to update version"
-                            });
-                        }
-                    }
-
-                    return BadRequest(new
-                    {
-                        message = $"Could not find version with an id of {id} under product \"{model.Name}\""
-                    });
-                }
-
-                return BadRequest(new
-                {
-                    message = "User is not authorized!"
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = $"Could not find product with an id of {product}"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "User not logged in!"
-        });
-    }
-    [HttpPost("{product_id}/version/{version_id}/asset"), DisableRequestSizeLimit]
-    public async Task<IActionResult> UploadAsset([FromRoute] int product_id, [FromRoute] int version_id, [FromQuery] Platform platform, [FromForm] IFormFile file)
-    {
-        if (IsLoggedIn(Request, out UserModel user))
-        {
-            if (ProductListHandler.TryGetByID(product_id, out ProductModel product))
-            {
-                try
-                {
-                    if (await GitHandler.UploadReleaseAsset(user.GitCredentials, file.OpenReadStream(), product, platform, version_id))
-                    {
-                        return Ok(new
-                        {
-                            message = "asset uploaded!"
-                        });
-                    }
-                }
-                catch (Exception e)
-                {
-                    return BadRequest(new
-                    {
-                        message = $"Unable to upload git release asset: {e.Message}",
-                        stacktrace = e.StackTrace
-                    });
-                }
-                return BadRequest(new
-                {
-                    message = $"Unable to upload git release asset"
-                });
-
-            }
-
-            return BadRequest(new
-            {
-                message = $"Unable to find product with id of {product_id}"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "User couldn't be authenticated"
-        });
-    }
-
-    [HttpGet("{product_id}/reviews")]
-    public IActionResult GetReviews([FromRoute] int product_id)
-    {
-        if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
-        {
-            return new JsonResult(ReviewListHandler.GetProductReviews(product));
-        }
-
-        return BadRequest(new
-        {
-            message = $"Unable to find product with id of {product_id}"
-        });
-    }
-
-    [HttpPost("{product_id}/reviews")]
-    public IActionResult CreateReview([FromRoute] int product_id, [FromForm] string summery, [FromForm] string body, [FromForm] byte rating)
-    {
-        if (IsLoggedIn(Request, out UserModel? user))
-        {
-            if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
-            {
-                if (user.Equals(product.User))
-                {
-                    return BadRequest(new
-                    {
-                        message = $"You cannot leave a review on your own product!"
-                    });
-                }
-                if (user.OwnedProducts.ContainsKey(product_id))
-                {
-                    ReviewListHandler.CreateReview(user, product, rating, summery, body);
-                    return Ok(new
-                    {
-                        message = "Review successfully submitted"
-                    });
-                }
-
-                return BadRequest(new
-                {
-                    message = $"User is not a verified owner of '{product.Name}' and therefore can not leave a review"
-                });
-            }
-
-            return BadRequest(new
-            {
-                message = $"Unable to find product with id of {product_id}"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "User couldn't be authenticated"
-        });
-    }
-
+    /// <summary>
+    /// Returns a list of all acceptable tags and their corresponding id
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("tags")]
     public IActionResult GetTags()
     {
-
-        return new JsonResult(OpenDSM.Core.Models.Tags.GetTags());
+        return new JsonResult(Tags.GetTags());
     }
 
     #endregion Public Methods
