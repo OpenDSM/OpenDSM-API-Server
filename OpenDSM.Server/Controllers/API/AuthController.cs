@@ -50,44 +50,6 @@ public class AuthController : ControllerBase
         });
     }
 
-    [HttpGet("image/{type}")]
-    public IActionResult GetProfileImage(string type, int id)
-    {
-        UserModel? user = UserListHandler.GetByID(id);
-        if (user != null)
-        {
-            string path = type switch
-            {
-                "profile" => user.ProfileImage,
-                "banner" => user.BannerImage,
-                _ => user.ProfileImage
-            };
-            if (System.IO.File.Exists(path))
-            {
-                return new FileStreamResult(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), new FileExtensionContentTypeProvider().TryGetContentType(path, out var contentType) ? contentType : "image/png");
-            }
-            if (type == "profile")
-            {
-                return Redirect("/assets/images/missing-profile-image.svg");
-            }
-            else if (type == "banner")
-            {
-                return Redirect("/assets/images/missing-banner.jpg");
-            }
-        }
-        else
-        {
-            return NotFound(new
-            {
-                message = $"No user with an ID of {id} exists"
-            });
-        }
-        return NotFound(new
-        {
-            message = $"Image type not found: {type}"
-        });
-    }
-
     [HttpGet("readme/{id}")]
     public IActionResult GetReadme(int id, bool? git)
     {
@@ -155,7 +117,7 @@ public class AuthController : ControllerBase
             try
             {
 
-                if (Authorization.Register(username, email, password, out var reason))
+                if (Authorization.CreateUser(username, email, password, out var reason))
                 {
                     if (UserListHandler.TryGetUser(username, password, out UserModel? user))
                     {
@@ -183,27 +145,6 @@ public class AuthController : ControllerBase
                     stacktrace = e.StackTrace,
                 });
             }
-        });
-    }
-
-    [HttpGet("repositories")]
-    public IActionResult GetUserRepositories()
-    {
-        if (IsLoggedIn(Request, out UserModel? user))
-        {
-            if (user.IsDeveloperAccount)
-            {
-                return new JsonResult(user.Repositories);
-            }
-
-            return BadRequest(new
-            {
-                message = "Developer account not activated!"
-            });
-        }
-        return BadRequest(new
-        {
-            message = "User is not authorized!"
         });
     }
 
