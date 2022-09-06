@@ -187,13 +187,13 @@ public class UserModel
                 profile = new
                 {
                     base64 = profile,
-                    path = $"/api/auth/image/profile?id={Id}",
+                    path = $"/api/images/user/{Id}/profile",
                     mime = new FileExtensionContentTypeProvider().TryGetContentType(ProfileImage, out var contentType) ? contentType : "image/png"
                 },
                 banner = new
                 {
                     base64 = banner,
-                    path = $"/api/auth/image/banner?id={Id}",
+                    path = $"/api/images/user/{Id}/banner",
                     mime = new FileExtensionContentTypeProvider().TryGetContentType(BannerImage, out contentType) ? contentType : "image/png"
                 },
             },
