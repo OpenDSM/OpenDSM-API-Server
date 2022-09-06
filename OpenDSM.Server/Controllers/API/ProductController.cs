@@ -5,7 +5,7 @@ using OpenDSM.Core.Models;
 using Tags = OpenDSM.Core.Models.Tags;
 namespace OpenDSM.Server.Controllers.API;
 
-[Route("api/product")]
+[Route("api/products")]
 public class ProductController : ControllerBase
 {
 
