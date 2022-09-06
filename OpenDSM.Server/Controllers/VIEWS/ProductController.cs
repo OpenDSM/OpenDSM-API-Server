@@ -31,43 +31,6 @@ public class ProductController : Controller
         return RedirectToAction("Index", "Error", new { code = 401 });
     }
 
-    [HttpGet("{id}/images/gallery/{name}")]
-    public IActionResult GetGalleryImage(int id, string name)
-    {
-        string path = Path.Combine(GetProductDirectory(id), "gallery", $"{name}.jpg");
-        if (System.IO.File.Exists(path))
-        {
-            FileStream fs = new(path, FileMode.Open, FileAccess.Read);
-            return new FileStreamResult(fs, "image/jpg");
-        }
-        return BadRequest();
-    }
-
-    [HttpGet("{id}/images/{name}")]
-    public IActionResult GetImage(int id, string name)
-    {
-        string path = Path.Combine(GetProductDirectory(id), $"{name}.jpg");
-        if (System.IO.File.Exists(path))
-        {
-            FileStream fs = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            return new FileStreamResult(fs, "image/jpg");
-        }
-        return BadRequest();
-    }
-
-    [HttpGet("video/{yt_id}")]
-    public IActionResult GetVideo(string yt_id)
-    {
-        if (YTHandler.TryGetYoutubeDirectURL(yt_id, out Uri url))
-        {
-            return Redirect(url.AbsoluteUri);
-        }
-        return BadRequest(new
-        {
-            message = "Unable to parse youtube url"
-        });
-    }
-
     [Route("{id}")]
     public IActionResult Index(int id, bool? preview)
     {
