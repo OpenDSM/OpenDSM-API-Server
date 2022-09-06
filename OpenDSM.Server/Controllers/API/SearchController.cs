@@ -8,6 +8,12 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("/api/search")]
 public class SearchController : ControllerBase
 {
+    /// <summary>
+    /// Searches for user based on a query
+    /// </summary>
+    /// <param name="query">The search query</param>
+    /// <param name="maxSize">The max number of results</param>
+    /// <returns></returns>
     [HttpGet("users")]
     public IActionResult Users([FromQuery] string query, [FromQuery] int? maxSize)
     {
@@ -27,14 +33,20 @@ public class SearchController : ControllerBase
         return new JsonResult(usersNeutered);
     }
 
+    /// <summary>
+    /// Searches for applications based on a query
+    /// </summary>
+    /// <param name="query">The search query</param>
+    /// <param name="maxSize">The max number of results</param>
+    /// <param name="tags">Any tags to filter results</param>
+    /// <returns></returns>
     [HttpGet("applications")]
-
     public IActionResult Applications([FromQuery] string query, [FromQuery] int? maxSize, [FromQuery] string? tags)
     {
         int[] tagsList = Array.Empty<int>();
         if (!string.IsNullOrEmpty(tags))
         {
-            tagsList = Array.ConvertAll(tags.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), i=>CLMath.CLConverter.ToInt32(i));
+            tagsList = Array.ConvertAll(tags.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), i => CLMath.CLConverter.ToInt32(i));
         }
         ProductModel[] products = ProductListHandler.GetProductsFromPartial(maxSize.GetValueOrDefault(-1), query, tagsList);
         object[] productsNeutered = new object[products.Length];
