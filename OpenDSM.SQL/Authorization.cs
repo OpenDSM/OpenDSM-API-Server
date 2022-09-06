@@ -237,7 +237,7 @@ public static class Authorization
         return Login(email, pwd, out reason, out type, out use_git_readme, out r_id, out r_email, out r_username, out r_token, out r_owned_products, out r_git_username, out r_git_token);
     }
 
-    public static bool Register(string username, string email, string password, out FailedReason reason)
+    public static bool CreateUser(string username, string email, string password, out FailedReason reason)
     {
         reason = FailedReason.None;
         if (CheckUserExists(username))
