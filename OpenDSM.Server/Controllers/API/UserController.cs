@@ -5,7 +5,7 @@ using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.API;
 [ApiController]
-[Route("api/user")]
+[Route("api/users")]
 public class UserController : ControllerBase
 {
     /// <summary>
