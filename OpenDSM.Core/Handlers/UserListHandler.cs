@@ -22,7 +22,7 @@ public static class UserListHandler
     }
 
 
-    public static bool TryGetByID(int id, out UserModel? user)
+    public static bool TryGetByID(int id, out UserModel user)
     {
         return (user = GetByID(id)) != null;
     }
@@ -71,18 +71,11 @@ public static class UserListHandler
         return null;
     }
 
-    public static bool TryGetUser(string username, string password, out UserModel? user)
-    {
-        return TryGetUser(username, password, out user, out FailedReason _);
-    }
+    public static bool TryGetUser(string username, string password, out UserModel user) => TryGetUser(username, password, out user, out FailedReason _);
 
-    public static bool TryGetUser(string username, string password, out UserModel? user, out FailedReason reason)
-    {
-        user = GetUser(username, password, out reason);
-        return user != null;
-    }
+    public static bool TryGetUser(string username, string password, out UserModel user, out FailedReason reason) => (user = GetUser(username, password, out reason)) != null;
 
-    public static bool TryGetUserWithToken(string email, string password, out UserModel? user)
+    public static bool TryGetUserWithToken(string email, string password, out UserModel user)
     {
         user = null;
         if (Authorization.LoginWithToken(email, password, out var reason, out AccountType type, out bool use_git_readme, out int id, out string r_email, out string uname, out string token, out string products, out string r_git_username, out string r_git_token))
