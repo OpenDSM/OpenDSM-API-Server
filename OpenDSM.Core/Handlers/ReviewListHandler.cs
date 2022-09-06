@@ -9,7 +9,7 @@ public static class ReviewListHandler
     #region Public Methods
     public static RatingDenominations GetProductAverageRating(ProductModel product)
     {
-        ReviewModel[] reviews = GetProductReviews(product);
+        ReviewModel[] reviews = GetProductReviews(product).Values.ToArray();
         if (!reviews.Any())
         {
             return new(0, 0, 0, 0, 0, 0, 0);
@@ -57,15 +57,15 @@ public static class ReviewListHandler
         return new(five, four, three, two, one, rating, reviews.Length);
     }
 
-    public static ReviewModel[] GetProductReviews(ProductModel product)
+    public static Dictionary<long, ReviewModel> GetProductReviews(ProductModel product)
     {
-        List<ReviewModel> Reviews = new();
+        Dictionary<long, ReviewModel> Reviews = new();
         int[] review_ids = SQL.Reviews.GetReviewsByProductID(product.Id);
-        foreach (int id in review_ids)
+        foreach (long id in review_ids)
         {
             if (SQL.Reviews.GetReviewByID(id, out _, out byte rating, out string summery, out string body, out DateTime posted, out int user_id))
             {
-                Reviews.Add(new()
+                Reviews.Add(id, new()
                 {
                     Posted = posted,
                     Product = product,
@@ -76,7 +76,7 @@ public static class ReviewListHandler
                 });
             }
         }
-        return Reviews.OrderByDescending(x => x.Posted).ToArray();
+        return Reviews.OrderByDescending(x => x.Value.Posted).ToDictionary(i => i.Key, i => i.Value);
     }
 
     public static void CreateReview(UserModel user, ProductModel product, byte rating, string summery, string body)
