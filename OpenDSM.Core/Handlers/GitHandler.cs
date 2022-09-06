@@ -156,7 +156,7 @@ public static class GitHandler
         return false;
     }
 
-    public static async Task<bool> RemoveVersion(GitCredentials credentials, ProductModel productModel, VersionModel versionModel)
+    public static async Task<bool> DeleteVersion(GitCredentials credentials, ProductModel productModel, VersionModel versionModel)
     {
         if (CheckCredentials(credentials))
         {
