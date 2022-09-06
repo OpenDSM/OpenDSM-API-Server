@@ -14,7 +14,7 @@ public static class Reviews
         return cmd.ExecuteNonQuery() > 0;
     }
 
-    public static bool GetReviewByID(int id, out int product_id, out byte rating, out string summery, out string body, out DateTime posted, out int user_id)
+    public static bool GetReviewByID(long id, out int product_id, out byte rating, out string summery, out string body, out DateTime posted, out int user_id)
     {
         user_id = 0;
         product_id = 0;
