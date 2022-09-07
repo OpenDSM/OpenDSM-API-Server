@@ -7,9 +7,9 @@
     bool HasProduct = (bool)(ViewData["HasProduct"] ?? false);
     int product_id = (int)(ViewData["ProductID"] ?? -1);
     string name = (string)(ViewData["ProductName"] ?? "");
-    int filter = (int)(ViewData["Filter"]??-1);
+    int filter = (int)(ViewData["Filter"] ?? -1);
 
-    var dem = ReviewListHandler.GetProductAverageRating(Model);
+    var dem = ReviewListHandler.GetProductRatingDenomination(Model);
     string review_count = dem.count.ToString("G");
     if (dem.count >= Math.Pow(10, 9))
     {
@@ -70,11 +70,11 @@
         </div>
     </div>
     @{
-        ReviewModel[] reviews = filter == -1 ? ReviewListHandler.GetProductReviews(Model).Values.Take(10).ToArray() : ReviewListHandler.GetProductReviews(Model).Values.Where(x => x.Rating == filter * 10 || (filter == 1 && x.Rating == (filter * 10) - 5) || x.Rating == (filter * 10) + 5).Take(10).ToArray();
+        ReviewModel[] reviews = filter == -1 ? ReviewListHandler.GetProductReviews(Model, 10, 0).Values.ToArray() : ReviewListHandler.GetProductReviews(Model, int.MaxValue, 0).Values.Where(x => x.Rating == filter * 10 || (filter == 1 && x.Rating == (filter * 10) - 5) || x.Rating == (filter * 10) + 5).Take(10).ToArray();
     }
     @if (reviews.Any())
     {
-            <div class="list vertical testimonials">
+        <div class="list vertical testimonials">
             @foreach (ReviewModel review in reviews)
             {
                 string active = "";
@@ -107,69 +107,71 @@
                 {
                     active = "Never Used";
                 }
-                        <div class="testimonial">
-                        <div class="list vertical">
-                            <div class="list horizontal profile-info">
-                                <span class="profile-image" style="background-image: url('/api/auth/image/profile?id=@review.User.Id');"></span>
-                                <h4 class="name">@review.User.Username</h4>
-                            </div>
-                            <div class="list vertical testimonial-details">
-                                <div class="list horizontal">
-                                    <span class="title">Rating</span>
-                                    <span class="value">@Math.Round(review.Rating/10.0,1) Stars</span>
-                                </div>
-                                <div class="list horizontal">
-                                    <span class="title">Date</span>
-                                    <span class="value">@review.Posted.ToString("G")</span>
-                                </div>
-                                <div class="list horizontal">
-                                    <span class="title">Time Used</span>
-                                    <span class="value">@active</span>
-                                </div>
-                            </div>
-                            <p class="paragraph-1 testimonial-subject">@review.Subject</p>
-                            <p class="paragraph-1 testimonial-description">
-                            @review.Body
-                            </p>
+                <div class="testimonial">
+                    <div class="list vertical">
+                        <div class="list horizontal profile-info">
+                            <span class="profile-image" style="background-image: url('/api/auth/image/profile?id=@review.User.Id');"></span>
+                            <h4 class="name">@review.User.Username</h4>
                         </div>
-                        <!-- <button class="btn secondary reply-button">Reply</button>-->
+                        <div class="list vertical testimonial-details">
+                            <div class="list horizontal">
+                                <span class="title">Rating</span>
+                                <span class="value">@Math.Round(review.Rating/10.0,1) Stars</span>
+                            </div>
+                            <div class="list horizontal">
+                                <span class="title">Date</span>
+                                <span class="value">@review.Posted.ToString("G")</span>
+                            </div>
+                            <div class="list horizontal">
+                                <span class="title">Time Used</span>
+                                <span class="value">@active</span>
+                            </div>
+                        </div>
+                        <p class="paragraph-1 testimonial-subject">@review.Subject</p>
+                        <p class="paragraph-1 testimonial-description">
+                            @review.Body
+                        </p>
                     </div>
+                    <!-- <button class="btn secondary reply-button">Reply</button>-->
+        </div>
             }
-            </div>
+        </div>
     }
     <!--ineligible-->
-        <div id="leave-review-form" class="list vertical @((IsOwner || !HasProduct)?"ineligible":"")" style="margin: 100px 0">
+    <div id="leave-review-form" class="list vertical @((IsOwner || !HasProduct)?"ineligible":"")" style="margin: 100px 0">
         @if (!reviews.Any())
         {
             <h3>No Reviews?</h3>
             <p class="paragraph-2">Be the first to leave a review!</p>
-        }else{
+        }
+        else
+        {
             <h3>Leave a Review!</h3>
             <p class="paragraph-2">Tell the developers what you think!</p>
         }
-            <div class="input" title="A brief overview of your expirence">
-                <label for="review-subject-box">Subject</label>
-                <input type="text" id="review-subject-box" autocomplete="false" required>
-            </div>
-
-            <div class="stars-input list vertical" value="0">
-                <h4>Rating</h4>
-                <div class="list horizontal">
-                    <span class="star-input fa-regular fa-star" star="0"></span>
-                    <span class="star-input fa-regular fa-star" star="1"></span>
-                    <span class="star-input fa-regular fa-star" star="2"></span>
-                    <span class="star-input fa-regular fa-star" star="3"></span>
-                    <span class="star-input fa-regular fa-star" star="4"></span>
-                </div>
-            </div>
-
-            <div class="large-input list vertical" id="review-body-input">
-                <h4>Body</h4>
-                <p class="paragraph-2">This is using markdown language. For more information check our <a href="#">documentation on markdown</a></p>
-                <textarea type="text" id="review-body-box" autocomplete="false" required></textarea>
-            </div>
-
-            <button id="leave-review-button" class="btn" style="margin-left: 0; margin-right: 0">Leave Review!</button>
+        <div class="input" title="A brief overview of your expirence">
+            <label for="review-subject-box">Subject</label>
+            <input type="text" id="review-subject-box" autocomplete="false" required>
         </div>
+
+        <div class="stars-input list vertical" value="0">
+            <h4>Rating</h4>
+            <div class="list horizontal">
+                <span class="star-input fa-regular fa-star" star="0"></span>
+                <span class="star-input fa-regular fa-star" star="1"></span>
+                <span class="star-input fa-regular fa-star" star="2"></span>
+                <span class="star-input fa-regular fa-star" star="3"></span>
+                <span class="star-input fa-regular fa-star" star="4"></span>
+            </div>
+        </div>
+
+        <div class="large-input list vertical" id="review-body-input">
+            <h4>Body</h4>
+            <p class="paragraph-2">This is using markdown language. For more information check our <a href="#">documentation on markdown</a></p>
+            <textarea type="text" id="review-body-box" autocomplete="false" required></textarea>
+        </div>
+
+        <button id="leave-review-button" class="btn" style="margin-left: 0; margin-right: 0">Leave Review!</button>
+    </div>
 </div>
 <section class="ad"></section>
