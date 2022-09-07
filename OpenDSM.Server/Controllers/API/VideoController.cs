@@ -15,9 +15,30 @@ public class VideoController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("channel/{id}")]
-    public IActionResult GetChannelUploads(string id)
+    public IActionResult GetChannelUploads([FromRoute] string id, [FromQuery] int? count, [FromQuery] int? page)
     {
-        return new JsonResult(YTHandler.GetChannelVideos(id).Result);
+        try
+        {
+            var videos = YTHandler.GetChannelVideos(id, count.GetValueOrDefault(20), page.GetValueOrDefault(0)).Result;
+            if (videos != null && videos.Any())
+                return new JsonResult(videos);
+            return BadRequest(new
+            {
+                message = $"No channel with id of \"{id}\" found"
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new
+            {
+                message = $"Unable to get channel upload information for channel \"{id}\"",
+                error = new
+                {
+                    e.Message,
+                    e.StackTrace,
+                }
+            });
+        }
     }
 
     /// <summary>
