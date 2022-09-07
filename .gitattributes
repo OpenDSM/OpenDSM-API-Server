@@ -2,7 +2,7 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 # * linguist-detectable=false
-#*.cshtml linguist-detectable=false
+*.cshtml linguist-detectable=false
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
@@ -25,7 +25,7 @@
 ###############################################################################
 *.sln       merge=csharp
 *.csproj    merge=csharp
-*.cshtml    merge=csharp
+# *.cshtml    merge=csharp
 #*.vbproj    merge=binary
 #*.vcxproj   merge=binary
 #*.vcproj    merge=binary
