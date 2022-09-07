@@ -5,7 +5,7 @@ using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.API;
 [ApiController]
-[Route("api/users")]
+[Route("api/user")]
 public class UserController : ControllerBase
 {
     /// <summary>
@@ -126,5 +126,90 @@ public class UserController : ControllerBase
             message = "Invalid Credentials"
         });
     }
-    
+
+
+    /// <summary>
+    /// Updates settings specified by name to content of body
+    /// </summary>
+    /// <param name="name">The name of the setting</param>
+    /// <param name="value">The value of the setting</param>
+    /// <returns></returns>
+    [HttpPatch("{name}")]
+    public IActionResult UpdateSettings([FromRoute] string name, [FromBody] string value)
+    {
+
+        if (IsLoggedIn(Request, out UserModel? user))
+        {
+            switch (name)
+            {
+                case "about":
+                    user.UpdateAbout(value);
+                    break;
+
+                default:
+                    if (!string.IsNullOrWhiteSpace(value))
+                        user.UpdateSetting(name, value);
+                    break;
+            }
+            return Ok(new
+            {
+                message = $"\"{name}\" has been updated"
+            });
+        }
+        return BadRequest(new
+        {
+            message = "Invalid Credentials"
+        });
+    }
+
+    /// <summary>
+    /// Validates user credentials
+    /// </summary>
+    /// <param name="username">The users username or email</param>
+    /// <param name="password">The users password</param>
+    /// <returns></returns>
+    [HttpPost("validate")]
+    public async Task<IActionResult> ValidateUserCredentials([FromForm] string username, [FromForm] string password) => await Task.Run(() =>
+        {
+            if (UserListHandler.TryGetUser(username, password, out UserModel? user, out var reason))
+            {
+                return new JsonResult(new
+                {
+                    success = true,
+                    message = "Logged in Successfully",
+                    user = user.ToObject(),
+                });
+            }
+            return new JsonResult(new
+            {
+                success = false,
+                message = string.Concat(reason.ToString().Select(x => char.IsUpper(x) ? " " + x : x.ToString())).Trim()
+            });
+        });
+
+    /// <summary>
+    /// Validates user credentials using a token
+    /// </summary>
+    /// <param name="username">The users username or email</param>
+    /// <param name="token">The users token</param>
+    /// <returns></returns>
+    [HttpPost("validate/token")]
+    public async Task<IActionResult> ValidateUserCredentialsWithToken([FromForm] string username, [FromForm] string token) => await Task.Run(() =>
+        {
+            if (UserListHandler.TryGetUserWithToken(username, token, out UserModel? user))
+            {
+                return new JsonResult(new
+                {
+                    success = true,
+                    message = "Logged in Successfully",
+                    user = user.ToObject(),
+                });
+            }
+            return new JsonResult(new
+            {
+                success = false,
+                message = "Unable to login with token provided!"
+            });
+        });
+
 }
