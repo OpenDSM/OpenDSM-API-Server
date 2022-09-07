@@ -1,7 +1,7 @@
-﻿using CLMath;
-using MySql.Data.MySqlClient;
-using System.Text;
+﻿using System.Text;
 using System.Xml.Linq;
+using CLMath;
+using MySql.Data.MySqlClient;
 
 namespace OpenDSM.SQL;
 
@@ -79,18 +79,18 @@ public static class Versions
         return !string.IsNullOrEmpty(name) && platforms.Any();
     }
 
-    public static long[] GetVersionsByProductID(int product_id)
+    public static long[] GetVersionsByProductID(int product_id, int count, int page)
     {
         try
         {
             using MySqlConnection conn = GetConnection();
             List<long> versions = new();
-            using MySqlCommand cmd = new($"select id from versions where `product_id`='{product_id}'", conn);
+            using MySqlCommand cmd = new($"select id from versions where `product_id`='{product_id}' order by posted limit {count} offset {count * page}", conn);
 
             using MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                versions.Add(reader.GetInt64("id"));
+                versions.Add(reader.GetInt64(0));
             }
             return versions.ToArray();
         }
