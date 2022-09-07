@@ -41,12 +41,12 @@ public static class Reviews
         return false;
     }
 
-    public static int[] GetReviewsByProductID(int product_id)
+    public static int[] GetReviewsByProductID(int product_id, int count, int page)
     {
         List<int> reviews = new();
 
         using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select `id` from `review` where `product_id`='{product_id}'", conn);
+        using MySqlCommand cmd = new($"select `id` from `review` where `product_id`='{product_id}' order by posted", conn);
         using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
