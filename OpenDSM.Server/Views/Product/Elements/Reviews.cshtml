@@ -70,7 +70,7 @@
         </div>
     </div>
     @{
-        ReviewModel[] reviews = filter == -1 ? ReviewListHandler.GetProductReviews(Model).Take(10).ToArray() : ReviewListHandler.GetProductReviews(Model).Where(x => x.Rating == filter * 10 || (filter == 1 && x.Rating == (filter * 10) - 5) || x.Rating == (filter * 10) + 5).Take(10).ToArray();
+        ReviewModel[] reviews = filter == -1 ? ReviewListHandler.GetProductReviews(Model).Values.Take(10).ToArray() : ReviewListHandler.GetProductReviews(Model).Values.Where(x => x.Rating == filter * 10 || (filter == 1 && x.Rating == (filter * 10) - 5) || x.Rating == (filter * 10) + 5).Take(10).ToArray();
     }
     @if (reviews.Any())
     {
