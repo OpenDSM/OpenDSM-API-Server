@@ -1,6 +1,6 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
-using MySql.Data.MySqlClient;
 using System.Text;
+using MySql.Data.MySqlClient;
 
 namespace OpenDSM.SQL;
 
@@ -46,7 +46,7 @@ public static class Products
         try
         {
             using MySqlConnection conn = GetConnection();
-            MySqlCommand cmd = new($"select * from `products` where `id` = '{id}'", conn);
+            MySqlCommand cmd = new($"select id from `products` where `id` = '{id}' order by posted limit 1", conn);
             return cmd.ExecuteReader().HasRows;
         }
         catch
@@ -95,7 +95,7 @@ public static class Products
         return false;
     }
 
-    public static int[] GetAllProductsWithTags(params int[] tags)
+    public static int[] GetAllProductsWithTags(int count, int page, params int[] tags)
     {
         List<int> products = new();
         StringBuilder tagBuilder = new();
@@ -109,13 +109,13 @@ public static class Products
         }
 
         using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", conn);
+        using MySqlCommand cmd = new($"select id from `products` {tagBuilder} limit {count} offset {page * count}", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
             while (reader.Read())
             {
-                products.Add(reader.GetInt32("id"));
+                products.Add(reader.GetInt32(0));
             }
         }
 
@@ -126,19 +126,17 @@ public static class Products
     {
         Dictionary<int, DateTime> products = new();
         using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select id, posted from products order by posted offset {page * count} rows;", conn);
+        using MySqlCommand cmd = new($"select id, posted from products order by posted limit {count} offset {page * count}", conn);
         using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
-            int current = 0;
-            while (reader.Read() && current <= count)
+            while (reader.Read())
             {
                 products.Add(reader.GetInt32(0), reader.GetDateTime(1));
-                current++;
             }
         }
 
-        return products.OrderByDescending(i => i.Value).ToDictionary(i => i.Key, i => i.Value).Keys.ToArray();
+        return products.Keys.ToArray();
     }
 
     public static bool GetProductFromID(int id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted)
@@ -196,7 +194,7 @@ public static class Products
         return products.ToArray();
     }
 
-    public static int[] GetProductsFromQuery(string query, int max, params int[] tags)
+    public static int[] GetProductsFromQuery(string query, int count, int page, params int[] tags)
     {
         Dictionary<int, int> products = new();
         StringBuilder tagBuilder = new();
@@ -211,12 +209,11 @@ public static class Products
 
         string[] keywords = query.ToLower().Split(' ');
         using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select * from `products` {tagBuilder}", conn);
+        using MySqlCommand cmd = new($"select * from `products` {tagBuilder} offset {page * count} rows;", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
-            int count = 0;
-            while (reader.Read() && (count <= max && max != -1))
+            while (reader.Read())
             {
                 int matches = 0;
                 string[] key = reader.GetString("keywords").Split(";", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
