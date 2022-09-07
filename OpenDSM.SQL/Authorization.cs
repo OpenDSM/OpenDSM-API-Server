@@ -1,9 +1,9 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
-using MySql.Data.MySqlClient;
 using System.Data.SqlTypes;
-using CLMath;
-using System.Text.Json;
 using System.Text;
+using System.Text.Json;
+using CLMath;
+using MySql.Data.MySqlClient;
 
 namespace OpenDSM.SQL;
 
@@ -266,11 +266,11 @@ public static class Authorization
         return false;
     }
 
-    public static int[] GetUsers()
+    public static int[] GetUsers(int count, int page)
     {
         List<int> users = new();
         using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select id from users", conn);
+        using MySqlCommand cmd = new($"select id from users limit {count} offset {count * page}", conn);
         using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
@@ -283,7 +283,7 @@ public static class Authorization
 
     }
 
-    public static int[] GetUsersWithPartialUsername(int maxSize, params string[] partials)
+    public static int[] GetUsersWithPartialUsername(int page, int count, params string[] partials)
     {
         List<int> users = new();
         StringBuilder partialBuilder = new();
@@ -296,12 +296,12 @@ public static class Authorization
             }
         }
         using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select id from users where {partialBuilder}", conn);
+        using MySqlCommand cmd = new($"select id from users where {partialBuilder} limit {count} offset {count * page}", conn);
         using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.HasRows)
         {
             int current = 0;
-            while (reader.Read() && (maxSize != -1 && current <= maxSize))
+            while (reader.Read())
             {
                 users.Add(reader.GetInt32(0));
                 current++;
@@ -315,7 +315,7 @@ public static class Authorization
         if (value == "true" || value == "false")
             value = value == "true" ? 1 : 0;
         using MySqlConnection conn = GetConnection();
-        MySqlCommand cmd = new($"update users set {name}='{value}' where `id`='{id}' and `password`='{token}'", conn);
+        MySqlCommand cmd = new($"update users set {name}='{value}' where `id`='{id}' and `password`='{token}' limit 1", conn);
         return cmd.ExecuteNonQuery() > 1;
     }
 
