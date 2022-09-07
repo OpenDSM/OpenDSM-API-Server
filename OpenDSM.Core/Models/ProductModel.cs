@@ -124,29 +124,10 @@ public class ProductModel
         Products.AddPageView(Id);
     }
 
-    public void PopulateReviews()
-    {
-        Reviews = new();
-        int[] review_ids = SQL.Reviews.GetReviewsByProductID(Id);
-        foreach (int id in review_ids)
-        {
-            if (SQL.Reviews.GetReviewByID(id, out _, out byte rating, out string summery, out string body, out DateTime posted, out int user_id))
-            {
-                Reviews.Add(new()
-                {
-                    Posted = posted,
-                    Product = this,
-                    Rating = rating,
-                    Subject = summery,
-                    User = UserListHandler.GetByID(user_id)
-                });
-            }
-        }
-    }
 
     public void PopulateVersionsFromDB()
     {
-        long[] version_ids = SQL.Versions.GetVersionsByProductID(Id);
+        long[] version_ids = SQL.Versions.GetVersionsByProductID(Id, 20, 0);
         if (version_ids.Any())
         {
             TotalDownloads = TotalWeeklyDownloads = 0;
@@ -200,7 +181,7 @@ public class ProductModel
         try
         {
             long[] remoteVersions = GitHandler.GitReleases(GitRepositoryName, User.GitCredentials).Result;
-            foreach (long version_id in SQL.Versions.GetVersionsByProductID(Id))
+            foreach (long version_id in SQL.Versions.GetVersionsByProductID(Id, int.MaxValue, 0))
             {
                 if (!remoteVersions.Contains(version_id))
                 {
