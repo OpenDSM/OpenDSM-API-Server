@@ -2,6 +2,7 @@
 using YoutubeExplode;
 using YoutubeExplode.Channels;
 using YoutubeExplode.Common;
+using YoutubeExplode.Playlists;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
@@ -12,69 +13,56 @@ public static class YTHandler
 
     #region Public Methods
 
-    public static async Task<IReadOnlyList<YoutubeExplode.Playlists.PlaylistVideo>?> GetChannelVideos(string channelId)
+    /// <summary>
+    /// Gets a list of all youtube videos based on channel id
+    /// </summary>
+    /// <param name="channelId">The channel id</param>
+    /// <returns></returns>
+    public static async Task<IReadOnlyList<PlaylistVideo>?> GetChannelVideos(string channelId, int count = 20, int page = 0)
     {
         YoutubeClient client = new();
         Channel? channel = null;
         try
         {
-            channel = await client.Channels.GetByUserAsync($"https://youtube.com/user/{channelId}");
+            channel = await client.Channels.GetByUserAsync(channelId);
         }
         catch
         {
-            try
-            {
-                channel = await client.Channels.GetByUserAsync($"https://youtube.com/channel/{channelId}");
-            }
-            catch
+            channel = await client.Channels.GetBySlugAsync(channelId);
+        }
+        if (channel == null)
+        {
+            string[] slugs = { "user", "channel", "c", "u" };
+            foreach (string slug in slugs)
             {
                 try
                 {
-                    channel = await client.Channels.GetByUserAsync($"https://youtube.com/c/{channelId}");
+                    channel = await client.Channels.GetByUserAsync($"https://youtube.com/{slug}/{channelId}");
+                    break;
                 }
                 catch
                 {
+
                     try
                     {
-                        channel = await client.Channels.GetByUserAsync($"https://youtube.com/u/{channelId}");
+                        channel = await client.Channels.GetBySlugAsync($"https://youtube.com/{slug}/{channelId}");
+                        break;
                     }
                     catch
                     {
-                        try
-                        {
-                            channel = await client.Channels.GetBySlugAsync($"https://youtube.com/user/{channelId}");
-                        }
-                        catch
-                        {
-                            try
-                            {
-                                channel = await client.Channels.GetBySlugAsync($"https://youtube.com/channel/{channelId}");
-                            }
-                            catch
-                            {
-                                try
-                                {
-                                    channel = await client.Channels.GetBySlugAsync($"https://youtube.com/c/{channelId}");
-                                }
-                                catch
-                                {
-                                    try
-                                    {
-
-                                        channel = await client.Channels.GetBySlugAsync($"https://youtube.com/u/{channelId}");
-                                    }
-                                    catch
-                                    {
-                                        return null;
-                                    }
-                                }
-                            }
-                        }
+                        channel = null;
+                        continue;
                     }
                 }
             }
         }
-        return await client.Channels.GetUploadsAsync($"https://youtube.com/channel/{channel.Id}");
+        if (channel != null)
+        {
+            IReadOnlyList<PlaylistVideo> uploads = await client.Channels.GetUploadsAsync(channel.Id);
+
+            return uploads.Skip(page * count).Take(count).ToArray();
+        }
+        return Array.Empty<PlaylistVideo>();
     }
 
     public static string GetYoutubeDirectURL(string id)
