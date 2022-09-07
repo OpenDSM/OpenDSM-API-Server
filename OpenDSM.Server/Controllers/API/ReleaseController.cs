@@ -141,7 +141,7 @@ public class ReleaseController : ControllerBase
                 {
                     if (model.Versions.TryGetValue(id, out VersionModel version))
                     {
-                        if (await GitHandler.DeleteVersion(user.GitCredentials, model, version))
+                        if (await GitHandler.DeleteRelease(user.GitCredentials, model, version))
                         {
                             return Ok(new
                             {
@@ -201,7 +201,7 @@ public class ReleaseController : ControllerBase
                 {
                     if (model.Versions.ContainsKey(id))
                     {
-                        if (await GitHandler.UpdateVersion(user.GitCredentials, model, model.Versions[id], name, type, changelog))
+                        if (await GitHandler.UpdateRelease(user.GitCredentials, model, model.Versions[id], name, type, changelog))
                         {
                             return Ok(new
                             {
