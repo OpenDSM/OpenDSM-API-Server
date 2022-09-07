@@ -12,12 +12,12 @@ public class SearchController : ControllerBase
     /// Searches for user based on a query
     /// </summary>
     /// <param name="query">The search query</param>
-    /// <param name="maxSize">The max number of results</param>
+    /// <param name="count">The max number of results</param>
     /// <returns></returns>
     [HttpGet("users")]
-    public IActionResult Users([FromQuery] string query, [FromQuery] int? maxSize)
+    public IActionResult Users([FromQuery] string query, [FromQuery] int? count, [FromQuery] int? page)
     {
-        UserModel[] users = UserListHandler.GetUserFromPartials(maxSize.GetValueOrDefault(-1), query.Split(" "));
+        UserModel[] users = UserListHandler.GetUserFromPartials(count.GetValueOrDefault(20), page.GetValueOrDefault(0), query.Split(" "));
         object[] usersNeutered = new object[users.Length];
         Parallel.For(0, usersNeutered.Length, i =>
         {
@@ -37,18 +37,18 @@ public class SearchController : ControllerBase
     /// Searches for applications based on a query
     /// </summary>
     /// <param name="query">The search query</param>
-    /// <param name="maxSize">The max number of results</param>
+    /// <param name="count">The max number of results</param>
     /// <param name="tags">Any tags to filter results</param>
     /// <returns></returns>
     [HttpGet("applications")]
-    public IActionResult Applications([FromQuery] string query, [FromQuery] int? maxSize, [FromQuery] string? tags)
+    public IActionResult Applications([FromQuery] string query, [FromQuery] int? count, [FromQuery] int? page, [FromQuery] string? tags)
     {
         int[] tagsList = Array.Empty<int>();
         if (!string.IsNullOrEmpty(tags))
         {
             tagsList = Array.ConvertAll(tags.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), i => CLMath.CLConverter.ToInt32(i));
         }
-        ProductModel[] products = ProductListHandler.GetProductsFromPartial(maxSize.GetValueOrDefault(-1), query, tagsList);
+        ProductModel[] products = ProductListHandler.GetProductsFromPartial(count.GetValueOrDefault(20), page.GetValueOrDefault(0), query, tagsList);
         object[] productsNeutered = new object[products.Length];
         Parallel.For(0, productsNeutered.Length, i =>
         {
@@ -61,7 +61,7 @@ public class SearchController : ControllerBase
                 views = product.TotalPageViews,
                 product.ShortSummery,
                 product.Price,
-                rating = ReviewListHandler.GetProductAverageRating(product),
+                rating = ReviewListHandler.GetProductRatingDenomination(product),
                 product.Platforms,
                 author = new
                 {
