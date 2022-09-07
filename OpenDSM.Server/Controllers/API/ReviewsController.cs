@@ -15,11 +15,11 @@ namespace OpenDSM.Server.Controllers.API
         /// <param name="product_id"></param>
         /// <returns></returns>
         [HttpGet()]
-        public IActionResult GetReviews([FromRoute] int product_id)
+        public IActionResult GetReviews([FromRoute] int product_id, [FromQuery] int? count, [FromQuery] int? page)
         {
             if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
             {
-                return new JsonResult(ReviewListHandler.GetProductReviews(product));
+                return new JsonResult(ReviewListHandler.GetProductReviews(product, count.GetValueOrDefault(int.MaxValue), page.GetValueOrDefault(0)));
             }
 
             return BadRequest(new
@@ -39,7 +39,7 @@ namespace OpenDSM.Server.Controllers.API
         {
             if (ProductListHandler.TryGetByID(product_id, out ProductModel? product))
             {
-                if (ReviewListHandler.GetProductReviews(product).TryGetValue(id, out ReviewModel review))
+                if (ReviewListHandler.TryGetProductReview(product, id, out ReviewModel review))
                     return new JsonResult(review);
             }
 
