@@ -3,11 +3,18 @@ using System.Diagnostics;
 
 namespace OpenDSM.Core.Handlers;
 
+/// <summary>
+/// Handles all FFmpeg actions
+/// </summary>
 public class FFmpegHandler
 {
 
     #region Public Fields
 
+    /// <summary>
+    /// A singleton instance of FFmpegHandler
+    /// </summary>
+    /// <returns></returns>
     public static FFmpegHandler Instance = Instance ??= new();
 
     #endregion Public Fields
@@ -20,6 +27,9 @@ public class FFmpegHandler
 
     #region Protected Constructors
 
+    /// <summary>
+    /// Initializes FFmpeg
+    /// </summary>
     protected FFmpegHandler()
     {
         if (!Directory.GetFiles(FFMpegDirectory, "*ffmpeg*", SearchOption.AllDirectories).Any())
@@ -34,7 +44,15 @@ public class FFmpegHandler
 
     #region Public Methods
 
-    public Task Resize(int width, int height, string file) => Task.Run(() =>
+    /// <summary>
+    /// Creates an instance of the image with the desired dimensions and then overwrites the original.
+    /// </summary>
+    /// <param name="width">The desired width</param>
+    /// <param name="height">The desired height</param>
+    /// <param name="file">The absolute path to the image file</param>
+    /// <returns></returns>
+    public Task ResizeImage(int width, int height, string file) =>
+    Task.Run(() =>
         {
             FileInfo info = new(file);
             DirectoryInfo? dir = Directory.GetParent(file);
@@ -61,6 +79,11 @@ public class FFmpegHandler
             }
         });
 
+    /// <summary>
+    /// Returns the width and height of the image file
+    /// </summary>
+    /// <param name="file">The absolute path to the image file</param>
+    /// <returns>width, height</returns>
     public (int, int) GetSize(string file)
     {
         Xabe.FFmpeg.IMediaInfo info = Xabe.FFmpeg.FFmpeg.GetMediaInfo(file).Result;
