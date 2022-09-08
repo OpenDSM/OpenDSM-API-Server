@@ -83,9 +83,14 @@ public class ProductController : ControllerBase
     /// <param name="id">The id of the product</param>
     /// <returns></returns>
     [HttpGet("{id}")]
-    public IActionResult GetProduct(int id)
+    public IActionResult GetProduct([FromRoute] int id)
     {
-        return new JsonResult(ProductListHandler.GetByID(id).ToObject());
+        if (ProductListHandler.TryGetByID(id, out ProductModel product))
+            return new JsonResult(product.ToObject());
+        return BadRequest(new
+        {
+            message = $"No product was found with id of {id}"
+        });
     }
 
     /// <summary>
