@@ -5,7 +5,7 @@ using OpenDSM.Core.Models;
 namespace OpenDSM.Server.Controllers.API;
 
 [ApiController]
-[Route("/api/search")]
+[Route("/search")]
 public class SearchController : ControllerBase
 {
     /// <summary>
@@ -19,17 +19,11 @@ public class SearchController : ControllerBase
     {
         UserModel[] users = UserListHandler.GetUserFromPartials(count.GetValueOrDefault(20), page.GetValueOrDefault(0), query.Split(" "));
         object[] usersNeutered = new object[users.Length];
-        Parallel.For(0, usersNeutered.Length, i =>
+        for (int i = 0; i < users.Length; i++)
         {
             UserModel user = users[i];
-            usersNeutered[i] = new
-            {
-                user.Id,
-                user.Username,
-                products = user.CreatedProducts.Length,
-                user.IsDeveloperAccount
-            };
-        });
+            usersNeutered[i] = user.ToObject();
+        }
         return new JsonResult(usersNeutered);
     }
 
@@ -50,26 +44,11 @@ public class SearchController : ControllerBase
         }
         ProductModel[] products = ProductListHandler.GetProductsFromPartial(count.GetValueOrDefault(20), page.GetValueOrDefault(0), query, tagsList);
         object[] productsNeutered = new object[products.Length];
-        Parallel.For(0, productsNeutered.Length, i =>
+        for (int i = 0; i < products.Length; i++)
         {
             ProductModel product = products[i];
-            productsNeutered[i] = new
-            {
-                product.Id,
-                product.Name,
-                downloads = product.TotalDownloads,
-                views = product.TotalPageViews,
-                product.ShortSummery,
-                product.Price,
-                rating = ReviewListHandler.GetProductRatingDenomination(product),
-                product.Platforms,
-                author = new
-                {
-                    id = product.User.Id,
-                    name = product.User.Username,
-                }
-            };
-        });
+            productsNeutered[i] = product.ToObject();
+        }
         return new JsonResult(productsNeutered);
     }
 }
