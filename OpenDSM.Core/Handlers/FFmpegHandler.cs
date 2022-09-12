@@ -51,7 +51,7 @@ public class FFmpegHandler
     /// <param name="height">The desired height</param>
     /// <param name="file">The absolute path to the image file</param>
     /// <returns></returns>
-    public Task ResizeImage(int width, int height, string file) =>
+    public Task ResizeImage(int width, string file) =>
     Task.Run(() =>
         {
             FileInfo info = new(file);
@@ -63,7 +63,7 @@ public class FFmpegHandler
                 StartInfo = new()
                 {
                     FileName = ffmpeg_exe,
-                    Arguments = $"-y -i \"{file}\" -loglevel quiet -vf scale={width}:{height} \"{tmp_file}\""
+                    Arguments = $"-y -i \"{file}\" -loglevel quiet -vf \"scale={width}:-1\" \"{tmp_file}\""
                 }
             };
             process.Start();
