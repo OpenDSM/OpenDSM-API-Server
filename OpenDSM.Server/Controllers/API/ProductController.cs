@@ -5,7 +5,7 @@ using OpenDSM.Core.Models;
 using Tags = OpenDSM.Core.Models.Tags;
 namespace OpenDSM.Server.Controllers.API;
 
-[Route("api/products")]
+[Route("/products")]
 public class ProductController : ControllerBase
 {
 
@@ -19,7 +19,7 @@ public class ProductController : ControllerBase
     /// <param name="items_per_page">The number of items to show</param>
     /// <returns></returns>
     [HttpGet()]
-    public IActionResult GetProducts(ProductListType? type, int? page, int? items_per_page)
+    public IActionResult GetProducts([FromQuery] ProductListType? type, [FromQuery] int? page, [FromQuery] int? items_per_page)
     {
         ProductModel[] productModels = ProductListHandler.GetProducts(page.GetValueOrDefault(0), items_per_page.GetValueOrDefault(20), type.GetValueOrDefault(ProductListType.Latest));
         object[] products = new object[productModels.Count()];
@@ -36,8 +36,8 @@ public class ProductController : ControllerBase
     /// Creates a product listing
     /// </summary>
     /// <param name="name">The name of the product</param>
-    /// <param name="gitRepoName">The repository name</param>
-    /// <param name="shortSummery">A short summery of the product</param>
+    /// <param name="git_repo_name">The repository name</param>
+    /// <param name="short_summery">A short summery of the product</param>
     /// <param name="user_id">The user creating the product</param>
     /// <param name="yt_key">The youtube key of the trailer/video</param>
     /// <param name="subscription">If the product uses a subscription payment system</param>
@@ -49,32 +49,59 @@ public class ProductController : ControllerBase
     /// <param name="banner">The base64 of the banner/hero image</param>
     /// <returns></returns>
     [HttpPost()]
-    public IActionResult CreateProduct([FromForm] string name, [FromForm] string gitRepoName, [FromForm] string shortSummery, [FromForm] int user_id, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner)
+    public IActionResult CreateProduct([FromForm] string name, [FromForm] string git_repo_name, [FromForm] string short_summery, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner)
     {
-        try
+        if (IsLoggedIn(Request, out UserModel? user))
         {
-            keywords = keywords.ToLower().Trim();
-            List<int> ts = new();
-            foreach (var item in tags.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            if (user.IsDeveloperAccount)
             {
-                foreach (var tag in Tags.GetTags())
+                try
                 {
-                    if (tag.name == item) ts.Add(tag.id);
-                }
+                    keywords = keywords.ToLower().Trim();
+                    List<int> ts = new();
+                    foreach (var item in tags.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    {
+                        foreach (var tag in Tags.GetTags())
+                        {
+                            if (tag.name == item) ts.Add(tag.id);
+                        }
 
+                    }
+                    if (ProductListHandler.TryCreateProduct(git_repo_name, short_summery, user, name, yt_key ?? "", subscription, use_git_readme, (int)(price * 100), keywords.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), ts.ToArray(), out ProductModel model))
+                    {
+                        model.IconImage = icon;
+                        model.BannerImage = banner;
+                        return new JsonResult(model);
+                    }
+                }
+                catch (Exception e)
+                {
+                    log.Error(e.Message, e);
+
+                    return BadRequest(new
+                    {
+                        message = "Unable to create product",
+                        error = new
+                        {
+                            e.Message,
+                            e.StackTrace
+                        }
+                    });
+                }
+                return BadRequest(new
+                {
+                    message = "Unable to create product"
+                });
             }
-            if (ProductListHandler.TryCreateProduct(gitRepoName, shortSummery, UserListHandler.GetByID(user_id), name, yt_key ?? "", subscription, use_git_readme, (int)(price * 100), keywords.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), ts.ToArray(), out ProductModel model))
+            return BadRequest(new
             {
-                model.IconImage = icon;
-                model.BannerImage = banner;
-                return new JsonResult(model);
-            }
+                message = "Users developer account is not active"
+            });
         }
-        catch (Exception e)
+        return BadRequest(new
         {
-            log.Error(e.Message, e);
-        }
-        return BadRequest();
+            message = "User is not logged in"
+        });
     }
 
     /// <summary>
