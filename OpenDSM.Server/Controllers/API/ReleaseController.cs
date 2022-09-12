@@ -7,7 +7,7 @@ namespace OpenDSM.Server.Controllers.API;
 /// Controls all product releases based on the specified product id
 /// </summary>
 [ApiController]
-[Route("api/products/{product_id}/releases")]
+[Route("/products/{product_id}/releases")]
 public class ReleaseController : ControllerBase
 {
     /// <summary>

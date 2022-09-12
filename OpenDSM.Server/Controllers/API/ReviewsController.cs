@@ -5,7 +5,7 @@ using OpenDSM.Core.Models;
 namespace OpenDSM.Server.Controllers.API
 {
     [ApiController]
-    [Route("api/products/{product_id}/reviews")]
+    [Route("/products/{product_id}/reviews")]
     public class ReviewsController : ControllerBase
     {
 

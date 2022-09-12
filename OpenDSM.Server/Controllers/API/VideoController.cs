@@ -3,7 +3,7 @@ using OpenDSM.Core.Handlers;
 
 namespace OpenDSM.Server.Controllers.API;
 
-[Route("/api/video")]
+[Route("/video")]
 public class VideoController : ControllerBase
 {
 
