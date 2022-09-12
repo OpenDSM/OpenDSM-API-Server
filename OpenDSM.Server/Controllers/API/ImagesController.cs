@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
@@ -18,7 +19,7 @@ public enum ImageType
 /// Controller handling images
 /// </summary>
 [ApiController]
-[Route("api/images")]
+[Route("/images")]
 public class ImagesController : ControllerBase
 {
 
@@ -98,6 +99,8 @@ public class ImagesController : ControllerBase
         });
     }
 
+    [HttpPost("user/{name}")]
+    public async Task<IActionResult> UploadImage([FromRoute] string name) { return await UploadImage(ImageType.User, null, name); }
     /// <summary>
     /// Uploads Image based on parameters
     /// </summary>
@@ -107,8 +110,9 @@ public class ImagesController : ControllerBase
     /// <param name="image">The base64 image /p:PublishProfile=representation</param>
     /// <returns></returns>
     [HttpPost("{type}/{id?}/{name}")]
-    public IActionResult UploadImage([FromRoute] ImageType type, [FromRoute] int? id, [FromRoute] string name, [FromBody] string image)
+    public async Task<IActionResult> UploadImage([FromRoute] ImageType type, [FromRoute] int? id, [FromRoute] string name)
     {
+        string image = await new StreamReader(Request.Body).ReadToEndAsync();
         if (string.IsNullOrWhiteSpace(image))
         {
             return BadRequest(new
@@ -130,16 +134,29 @@ public class ImagesController : ControllerBase
                 if (name.ToLower().Equals("profile"))
                 {
                     user.ProfileImage = image;
+                    return Ok(new
+                    {
+                        message = $"{type}'s {name} image was uploaded successfully"
+                    });
                 }
                 else if (name.ToLower().Equals("banner"))
                 {
                     user.BannerImage = image;
+                    return Ok(new
+                    {
+                        message = $"{type}'s {name} image was uploaded successfully"
+                    });
                 }
                 return BadRequest(new
                 {
                     message = $"Unknown image name: {name}"
                 });
             }
+
+            return BadRequest(new
+            {
+                message = $"Invalid user credentials provided!"
+            });
         }
         else if (type == ImageType.Product)
         {
@@ -154,16 +171,28 @@ public class ImagesController : ControllerBase
                             if (name.ToLower().Equals("icon"))
                             {
                                 product.IconImage = image;
+                                return Ok(new
+                                {
+                                    message = $"{type}'s {name} image was uploaded successfully"
+                                });
                             }
                             else if (name.ToLower().Equals("banner"))
                             {
                                 product.BannerImage = image;
+                                return Ok(new
+                                {
+                                    message = $"{type}'s {name} image was uploaded successfully"
+                                });
                             }
                             else
                             {
                                 try
                                 {
                                     product.UploadGalleryImage(name, image);
+                                    return Ok(new
+                                    {
+                                        message = $"{type}'s gallery image was uploaded successfully"
+                                    });
                                 }
                                 catch (Exception e)
                                 {
@@ -312,7 +341,7 @@ public class ImagesController : ControllerBase
     /// </summary>
     /// <param name="id">the products id</param>
     /// <returns></returns>
-    [HttpGet("info/product/{id}")]
+    [HttpGet("product/{id}")]
     public IActionResult GetImagesInfo([FromRoute] int id)
     {
         if (ProductListHandler.TryGetByID(id, out ProductModel product))
