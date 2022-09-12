@@ -5,7 +5,7 @@ using OpenDSM.SQL;
 
 namespace OpenDSM.Server.Controllers.API;
 [ApiController]
-[Route("api/products/{product_id}/releases/{release_id}/assets")]
+[Route("/products/{product_id}/releases/{release_id}/assets")]
 public class ReleaseAssetController : ControllerBase
 {
     /// <summary>
