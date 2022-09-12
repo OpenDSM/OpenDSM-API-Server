@@ -20,7 +20,7 @@ public static class FileHandler
     {
         if (TryCreateImageFromBase64(base64, directory, file, out string path))
         {
-            FFmpegHandler.Instance.ResizeImage(width, -1, path).Wait();
+            FFmpegHandler.Instance.ResizeImage(width, path).Wait();
         }
     }
 
@@ -77,7 +77,7 @@ public static class FileHandler
     {
         if (TryCreateImageFromBase64(base64, directory, file, out path))
         {
-            FFmpegHandler.Instance.ResizeImage(width, -1, path).Wait();
+            FFmpegHandler.Instance.ResizeImage(width, path).Wait();
             return true;
         }
         return false;
