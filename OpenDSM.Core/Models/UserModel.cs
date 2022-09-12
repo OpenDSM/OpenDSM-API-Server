@@ -1,11 +1,11 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json.Linq;
-using Microsoft.AspNetCore.StaticFiles;
-using OpenDSM.Core.Handlers;
-using OpenDSM.SQL;
 using System.Linq;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
+using Newtonsoft.Json.Linq;
+using OpenDSM.Core.Handlers;
+using OpenDSM.SQL;
 
 namespace OpenDSM.Core.Models;
 public record UserProductStat(DateTime purchased, TimeSpan activeTime, float purchasePrice);
@@ -26,11 +26,9 @@ public class UserModel
         UseGitReadme = use_git_readme;
         string aboutPath = Path.Combine(GetUsersProfileDirectory(Id), "about.md");
         aboutPath = File.Exists(aboutPath) ? aboutPath : "./wwwroot/assets/md/default_about.md";
-        using (FileStream fs = new(aboutPath, FileMode.Open, FileAccess.Read))
-        {
-            using StreamReader reader = new(fs);
-            About = reader.ReadToEnd();
-        }
+        using FileStream fs = new(aboutPath, FileMode.Open, FileAccess.Read);
+        using StreamReader reader = new(fs);
+        About = reader.ReadToEnd();
     }
 
     #endregion Protected Constructors
@@ -172,7 +170,7 @@ public class UserModel
             Username,
             Email,
             Token,
-            About,
+            About = UseGitReadme ? GitReadme : About,
             CreatedProducts,
             OwnedProducts,
             git = new
@@ -180,7 +178,6 @@ public class UserModel
                 HasGitReadme = HasReadme,
                 useReadme = UseGitReadme,
                 IsDeveloperAccount,
-                readme = GitReadme,
             },
             images = new
             {
