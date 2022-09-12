@@ -5,7 +5,7 @@ using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers.API;
 [ApiController]
-[Route("api/user")]
+[Route("user")]
 public class UserController : ControllerBase
 {
     /// <summary>
@@ -148,7 +148,18 @@ public class UserController : ControllerBase
 
                 default:
                     if (!string.IsNullOrWhiteSpace(value))
-                        user.UpdateSetting(name, value);
+                    {
+                        string[] accepted = { "username" };
+                        if (accepted.Contains(name.ToLower().Trim()))
+                            user.UpdateSetting(name, value);
+                        else
+                        {
+                            return BadRequest(new
+                            {
+                                message = $"\"{name}\" is not a valid setting"
+                            });
+                        }
+                    }
                     break;
             }
             return Ok(new
