@@ -35,42 +35,37 @@ public class UserController : ControllerBase
     /// <param name="password">The users password</param>
     /// <returns></returns>
     [HttpPost()]
-    public async Task<IActionResult> CreateUser([FromForm] string email, [FromForm] string username, [FromForm] string password)
+    public IActionResult CreateUser([FromForm] string email, [FromForm] string username, [FromForm] string password)
     {
-        return await Task.Run(() =>
+        try
         {
-            try
+            if (SQL.Authorization.CreateUser(username, email, password, out var reason))
             {
-
-                if (SQL.Authorization.CreateUser(username, email, password, out var reason))
+                if (UserListHandler.TryGetUser(username, password, out UserModel user))
                 {
-                    if (UserListHandler.TryGetUser(username, password, out UserModel user))
+                    return new JsonResult(new
                     {
-                        return new JsonResult(new
-                        {
-                            success = true,
-                            message = "Account Created Successfully",
-                            user = user.ToObject(false)
-                        });
-                    }
+                        success = true,
+                        message = "Account Created Successfully",
+                        user = user.ToObject(false)
+                    });
                 }
-                return new JsonResult(new
-                {
-                    success = false,
-                    message = string.Concat(reason.ToString().Select(x => char.IsUpper(x) ? " " + x : x.ToString())).Trim()
-                });
             }
-            catch (Exception e)
+            return BadRequest(new
             {
-                log.Error($"Unable to create user", e);
-                return new JsonResult(new
-                {
-                    success = false,
-                    error = e.Message,
-                    stacktrace = e.StackTrace,
-                });
-            }
-        });
+                success = false,
+                message = string.Concat(reason.ToString().Select(x => char.IsUpper(x) ? " " + x : x.ToString())).Trim()
+            });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                error = e.Message,
+                stacktrace = e.StackTrace,
+            });
+        }
     }
 
     /// <summary>
