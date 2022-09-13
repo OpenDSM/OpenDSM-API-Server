@@ -1,5 +1,4 @@
 ﻿
-using System.Text.Json;
 using OpenDSM.Core.Models;
 using OpenDSM.SQL;
 
@@ -48,13 +47,9 @@ public static class UserListHandler
     {
         try
         {
-            if (Authorization.GetUserFromID(id, out string username, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] _))
+            if (Authorization.GetUserFromID(id, out User user))
             {
-                return new(id, username, email, "", type, use_git_readme, new())
-                {
-                    GitUsername = git_username,
-                    GitToken = git_token,
-                };
+                return new(user);
             }
         }
         catch (Exception e)
@@ -63,6 +58,26 @@ public static class UserListHandler
         }
         return null;
     }
+    /// <summary>
+    /// Attempts to get user from api key
+    /// </summary>
+    /// <param name="api">api key</param>
+    /// <param name="user">the returned user</param>
+    /// <returns>If the task was successfull</returns>
+    public static bool TryGetByAPIKey(string api, out UserModel user) => (user = GetByAPIKey(api)) != null;
+
+    /// <summary>
+    /// Gets the user by api key or null
+    /// </summary>
+    /// <param name="api">Api key</param>
+    /// <returns></returns>
+    public static UserModel GetByAPIKey(string api)
+    {
+        if (Authorization.GetUserFromAPIKey(api, out User u))
+            return new(u);
+        return null;
+    }
+
 
     /// <summary>
     /// Gets a user based on username or returns null if no user was found
@@ -71,13 +86,9 @@ public static class UserListHandler
     /// <returns>The user object or null if no user was found</returns>
     public static UserModel? GetByUsername(string username)
     {
-        if (Authorization.GetUserFromUsername(username, out int id, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out _))
+        if (Authorization.GetUserFromUsername(username, out User user))
         {
-            return new(id, username, email, "", type, use_git_readme, new())
-            {
-                GitUsername = git_username,
-                GitToken = git_token,
-            };
+            return new(user);
         }
         return null;
     }
@@ -90,13 +101,9 @@ public static class UserListHandler
     /// <returns>The user object created or null if the task failed</returns>
     public static UserModel? GetUser(string username, string password, out FailedReason reason)
     {
-        if (Authorization.Login(username, password, out reason, out AccountType type, out bool use_git_readme, out int id, out string email, out string uname, out string token, out string products, out string r_git_username, out string r_git_token))
+        if (Authorization.Login(username, password, out reason, out User user))
         {
-            return new(id, uname, email, token, type, use_git_readme, string.IsNullOrWhiteSpace(products) ? new() : JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
-            {
-                GitToken = r_git_token,
-                GitUsername = r_git_username
-            };
+            return new(user);
         }
         return null;
     }
@@ -130,13 +137,9 @@ public static class UserListHandler
     public static bool TryGetUserWithToken(string loginName, string loginToken, out UserModel user)
     {
         user = null;
-        if (Authorization.LoginWithToken(loginName, loginToken, out _, out AccountType type, out bool use_git_readme, out int id, out string r_email, out string uname, out _, out string products, out string r_git_username, out string r_git_token))
+        if (Authorization.LoginWithToken(loginName, loginToken, out _, out User u))
         {
-            user = new(id, uname, r_email, loginToken, type, use_git_readme, string.IsNullOrWhiteSpace(products) ? new() : JsonSerializer.Deserialize<Dictionary<int, UserProductStat>>(products))
-            {
-                GitToken = r_git_token,
-                GitUsername = r_git_username
-            }; ;
+            user = new(u);
             return true;
         }
         return false;

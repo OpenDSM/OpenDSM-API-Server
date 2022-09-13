@@ -3,10 +3,10 @@ global using static OpenDSM.Core.Global;
 using ChaseLabs.CLLogger;
 using ChaseLabs.CLLogger.Interfaces;
 using Microsoft.AspNetCore.Http;
-using OpenDSM.Core.Models;
-using OpenDSM.Core.Handlers;
-using OpenDSM.SQL;
 using Microsoft.Extensions.Primitives;
+using OpenDSM.Core.Handlers;
+using OpenDSM.Core.Models;
+using OpenDSM.SQL;
 
 namespace OpenDSM.Core;
 
@@ -54,26 +54,34 @@ public static class Global
         _ = Connections.Instance;
     }
 
-    public static bool IsLoggedIn(HttpRequest request, out UserModel? user)
+    public static bool IsLoggedIn(HttpRequest request, out UserModel user)
     {
-        user = null;
         if (request.Cookies["auth_email"] != null && request.Cookies["auth_token"] != null)
         {
             try
             {
-                return UserListHandler.TryGetUserWithToken(request.Cookies["auth_email"].ToString(), request.Cookies["auth_token"], out user);
+                return UserListHandler.TryGetUserWithToken((request.Cookies["auth_email"] ?? "").ToString(), (request.Cookies["auth_token"] ?? "").ToString(), out user);
             }
             catch { }
         }
         IHeaderDictionary headers = request.Headers;
         if (headers.TryGetValue("auth_user", out StringValues email) && headers.TryGetValue("auth_token", out StringValues token))
         {
-            if (!string.IsNullOrEmpty(email.ToString()) && !string.IsNullOrWhiteSpace(token))
+            if (!string.IsNullOrEmpty(email) && !string.IsNullOrWhiteSpace(token))
             {
-                return UserListHandler.TryGetUserWithToken(email.ToString(), token, out user);
+                return UserListHandler.TryGetUserWithToken(email, token, out user);
             }
         }
 
+        if (headers.TryGetValue("api_key", out StringValues value))
+        {
+            if (UserListHandler.TryGetByAPIKey(value, out user))
+            {
+                API.IncrementCall(value);
+                return true;
+            }
+        }
+        user = UserModel.Empty;
         return false;
     }
 
