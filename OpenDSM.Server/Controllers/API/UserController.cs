@@ -13,17 +13,54 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id}")]
-    public IActionResult GetUser([FromRoute] int id, [FromQuery] bool? includeImages)
+    [HttpGet("{id?}")]
+    public IActionResult GetUser([FromRoute] int? id, [FromQuery] bool? includeImages)
     {
-        if (UserListHandler.TryGetByID(id, out UserModel user))
+        UserModel user = null;
+        if (id == null)
         {
-            return new JsonResult(user.ToObject(includeImages.GetValueOrDefault(false)));
+            if (IsLoggedIn(Request, out user))
+            {
+                return new JsonResult(user.ToObject(includeImages.GetValueOrDefault(false)));
+            }
+            return BadRequest(new
+            {
+                message = "User not authenticated, ID must be provided!"
+            });
         }
+        else
+        {
+            if (UserListHandler.TryGetByID(id.Value, out user))
+            {
+                return new JsonResult(user.ToObject(includeImages.GetValueOrDefault(false)));
+            }
 
+            return BadRequest(new
+            {
+                message = $"No user found with id of '{id}'"
+            });
+        }
+    }
+
+    /// <summary>
+    /// Gets the users api key
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("api_key")]
+    public IActionResult GetAPIKey([FromQuery] bool? regen)
+    {
+        if (IsLoggedIn(Request, out UserModel? user))
+        {
+            if (regen.GetValueOrDefault(false) || string.IsNullOrWhiteSpace(user.API_KEY))
+                user.GenerateAPIKey();
+            return new JsonResult(new
+            {
+                api_key = user?.API_KEY
+            });
+        }
         return BadRequest(new
         {
-            message = $"No user found with id of '{id}'"
+            message = $"Unable to authenticate user"
         });
     }
 
@@ -77,7 +114,7 @@ public class UserController : ControllerBase
     {
         if (IsLoggedIn(Request, out UserModel? user))
         {
-            if (user.IsDeveloperAccount)
+            if (user?.IsDeveloperAccount ?? false)
             {
                 return new JsonResult(user.Repositories);
             }
@@ -127,12 +164,16 @@ public class UserController : ControllerBase
     /// Updates settings specified by name to content of body
     /// </summary>
     /// <param name="name">The name of the setting</param>
-    /// <param name="value">The value of the setting</param>
     /// <returns></returns>
     [HttpPatch("{name}")]
-    public IActionResult UpdateSettings([FromRoute] string name, [FromBody] string value)
+    public IActionResult UpdateSettings([FromRoute] string name)
     {
-
+        string value = new StreamReader(Request.Body).ReadToEndAsync().Result;
+        if (string.IsNullOrWhiteSpace(value))
+            return BadRequest(new
+            {
+                message = "Body can't be empty"
+            });
         if (IsLoggedIn(Request, out UserModel? user))
         {
             switch (name)
