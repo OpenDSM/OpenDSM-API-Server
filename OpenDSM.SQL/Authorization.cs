@@ -1,7 +1,5 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
-using System.Data.SqlTypes;
 using System.Text;
-using System.Text.Json;
 using CLMath;
 using MySql.Data.MySqlClient;
 
@@ -28,6 +26,8 @@ public enum FailedReason
     AccountDisabled,
 }
 
+public record User(int id, string username, string email, string token, AccountType type, bool use_git_readme, string git_username, string git_token, int[] owned_products);
+
 public static class Authorization
 {
 
@@ -38,7 +38,7 @@ public static class Authorization
         try
         {
             using MySqlConnection conn = GetConnection();
-            MySqlCommand cmd = new($"select * from users where `username` = '{username}' or `email` = '{username}'", conn);
+            MySqlCommand cmd = new($"select id from users where `username` = '{username}' or `email` = '{username}'", conn);
             return cmd.ExecuteReader().HasRows;
         }
         catch (Exception ex)
@@ -48,15 +48,16 @@ public static class Authorization
         }
     }
 
-    public static bool GetUserFromID(int id, out string username, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] owned_products)
+    public static bool GetUserFromID(int id, out User user)
     {
-        username = "";
-        email = "";
-        git_username = "";
-        git_token = "";
-        type = AccountType.User;
-        owned_products = Array.Empty<int>();
-        use_git_readme = false;
+        string username = "";
+        string email = "";
+        string git_username = "";
+        string git_token = "";
+        AccountType type = AccountType.User;
+        int[] owned_products = Array.Empty<int>();
+        bool use_git_readme = false;
+        user = null;
         try
         {
             using MySqlConnection conn = GetConnection();
@@ -101,6 +102,7 @@ public static class Authorization
                     {
                         owned_products = Array.Empty<int>();
                     }
+                    user = new(id, username, email, "", type, use_git_readme, git_username, git_token, owned_products);
                     return true;
                 }
             }
@@ -113,53 +115,45 @@ public static class Authorization
         return false;
     }
 
-    public static bool GetUserFromUsername(string username, out int id, out string email, out AccountType type, out bool use_git_readme, out string git_username, out string git_token, out int[] owned_products)
+    public static bool GetUserFromUsername(string username, out User user)
     {
-        id = 0;
-        email = "";
-        git_username = "";
-        git_token = "";
-        type = AccountType.User;
-        owned_products = Array.Empty<int>();
-        use_git_readme = false;
         using MySqlConnection conn = GetConnection();
-        MySqlCommand cmd = new($"select * from users where username = '{username}'", conn);
+        MySqlCommand cmd = new($"select id from users where username = '{username}' limit 1", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
+        user = null;
         if (reader.HasRows)
         {
             while (reader.Read())
             {
-                id = reader.GetInt32("id");
-                email = reader.GetString("email");
-                use_git_readme = reader.GetBoolean("use_git_readme");
-                git_username = reader.GetString("git_username");
-                git_token = reader.GetString("git_token");
-                type = reader.GetInt16("type") switch
-                {
-                    1 => AccountType.Seller,
-                    2 => AccountType.Admin,
-                    _ => AccountType.User
-                };
-                owned_products = Array.ConvertAll(reader.GetString("owned_product_ids").Split(";", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries), i => Convert.ToInt32(i));
-                return true;
+                return GetUserFromID(reader.GetInt32(0), out user);
             }
         }
         return false;
     }
-    public static bool Login(string username, string password, out FailedReason reason, out AccountType type, out bool use_git_readme, out int r_id, out string r_email, out string r_username, out string r_token, out string r_owned_products, out string r_git_username, out string r_git_token)
+
+    public static bool GetUserFromAPIKey(string api, out User user)
+    {
+        using MySqlConnection conn = GetConnection();
+        MySqlCommand cmd = new($"select user_id from api_keys where `key`='{api}' limit 1", conn);
+        MySqlDataReader reader = cmd.ExecuteReader();
+        user = null;
+        if (reader.HasRows)
+        {
+            if (reader.Read())
+            {
+                return GetUserFromID(reader.GetInt32(0), out user);
+            }
+        }
+        return false;
+    }
+
+    public static bool Login(string username, string password, out FailedReason reason, out User user)
     {
         reason = FailedReason.None;
-        type = AccountType.User;
-        r_email = "";
-        r_username = "";
-        r_owned_products = "";
-        r_id = 0;
-        r_token = "";
-        r_git_token = "";
-        r_git_username = "";
-        use_git_readme = false;
+        user = null;
+
         using MySqlConnection conn = GetConnection();
-        MySqlCommand cmd = new($"select * from users where username = '{username}' or email = '{username}'", conn);
+        MySqlCommand cmd = new($"select id, password from users where username = '{username}' or email = '{username}'", conn);
         MySqlDataReader reader = cmd.ExecuteReader();
         if (!reader.HasRows)
         {
@@ -171,49 +165,14 @@ public static class Authorization
             try
             {
                 reader.Read();
-                r_id = reader.GetInt32("id");
-                r_email = reader.GetString("email");
-                r_username = reader.GetString("username");
-                type = reader.GetInt16("type") switch
-                {
-                    1 => AccountType.Seller,
-                    2 => AccountType.Admin,
-                    _ => AccountType.User
-                };
-                try
-                {
-                    r_owned_products = reader.GetString("owned_products");
-                }
-                catch (SqlNullValueException)
-                {
-                    r_owned_products = "";
-                }
-                try
-                {
-                    r_git_username = !reader.IsDBNull(6) ? reader.GetString("git_username") : "";
-                }
-                catch (SqlNullValueException)
-                {
-                    r_git_username = "";
-                }
-                try
-                {
-                    r_git_token = !reader.IsDBNull(7) ? reader.GetString("git_token") : "";
-
-                }
-                catch (SqlNullValueException)
-                {
-                    r_git_token = "";
-                }
-                use_git_readme = reader.GetBoolean("use_git_readme");
                 string enc_pwd = reader.GetString("password");
                 string pwd = CLAESMath.DecryptStringAES(enc_pwd);
 
                 if (!string.IsNullOrEmpty(pwd))
                 {
-                    if (pwd.Equals(password))
+                    if (pwd.Equals(password) && GetUserFromID(reader.GetInt32("id"), out user))
                     {
-                        r_token = enc_pwd;
+                        user = new(user.id, user.username, user.email, enc_pwd, user.type, user.use_git_readme, user.git_username, user.git_token, user.owned_products);
                         return true;
                     }
                     else
@@ -231,11 +190,7 @@ public static class Authorization
         return false;
     }
 
-    public static bool LoginWithToken(string email, string token, out FailedReason reason, out AccountType type, out bool use_git_readme, out int r_id, out string r_email, out string r_username, out string r_token, out string r_owned_products, out string r_git_username, out string r_git_token)
-    {
-        string pwd = CLAESMath.DecryptStringAES(token);
-        return Login(email, pwd, out reason, out type, out use_git_readme, out r_id, out r_email, out r_username, out r_token, out r_owned_products, out r_git_username, out r_git_token);
-    }
+    public static bool LoginWithToken(string email, string token, out FailedReason reason, out User user) => Login(email, CLAESMath.DecryptStringAES(token), out reason, out user);
 
     public static bool CreateUser(string username, string email, string password, out FailedReason reason)
     {

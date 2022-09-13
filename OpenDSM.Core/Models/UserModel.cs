@@ -1,40 +1,48 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
-using System.Linq;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.StaticFiles;
-using Newtonsoft.Json.Linq;
 using OpenDSM.Core.Handlers;
 using OpenDSM.SQL;
 
 namespace OpenDSM.Core.Models;
 public record UserProductStat(DateTime purchased, TimeSpan activeTime, float purchasePrice);
-public class UserModel
+public sealed class UserModel
 {
 
     #region Protected Constructors
+    internal static UserModel Empty = new(new(-1, "", "", "", AccountType.User, false, "", "", Array.Empty<int>()));
 
-    internal UserModel(int id, string username, string email, string token, AccountType type, bool use_git_readme, Dictionary<int, UserProductStat> ownedProducts)
+    internal UserModel(User user)
     {
-        Id = id;
-        Username = username;
-        Email = email;
-        Token = token;
-        Type = type;
-        OwnedProducts = ownedProducts;
-        CreatedProducts = Products.GetProductsByOwner(id);
-        UseGitReadme = use_git_readme;
-        string aboutPath = Path.Combine(GetUsersProfileDirectory(Id), "about.md");
-        aboutPath = File.Exists(aboutPath) ? aboutPath : "./wwwroot/assets/md/default_about.md";
-        using FileStream fs = new(aboutPath, FileMode.Open, FileAccess.Read);
-        using StreamReader reader = new(fs);
-        About = reader.ReadToEnd();
+        if (user == null) return;
+        Id = user.id;
+        Username = user.username;
+        Email = user.email;
+        Token = user.token;
+        Type = user.type;
+        OwnedProducts = IsEmpty(this) ? new Dictionary<int, UserProductStat>() : user.owned_products.ToDictionary(i => i, i => new UserProductStat(DateTime.Now, new TimeSpan(0), 0));
+        CreatedProducts = IsEmpty(this) ? Array.Empty<int>() : Products.GetProductsByOwner(user.id);
+        UseGitReadme = user.use_git_readme;
+        About = "";
+        if (!IsEmpty(this))
+        {
+            string aboutPath = Path.Combine(GetUsersProfileDirectory(Id), "about.md");
+            aboutPath = File.Exists(aboutPath) ? aboutPath : "./wwwroot/assets/md/default_about.md";
+            using FileStream fs = new(aboutPath, FileMode.Open, FileAccess.Read);
+            using StreamReader reader = new(fs);
+            About = reader.ReadToEnd();
+        }
+
+        API_KEY = API.GetUsersAPIKey(Id);
+        GitUsername = user.git_username;
+        GitToken = user.git_token;
     }
 
     #endregion Protected Constructors
 
     #region Public Properties
-
+    public string API_KEY { get; private set; }
     public string About { get; private set; }
     public int[] CreatedProducts { get; private set; }
     public string Email { get; private set; }
@@ -109,10 +117,23 @@ public class UserModel
         }
         return false;
     }
-
+    public static bool IsEmpty(UserModel user)
+    {
+        return user.Id <= 0 || user.Username == "" || user.Email == "";
+    }
     public override bool Equals(object? obj)
     {
         return obj != null && obj.GetType().Equals(typeof(UserModel)) && ((UserModel)obj).Id == Id && ((UserModel)obj).Email == Email && ((UserModel)obj).Username == Username;
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+    public void GenerateAPIKey()
+    {
+        API_KEY = API.GenerateAPIKey(Id);
     }
 
     public void UpdateAbout(string markdown)
