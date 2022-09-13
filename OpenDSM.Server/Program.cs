@@ -1,8 +1,8 @@
 // LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 global using static OpenDSM.Core.Global;
+using System.Net;
 using Microsoft.AspNetCore.HttpOverrides;
 using OpenDSM.Core.Handlers;
-using System.Net;
 namespace OpenDSM.Server;
 
 public class Program
