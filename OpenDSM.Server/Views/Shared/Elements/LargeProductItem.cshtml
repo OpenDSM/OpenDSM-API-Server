@@ -4,11 +4,11 @@
 @model ProductModel
 @{
     StringBuilder tagBuilder = new();
-    Tag[] tags = OpenDSM.Core.Models.Tags.GetTags().Where(i => Model.Tags.Contains(i.id)).ToArray();
+    var tags = OpenDSM.Core.Models.Tags.GetTags().Where(i => Model.Tags.Contains(i.Key)).ToArray();
     int index = 0;
-    foreach (Tag tag in tags)
+    foreach ((int id, string name) in tags)
     {
-        tagBuilder.Append(tag.name);
+        tagBuilder.Append(name);
         index++;
         if (index >= 3) break;
         tagBuilder.Append(", ");

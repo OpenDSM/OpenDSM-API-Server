@@ -63,7 +63,7 @@ public class ProductController : ControllerBase
                     {
                         foreach (var tag in Tags.GetTags())
                         {
-                            if (tag.name == item) ts.Add(tag.id);
+                            if (tag.Value == item) ts.Add(tag.Key);
                         }
 
                     }

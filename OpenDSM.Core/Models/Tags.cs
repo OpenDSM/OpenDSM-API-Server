@@ -1,7 +1,7 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
-namespace OpenDSM.Core.Models;
+using System.Collections.Immutable;
 
-public record Tag(int id, string name);
+namespace OpenDSM.Core.Models;
 
 public class Tags
 {
@@ -9,7 +9,7 @@ public class Tags
     #region Private Fields
 
     private static Tags Instance = Instance ??= new();
-    private readonly Tag[] tags;
+    private IReadOnlyDictionary<int, string> tags;
 
     #endregion Private Fields
 
@@ -17,22 +17,14 @@ public class Tags
 
     private Tags()
     {
-        Dictionary<int, string> TagDictionary = SQL.Tags.GetTags();
-        List<Tag> list = new();
-
-        foreach (var (id, name) in TagDictionary)
-        {
-            list.Add(new(id, name));
-        }
-
-        tags = list.ToArray();
+        tags = SQL.Tags.GetTags();
     }
 
     #endregion Private Constructors
 
     #region Public Methods
 
-    public static Tag[] GetTags()
+    public static IReadOnlyDictionary<int, string> GetTags()
     {
         return Instance.tags;
     }

@@ -16,9 +16,9 @@
             keywordsBuilder.Append("; ");
         }
 
-        foreach (Tag tag in Tags.GetTags().Where(i => product.Tags.Contains(i.id)))
+        foreach ((int id, string name) in Tags.GetTags().Where(i => product.Tags.Contains(i.Key)))
         {
-            tagBuilder.Append(tag.name);
+            tagBuilder.Append(name);
             tagBuilder.Append("; ");
         }
 
@@ -67,9 +67,9 @@
                 <label for="tags-search-box">Tags*</label>
                 <input type="text" id="tags-search-box" autocomplete="false" placeholder="Desktop; Games; Server;" readonly required value="@(EditMode?tagBuilder.ToString():"")">
                 <div class="dropdown-body">
-                    @foreach (Tag tag in Tags.GetTags())
+                    @foreach ((int id, string name) in Tags.GetTags())
                     {
-                        <div class="dropdown-item">@tag.name</div>
+                        <div class="dropdown-item">@name</div>
                     }
                 </div>
             </div>

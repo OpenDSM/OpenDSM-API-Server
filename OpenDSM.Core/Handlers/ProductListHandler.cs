@@ -138,13 +138,13 @@ public static class ProductListHandler
     /// <param name="count">The max number of products to return</param>
     /// <param name="page">The page offset of the list</param>
     /// <returns>A filtered list of products based on tags</returns>
-    public static ProductModel[] GetProductsByTag(int count, int page, params Tag[] tags)
+    public static ProductModel[] GetProductsByTag(int count, int page, params int[] tags)
     {
         List<ProductModel> products = new();
         int[] tagIds = new int[tags.Length];
         for (int i = 0; i < tags.Length; i++)
         {
-            tagIds[i] = tags[i].id;
+            tagIds[i] = tags[i];
         }
 
         int[] productIds = Products.GetAllProductsWithTags(count, page, tagIds);
