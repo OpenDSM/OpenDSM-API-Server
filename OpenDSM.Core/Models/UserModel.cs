@@ -44,7 +44,7 @@ public sealed class UserModel
     #region Public Properties
     public string API_KEY { get; private set; }
     public string About { get; private set; }
-    public int[] CreatedProducts { get; private set; }
+    public IReadOnlyCollection<int> CreatedProducts { get; }
     public string Email { get; private set; }
     public GitCredentials GitCredentials => new(GitUsername ?? "", GitToken ?? "");
     public string GitReadme
@@ -61,9 +61,9 @@ public sealed class UserModel
     public string GitToken { get; set; }
     public string GitUsername { get; set; }
     public bool HasReadme => GitHandler.HasReadME(GitUsername, GitCredentials, out string _);
-    public int Id { get; private set; }
+    public int Id { get; }
     public bool IsDeveloperAccount => !string.IsNullOrEmpty(GitUsername) && !string.IsNullOrEmpty(GitToken) && GitCredentials != null && GitHandler.CheckCredentials(GitCredentials);
-    public Dictionary<int, UserProductStat> OwnedProducts { get; private set; }
+    public IReadOnlyDictionary<int, UserProductStat> OwnedProducts { get; }
     public string BannerImage
     {
         get
@@ -106,17 +106,6 @@ public sealed class UserModel
     #endregion Public Properties
 
     #region Public Methods
-    public bool AddToLibrary(ProductModel product, float purchasedPrice = -1)
-    {
-        if (!OwnedProducts.ContainsKey(product.Id))
-        {
-            UserProductStat stat = new(DateTime.Now, new TimeSpan(0), purchasedPrice == -1 ? product.Price : purchasedPrice);
-            OwnedProducts.Add(product.Id, stat);
-            UpdateProductStat(product.Id, stat);
-            return true;
-        }
-        return false;
-    }
     public static bool IsEmpty(UserModel user)
     {
         return user.Id <= 0 || user.Username == "" || user.Email == "";
@@ -152,17 +141,6 @@ public sealed class UserModel
         }
     }
 
-    public bool UpdateProductStat(int productId, UserProductStat stat)
-    {
-        if (OwnedProducts.ContainsKey(productId))
-        {
-            OwnedProducts[productId] = stat;
-            Authorization.UpdateProperty(Id, Token, "owned_products", JsonSerializer.Serialize(OwnedProducts));
-            return true;
-        }
-        return false;
-    }
-
     public void UpdateSetting(string name, dynamic value)
     {
         Authorization.UpdateProperty(Id, Token, name, value);
@@ -187,7 +165,7 @@ public sealed class UserModel
         }
         return new
         {
-            Id,
+            Id = HashIds.Encode(Id),
             Username,
             Email,
             Token,
