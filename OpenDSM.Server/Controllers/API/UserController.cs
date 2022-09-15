@@ -1,3 +1,4 @@
+using HashidsNet;
 using Microsoft.AspNetCore.Mvc;
 
 using OpenDSM.Core.Handlers;
@@ -8,16 +9,17 @@ namespace OpenDSM.Server.Controllers.API;
 [Route("user")]
 public class UserController : ControllerBase
 {
+
     /// <summary>
     /// Gets information on specified user
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id_hash"></param>
     /// <returns></returns>
-    [HttpGet("{id?}")]
-    public IActionResult GetUser([FromRoute] int? id, [FromQuery] bool? includeImages)
+    [HttpGet("{id_hash?}")]
+    public IActionResult GetUser([FromRoute] string? id_hash, [FromQuery] bool? includeImages)
     {
         UserModel user = null;
-        if (id == null)
+        if (id_hash == null || string.IsNullOrWhiteSpace(id_hash))
         {
             if (IsLoggedIn(Request, out user))
             {
@@ -30,14 +32,26 @@ public class UserController : ControllerBase
         }
         else
         {
-            if (UserListHandler.TryGetByID(id.Value, out user))
-            {
-                return new JsonResult(user.ToObject(includeImages.GetValueOrDefault(false)));
-            }
 
+            try
+            {
+                int id = HashIds.DecodeSingle(id_hash);
+                if (UserListHandler.TryGetByID(id, out user))
+                {
+                    return new JsonResult(user.ToObject(includeImages.GetValueOrDefault(false)));
+                }
+
+            }
+            catch (NoResultException)
+            {
+                return BadRequest(new
+                {
+                    message = $"Id provided was not valid: '{id_hash}'"
+                });
+            }
             return BadRequest(new
             {
-                message = $"No user found with id of '{id}'"
+                message = $"No user found with id of '{id_hash}'"
             });
         }
     }
@@ -162,7 +176,7 @@ public class UserController : ControllerBase
 
     /// <summary>
     /// Updates settings specified by name to content of body
-    /// </summary>
+    /// </summary> 
     /// <param name="name">The name of the setting</param>
     /// <returns></returns>
     [HttpPatch("{name}")]
