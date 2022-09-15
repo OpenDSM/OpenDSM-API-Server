@@ -2,6 +2,7 @@
 global using static OpenDSM.Core.Global;
 using ChaseLabs.CLLogger;
 using ChaseLabs.CLLogger.Interfaces;
+using HashidsNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using OpenDSM.Core.Handlers;
@@ -38,6 +39,7 @@ public static class Global
     public static string SalesLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Sales")).FullName;
     public static string UserLogsDirectory => Directory.CreateDirectory(Path.Combine(LogsDirectory, "Users")).FullName;
     public static string InstallLocation = Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location)?.FullName ?? "";
+    public static IHashids HashIds = new Hashids(ConfigHandler.Instance.Salt, 11);
     public static string wwwroot = "";
 
     #endregion Public Properties
@@ -50,6 +52,7 @@ public static class Global
 
     public static void InitHandlers()
     {
+        _ = ConfigHandler.Instance;
         _ = PaymentHandler.Instance;
         _ = Connections.Instance;
     }
