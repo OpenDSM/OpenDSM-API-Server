@@ -237,7 +237,7 @@ public class ProductModel
     {
         return new
         {
-            Id,
+            Id = HashIds.Encode(Id),
             Name,
             About,
             ShortSummery,

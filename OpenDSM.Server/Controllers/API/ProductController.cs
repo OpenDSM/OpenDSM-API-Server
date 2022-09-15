@@ -1,4 +1,5 @@
 ﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+using HashidsNet;
 using Microsoft.AspNetCore.Mvc;
 using OpenDSM.Core.Handlers;
 using OpenDSM.Core.Models;
@@ -107,16 +108,25 @@ public class ProductController : ControllerBase
     /// <summary>
     /// Gets information on a specific product based on the product id
     /// </summary>
-    /// <param name="id">The id of the product</param>
+    /// <param name="hash_id">The id of the product</param>
     /// <returns></returns>
-    [HttpGet("{id}")]
-    public IActionResult GetProduct([FromRoute] int id)
+    [HttpGet("{hash_id}")]
+    public IActionResult GetProduct([FromRoute] string hash_id)
     {
+        int id;
+        try { id = HashIds.DecodeSingle(hash_id); }
+        catch (NoResultException)
+        {
+            return BadRequest(new
+            {
+                message = $"Invalid HashID was provided: '{hash_id}'"
+            });
+        }
         if (ProductListHandler.TryGetByID(id, out ProductModel product))
             return new JsonResult(product.ToObject());
         return BadRequest(new
         {
-            message = $"No product was found with id of {id}"
+            message = $"No product was found with id of {hash_id}"
         });
     }
 
