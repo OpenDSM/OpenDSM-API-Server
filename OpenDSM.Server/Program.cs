@@ -1,7 +1,9 @@
 // LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 global using static OpenDSM.Core.Global;
 using System.Net;
+using HashidsNet;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using OpenDSM.Core.Handlers;
 namespace OpenDSM.Server;
 
@@ -16,36 +18,21 @@ public class Program
 
     #region Private Methods
 
-    private static void Main(string[] args)
+    private static void Main()
     {
         log.Info($"Welcome to {ApplicationName} Server");
         log.Debug(Copywrite);
 
         InitHandlers();
 
-        bool useKestrel = true;
-        foreach (string arg in args)
-        {
-            if (arg.Equals("--iis"))
-            {
-                useKestrel = false;
-            }
-        }
         Host.CreateDefaultBuilder().ConfigureWebHostDefaults(builder =>
         {
             builder.UseContentRoot(Directory.GetCurrentDirectory());
-            if (useKestrel)
-            {
-                log.Debug($"Starting server on port {port}");
-                builder.UseKestrel(options =>
-                    {
-                        options.ListenAnyIP(port);
-                    });
-            }
-            else
-            {
-                builder.UseIIS();
-            }
+            log.Debug($"Starting server on port {port}");
+            builder.UseKestrel(options =>
+                {
+                    options.ListenAnyIP(port);
+                });
             builder.UseStartup<Startup>();
             log.Info("Server is now running!");
         }).Build().Run();
@@ -98,7 +85,9 @@ internal class Startup
         {
             action.EnableEndpointRouting = false;
         });
-        service.AddMiniProfiler();
+        //   service.AddMiniProfiler();
+
+
     }
 
     #endregion Public Methods
