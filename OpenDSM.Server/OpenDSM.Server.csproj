@@ -1,29 +1,26 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <StartupObject>OpenDSM.Server.Program</StartupObject>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="wwwroot\assets\html\**" />
     <Content Remove="wwwroot\assets\html\**" />
     <EmbeddedResource Remove="wwwroot\assets\html\**" />
     <None Remove="wwwroot\assets\html\**" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="ChaseLabs.Configuration" Version="0.2.0" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
     <PackageReference Include="UAParser" Version="3.1.47" />
+    <PackageReference Include="Hashids.net" Version="1.6.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\OpenDSM.Core\OpenDSM.Core.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="Views\Popup\changelog.cshtml" />
     <None Include="Views\Popup\download.cshtml" />
@@ -33,13 +30,10 @@
     <None Include="Views\Popup\verify-account.cshtml" />
     <None Include="Views\Popup\video.cshtml" />
   </ItemGroup>
-
   <ItemGroup>
     <UpToDateCheckInput Remove="Views\Popup\delete-version.cshtml" />
   </ItemGroup>
-
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Popup\delete-version.cshtml" />
   </ItemGroup>
-
 </Project>
