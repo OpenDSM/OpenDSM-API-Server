@@ -76,7 +76,7 @@ public class ProductModel
         }
     }
 
-    public Dictionary<string, float> Coupon { get; private set; }
+    public IReadOnlyDictionary<string, float> Coupon { get; }
     public string[] GalleryImages => Directory.GetFiles(Directory.CreateDirectory(Path.Combine(GetProductDirectory(Id), "gallery")).FullName, "*.jpg", SearchOption.TopDirectoryOnly);
 
     public string GitRepositoryName { get; private set; }
@@ -94,24 +94,24 @@ public class ProductModel
     }
 
     public int Id { get; private set; }
-    public string[] Keywords { get; set; }
+    public IReadOnlyCollection<string> Keywords { get; }
     public string Name { get; private set; }
     public bool OnSale => SalePrice != -1;
-    public Platform[] Platforms { get; set; }
+    public IReadOnlyCollection<Platform> Platforms { get; private set; }
     public DateTime Posted { get; set; }
     public uint Price { get; private set; }
     public byte Rating { get; private set; }
-    public List<ReviewModel> Reviews { get; private set; }
+    public IReadOnlyCollection<ReviewModel> Reviews { get; private set; }
     public float SalePrice { get; private set; } = -1;
     public string ShortSummery { get; set; }
     public bool Subscription { get; private set; }
-    public int[] Tags { get; set; }
+    public IReadOnlyCollection<int> Tags { get; }
     public int TotalDownloads { get; private set; }
     public int TotalPageViews { get; private set; }
     public int TotalWeeklyDownloads { get; private set; }
     public bool UseGitReadME { get; }
     public UserModel User { get; private set; }
-    public Dictionary<long, VersionModel> Versions { get; private set; }
+    public IReadOnlyDictionary<long, VersionModel> Versions { get; private set; }
     public float ViewDownloadRatio => TotalDownloads / TotalPageViews + 1;
     public string YoutubeKey { get; private set; }
 
@@ -123,7 +123,6 @@ public class ProductModel
     {
         Products.AddPageView(Id);
     }
-
 
     public void PopulateVersionsFromDB()
     {
@@ -238,43 +237,43 @@ public class ProductModel
     {
         return new
         {
-            this.Id,
-            this.Name,
-            this.About,
-            this.ShortSummery,
-            this.Keywords,
-            this.Tags,
-            this.Platforms,
+            Id,
+            Name,
+            About,
+            ShortSummery,
+            Keywords,
+            Tags,
+            Platforms,
 
             market = new
             {
-                this.Price,
-                this.SalePrice,
-                this.OnSale,
-                this.Subscription,
+                Price,
+                SalePrice,
+                OnSale,
+                Subscription,
             },
             user = new
             {
-                id = this.User.Id,
-                name = this.User.Username
+                id = User.Id,
+                name = User.Username
             },
             stats = new
             {
-                this.Rating,
-                this.TotalDownloads,
-                this.TotalWeeklyDownloads,
-                this.TotalPageViews,
+                Rating,
+                TotalDownloads,
+                TotalWeeklyDownloads,
+                TotalPageViews,
             },
             youtube = new
             {
-                this.HasYoutubeVideo,
-                this.YoutubeKey,
+                HasYoutubeVideo,
+                YoutubeKey,
             },
             git = new
             {
-                Username = this.User.GitUsername,
-                Repository = this.GitRepositoryName,
-                UseReadme = this.UseGitReadME,
+                Username = User.GitUsername,
+                Repository = GitRepositoryName,
+                UseReadme = UseGitReadME,
             }
         };
     }
