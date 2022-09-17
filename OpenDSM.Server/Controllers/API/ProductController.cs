@@ -72,7 +72,7 @@ public class ProductController : ControllerBase
                     {
                         model.IconImage = icon;
                         model.BannerImage = banner;
-                        return new JsonResult(model);
+                        return new JsonResult(model.ToObject());
                     }
                 }
                 catch (Exception e)
