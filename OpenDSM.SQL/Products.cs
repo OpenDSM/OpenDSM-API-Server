@@ -169,7 +169,10 @@ public static class Products
             subscription = reader.GetBoolean("subscription");
             tags = Array.ConvertAll(reader.GetString("tags").Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), tag => int.Parse(tag));
             keywords = reader.GetString("keywords").Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            yt_key = reader.GetString("youtube_key");
+            try
+            { yt_key = reader.GetString("youtube_key"); }
+            catch { yt_key = ""; }
+
             price = reader.GetInt32("price");
             return true;
         }
