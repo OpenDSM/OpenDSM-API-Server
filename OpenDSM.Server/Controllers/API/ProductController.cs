@@ -50,7 +50,7 @@ public class ProductController : ControllerBase
     /// <param name="banner">The base64 of the banner/hero image</param>
     /// <returns></returns>
     [HttpPost()]
-    public IActionResult CreateProduct([FromForm] string name, [FromForm] string git_repo_name, [FromForm] string short_summery, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags, [FromForm] string icon, [FromForm] string banner)
+    public IActionResult CreateProduct([FromForm] string name, [FromForm] string git_repo_name, [FromForm] string short_summery, [FromForm] string? yt_key, [FromForm] bool subscription, [FromForm] bool use_git_readme, [FromForm] float price, [FromForm] string keywords, [FromForm] string tags)
     {
         if (IsLoggedIn(Request, out UserModel? user))
         {
@@ -70,8 +70,6 @@ public class ProductController : ControllerBase
                     }
                     if (ProductListHandler.TryCreateProduct(git_repo_name, short_summery, user, name, yt_key ?? "", subscription, use_git_readme, (int)(price * 100), keywords.Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), ts.ToArray(), out ProductModel model))
                     {
-                        model.IconImage = icon;
-                        model.BannerImage = banner;
                         return new JsonResult(model.ToObject());
                     }
                 }
@@ -104,6 +102,7 @@ public class ProductController : ControllerBase
             message = "User is not logged in"
         });
     }
+
 
     /// <summary>
     /// Gets information on a specific product based on the product id
