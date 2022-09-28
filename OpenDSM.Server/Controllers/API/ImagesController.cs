@@ -110,7 +110,7 @@ public class ImagesController : ControllerBase
     /// <param name="image">The base64 image /p:PublishProfile=representation</param>
     /// <returns></returns>
     [HttpPost("{type}/{id?}/{name}")]
-    public async Task<IActionResult> UploadImage([FromRoute] ImageType type, [FromRoute] int? id, [FromRoute] string name)
+    public async Task<IActionResult> UploadImage([FromRoute] ImageType type, [FromRoute] string? id, [FromRoute] string name)
     {
         string image = await new StreamReader(Request.Body).ReadToEndAsync();
         if (string.IsNullOrWhiteSpace(image))
@@ -162,7 +162,9 @@ public class ImagesController : ControllerBase
         {
             if (id != null)
             {
-                if (ProductListHandler.TryGetByID(id.Value, out ProductModel product))
+                int hash;
+                try { hash = HashIds.DecodeSingle(id); } catch (HashidsNet.NoResultException) { return BadRequest(new { message = "Invalid hash id" }); }
+                if (ProductListHandler.TryGetByID(hash, out ProductModel product))
                 {
                     if (IsLoggedIn(Request, out UserModel user))
                     {
@@ -221,7 +223,7 @@ public class ImagesController : ControllerBase
                 }
                 return BadRequest(new
                 {
-                    message = $"No product with id of '{id.Value}' was found"
+                    message = $"No product with id of '{id}' was found"
                 });
             }
             return BadRequest(new
