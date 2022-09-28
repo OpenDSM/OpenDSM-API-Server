@@ -30,7 +30,7 @@ public static class ProductListHandler
     /// <param name="tags">Any tags that the product might use in searching or categorizing</param>
     /// <param name="model">The created product</param>
     /// <returns>If the task was successfull</returns>
-    public static bool TryCreateProduct(string gitRepoName, string shortSummery, UserModel user, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out ProductModel model)
+    public static bool TryCreateProduct(string gitRepoName, string shortSummery, UserModel user, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out ProductModel? model)
     {
         model = null;
         if (Products.Create(user.Id, gitRepoName, shortSummery, name, yt_key, subscription, use_git_readme, price, keywords, tags, out int product_id) && TryGetByID(product_id, out model))
@@ -60,10 +60,9 @@ public static class ProductListHandler
     /// <returns>The product, if found, null if not</returns>
     public static ProductModel? GetByID(int id)
     {
-
         try
         {
-            if (Products.GetProductFromID(id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted))
+            if (Products.TryGetProductFromID(id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted))
             {
                 return new ProductModel(id, owner_id, gitRepoName, name, summery, useGitReadme, yt_key, (uint)price, tags, keywords, subscription, pageViews, posted);
             }
