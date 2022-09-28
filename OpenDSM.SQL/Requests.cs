@@ -6,8 +6,18 @@ namespace OpenDSM.SQL;
 public record IndividualWhereClause(string Key, object Value, string @Operator, bool And = true);
 public record WhereClause(IndividualWhereClause[] Clause, bool Inverse = false);
 public record OrderByClause(string Column, bool Ascending = true);
-public static class Requests
+public sealed class Requests
 {
+    private readonly IReadOnlyCollection<string> mysql_keywords;
+    private static Requests instance = instance ??= new();
+
+    private Requests()
+    {
+        string file = Path.Combine(Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location)?.FullName ?? ".", "mysql_keywords.json");
+        using FileStream fs = new(file, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using StreamReader reader = new(fs);
+        mysql_keywords = System.Text.Json.JsonSerializer.Deserialize<string[]>(reader.ReadToEnd()) ?? Array.Empty<string>();
+    }
 
     /// <summary>
     /// Builds and executes a select query.
@@ -33,7 +43,10 @@ public static class Requests
     /// <param name="orderby">The order the results should be in, or null for default</param>
     /// <returns>The resulting data reader</returns>
     public static MySqlDataReader Select(string table, string column, WhereClause? where = null, int limit = -1, int offset = -1, OrderByClause? orderby = null)
-        => Build(
+    {
+        if (instance.mysql_keywords.Contains(column.ToUpper()))
+         column = $"`{column}`";
+        return Build(
         start: $"SELECT {column} FROM",
         table: table,
         post_table: "",
@@ -43,6 +56,7 @@ public static class Requests
         offset: offset,
         orderby: orderby)
         .ExecuteReader();
+    }
     /// <summary>
     /// Builds and executes a insert query.
     /// </summary>
@@ -131,14 +145,14 @@ public static class Requests
                 dynamic value = items[i].Value;
 
                 keys.Append($"`{name}`");
-                values.Append($"@{name.ToUpper()}");
+                values.Append($"@{name.ToUpper()}_{i}");
                 if (i != items.Length - 1)
                 {
                     keys.Append(", ");
                     values.Append(", ");
                 }
 
-                cmd.Parameters.AddWithValue($"@{name.ToUpper()}", value);
+                cmd.Parameters.AddWithValue($"@{name.ToUpper()}_{i}", value);
 
             }
             if (items.Any())
@@ -160,12 +174,12 @@ public static class Requests
                 string name = clauses[i].Key;
                 object value = clauses[i].Value;
                 string op = clauses[i].Operator;
-                s_where.Append($"`{name}` {op} @{name.ToUpper().Replace(" ", "_")}");
+                s_where.Append($"`{name}` {op} @{name.ToUpper().Replace(" ", "_")}_{i}");
                 if (i != clauses.Length - 1)
                 {
                     s_where.Append(clauses[i].And ? " AND " : " OR ");
                 }
-                cmd.Parameters.AddWithValue($"@{name.ToUpper().Replace(" ", "_")}", value);
+                cmd.Parameters.AddWithValue($"@{name.ToUpper().Replace(" ", "_")}_{i}", value);
             }
 
             sql.Append($" {s_where}");
