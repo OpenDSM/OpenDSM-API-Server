@@ -40,7 +40,8 @@ public class HomeController : Controller
     }
 
     [Route("tos")]
-    public IActionResult TOS(){
+    public IActionResult TOS()
+    {
         return View();
     }
 
