@@ -18,7 +18,7 @@ public class UserController : ControllerBase
     [HttpGet("{id_hash?}")]
     public IActionResult GetUser([FromRoute] string? id_hash, [FromQuery] bool? includeImages)
     {
-        UserModel user = null;
+        UserModel? user = null;
         if (id_hash == null || string.IsNullOrWhiteSpace(id_hash))
         {
             if (IsLoggedIn(Request, out user))
@@ -90,7 +90,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            if (SQL.Authorization.CreateUser(username, email, password, out var reason))
+            if (SQL.Authorization.TryCreateUser(username, email, password, out var reason))
             {
                 if (UserListHandler.TryGetUser(username, password, out UserModel user))
                 {
