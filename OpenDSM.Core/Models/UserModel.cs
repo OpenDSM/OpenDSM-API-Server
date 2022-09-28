@@ -22,7 +22,7 @@ public sealed class UserModel
         Token = user.token;
         Type = user.type;
         OwnedProducts = IsEmpty(this) ? new Dictionary<int, UserProductStat>() : user.owned_products.ToDictionary(i => i, i => new UserProductStat(DateTime.Now, new TimeSpan(0), 0));
-        CreatedProducts = IsEmpty(this) ? Array.Empty<int>() : Products.GetProductsByOwner(user.id);
+        CreatedProducts = IsEmpty(this) ? Array.Empty<int>() : Products.GetProductsByOwner(user.id, int.MaxValue, 0);
         UseGitReadme = user.use_git_readme;
         About = "";
         if (!IsEmpty(this))
