@@ -37,18 +37,12 @@ public class Connections
         ConnectionString = GetConnectionString();
     }
 
-    public static MySqlConnection GetConnection()
-    {
-        MySqlConnection conn = new(Instance.ConnectionString);
-        conn.Open();
-        return conn;
-    }
 
     #endregion Private Constructors
 
     #region Public Methods
 
-    public string GetConnectionString()
+    public string GetConnectionString(int tries = 0)
     {
         string username = GetUsername();
         string password = GetDatabasePassword();
@@ -56,8 +50,14 @@ public class Connections
         string connection = $"datasource=localhost;port={port};username={username};password={password};database=opendsm;";
         if (!TestConnection(connection))
         {
-            log.Error($"Invalid Connection String: `{connection}`");
-            return GetConnectionString();
+            if (tries > 5)
+            {
+                log.Fatal($"Unable to verify the connection string", "Exiting!");
+                Environment.Exit(1);
+            }
+            log.Error($"Invalid Connection String: `{connection}`", "Retrying in 5 seconds!");
+            Thread.Sleep(1000 * 5);
+            return GetConnectionString(tries + 1);
         }
         log.Info("Successfully connected to Database!");
         return connection;
@@ -78,7 +78,7 @@ public class Connections
         {
             conn = new(connection_string);
             conn.Open();
-            
+
             using MySqlCommand cmd = new("select version()", conn);
             object scalar = cmd.ExecuteScalar();
             if (scalar != null && !string.IsNullOrWhiteSpace(scalar.ToString()))
@@ -98,7 +98,7 @@ public class Connections
         {
             if (conn != null)
                 conn.Close();
-                
+
         }
         return success;
     }
