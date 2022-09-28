@@ -170,8 +170,8 @@ public sealed class UserModel
             Email,
             Token,
             About = UseGitReadme ? GitReadme : About,
-            CreatedProducts,
-            OwnedProducts,
+            CreatedProducts = Array.ConvertAll(CreatedProducts.ToArray(), i => HashIds.Encode(i)),
+            OwnedProducts = Array.ConvertAll(OwnedProducts.Keys.ToArray(), i => HashIds.Encode(i)),
             git = new
             {
                 HasGitReadme = HasReadme,
