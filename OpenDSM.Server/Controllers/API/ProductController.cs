@@ -129,15 +129,5 @@ public class ProductController : ControllerBase
         });
     }
 
-    /// <summary>
-    /// Returns a list of all acceptable tags and their corresponding id
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("tags")]
-    public IActionResult GetTags()
-    {
-        return new JsonResult(Tags.GetTags());
-    }
-
     #endregion Public Methods
 }
