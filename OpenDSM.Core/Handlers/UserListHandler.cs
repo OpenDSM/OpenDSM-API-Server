@@ -47,7 +47,7 @@ public static class UserListHandler
     {
         try
         {
-            if (Authorization.GetUserFromID(id, out User user))
+            if (Authorization.TryGetUserFromID(id, out User user))
             {
                 return new(user);
             }
@@ -71,9 +71,9 @@ public static class UserListHandler
     /// </summary>
     /// <param name="api">Api key</param>
     /// <returns></returns>
-    public static UserModel GetByAPIKey(string api)
+    public static UserModel? GetByAPIKey(string api)
     {
-        if (Authorization.GetUserFromAPIKey(api, out User u))
+        if (Authorization.TryGetUserFromAPIKey(api, out User u))
             return new(u);
         return null;
     }
@@ -86,7 +86,7 @@ public static class UserListHandler
     /// <returns>The user object or null if no user was found</returns>
     public static UserModel? GetByUsername(string username)
     {
-        if (Authorization.GetUserFromUsername(username, out User user))
+        if (Authorization.TryGetUserFromUsername(username, out User user))
         {
             return new(user);
         }
@@ -101,7 +101,7 @@ public static class UserListHandler
     /// <returns>The user object created or null if the task failed</returns>
     public static UserModel? GetUser(string username, string password, out FailedReason reason)
     {
-        if (Authorization.Login(username, password, out reason, out User user))
+        if (Authorization.TryValidateUserCredentials(username, password, out reason, out User user))
         {
             return new(user);
         }
@@ -134,10 +134,10 @@ public static class UserListHandler
     /// <param name="loginToken">The users login token</param>
     /// <param name="user">The created user object or null</param>
     /// <returns>If the user object was able to be created</returns>
-    public static bool TryGetUserWithToken(string loginName, string loginToken, out UserModel user)
+    public static bool TryGetUserWithToken(string loginName, string loginToken, out UserModel? user)
     {
         user = null;
-        if (Authorization.LoginWithToken(loginName, loginToken, out _, out User u))
+        if (Authorization.TryValidateUserCredentialsWithToken(loginName, loginToken, out _, out User u))
         {
             user = new(u);
             return true;
