@@ -254,7 +254,7 @@ public class ProductModel
             },
             user = new
             {
-                id = User.Id,
+                id = HashIds.Encode(User.Id),
                 name = User.Username
             },
             stats = new
