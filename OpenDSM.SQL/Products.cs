@@ -137,7 +137,7 @@ public static class Products
         Dictionary<int, DateTime> products = new();
         using MySqlDataReader reader = Select(
             table: table,
-            column: "id",
+            columns: new[]{"id", "posted"},
             limit: count,
             offset: page * count,
             orderby: new("posted")
