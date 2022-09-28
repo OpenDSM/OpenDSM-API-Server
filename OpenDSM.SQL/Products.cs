@@ -1,4 +1,5 @@
-﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
+﻿using System.Diagnostics.Tracing;
+// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using System.Text;
 using MySql.Data.MySqlClient;
 
@@ -18,41 +19,46 @@ public enum Platform
 
 public static class Products
 {
-
+    private static readonly string table = "products";
     #region Public Methods
 
     public static void AddPageView(int id)
     {
-
-        MySqlCommand cmd;
-        int page_views = 0;
-        using MySqlConnection conn = GetConnection();
-        using (cmd = new($"select `page_views` from `products` where `id` = {id} limit 1", conn))
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "page_views",
+            new(new IndividualWhereClause[]{
+                new("id", id, "=")
+            }),
+            limit: 1
+        );
+        if (reader.Read())
         {
-            using MySqlDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
-            {
-                page_views = reader.GetInt32("page_views");
-            }
-        }
-        using (cmd = new($"UPDATE `products` SET `page_views` = {page_views + 1} WHERE `id` = {id} LIMIT 1", conn))
-        {
-            cmd.ExecuteNonQuery();
+            int page_views = reader.GetInt32(0);
+            Update(
+                table: table,
+                new KeyValuePair<string, dynamic>[]{
+                    new("page_views", page_views + 1)
+                },
+                where: new(new IndividualWhereClause[]{
+                    new("id", id, "=")
+                }),
+                limit: 1
+            );
         }
     }
 
     public static bool CheckProductExists(int id)
     {
-        try
-        {
-            using MySqlConnection conn = GetConnection();
-            MySqlCommand cmd = new($"select id from `products` where `id` = '{id}' order by posted limit 1", conn);
-            return cmd.ExecuteReader().HasRows;
-        }
-        catch
-        {
-            return false;
-        }
+        return Select(
+            table: table,
+            column: "id",
+            where: new(new IndividualWhereClause[]{
+                    new("id", id, "=")
+            }),
+            limit: 1,
+            orderby: new("posted")
+        ).HasRows;
     }
 
     public static bool Create(int user_id, string gitRepoName, string shortSummery, string name, string yt_key, bool subscription, bool use_git_readme, int price, string[] keywords, int[] tags, out int product_id)
@@ -60,30 +66,37 @@ public static class Products
         product_id = -1;
         try
         {
-            StringBuilder builder = new();
-            StringBuilder s_keyword = new();
-            foreach (string word in keywords)
+
+            bool success = Insert(
+                table: table,
+                items: new KeyValuePair<string, dynamic>[]
+                {
+                    new("id", user_id),
+                    new("git_repo_name", gitRepoName),
+                    new("name", name),
+                    new("youtube_key", yt_key),
+                    new("price", price),
+                    new("subscription", subscription),
+                    new("keywords", string.Join(';',keywords)),
+                    new("tags", string.Join(';',tags)),
+                    new("use_git_readme", use_git_readme),
+                    new("short_summery", shortSummery),
+                }
+            );
+            if (success)
             {
-                s_keyword.Append(word);
-                s_keyword.Append(";");
-            }
-            StringBuilder s_tag = new();
-            foreach (int tag in tags)
-            {
-                s_tag.Append(tag);
-                s_tag.Append(";");
-            }
-            using MySqlConnection conn = GetConnection();
-            string sql = $"INSERT INTO `products`( `user_id`, `git_repo_name`, `name`, `use_git_readme`, `youtube_key`, `price`, `subscription`, `tags`, `keywords`, `short_summery`) VALUES ('{user_id}', '{gitRepoName}','{name}', '{(use_git_readme ? 1 : 0)}','{yt_key}','{price}','{(subscription ? 1 : 0)}','{s_tag}','{s_keyword}', '{shortSummery}')";
-            log.Debug(sql);
-            MySqlCommand cmd = new(sql, conn);
-            if (cmd.ExecuteNonQuery() > 0)
-            {
-                MySqlCommand cmdf = new($"select id from products where user_id = '{user_id}' and name = '{name}'", conn);
-                MySqlDataReader reader = cmdf.ExecuteReader();
+                using MySqlDataReader reader = Select(
+                    table: table,
+                    column: "id",
+                    where: new(new IndividualWhereClause[]{
+                        new("user_id", user_id, "="),
+                        new("name", name, "="),
+                    }),
+                    limit: 1
+                );
                 if (reader.Read())
                 {
-                    product_id = reader.GetInt32("id");
+                    product_id = reader.GetInt32(0);
                     return true;
                 }
             }
@@ -98,19 +111,18 @@ public static class Products
     public static int[] GetAllProductsWithTags(int count, int page, params int[] tags)
     {
         List<int> products = new();
-        StringBuilder tagBuilder = new();
+        IndividualWhereClause[] clauses = new IndividualWhereClause[tags.Length];
         for (int i = 0; i < tags.Length; i++)
         {
-            if (i != 0)
-            {
-                tagBuilder.Append(" AND ");
-            }
-            tagBuilder.Append($"where tags contains {tags[i]}");
+            clauses[i] = new("tags", tags[i], "CONTAINS");
         }
-
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select id from `products` {tagBuilder} limit {count} offset {page * count}", conn);
-        MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "id",
+            limit: count,
+            offset: page * count,
+            where: new(clauses)
+        );
         if (reader.HasRows)
         {
             while (reader.Read())
@@ -125,9 +137,13 @@ public static class Products
     public static int[] GetLatestProducts(int page, int count)
     {
         Dictionary<int, DateTime> products = new();
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select id, posted from products order by posted limit {count} offset {page * count}", conn);
-        using MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "id",
+            limit: count,
+            offset: page * count,
+            orderby: new("posted")
+        );
         if (reader.HasRows)
         {
             while (reader.Read())
@@ -139,7 +155,7 @@ public static class Products
         return products.Keys.ToArray();
     }
 
-    public static bool GetProductFromID(int id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted)
+    public static bool TryGetProductFromID(int id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted)
     {
         gitRepoName = "";
         name = "";
@@ -154,9 +170,13 @@ public static class Products
         yt_key = "";
         owner_id = 0;
 
-        using MySqlConnection conn = GetConnection();
-        MySqlCommand cmd = new($"select * from products where id = '{id}'", conn);
-        MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "*",
+            where: new(new IndividualWhereClause[]{
+                new("id", id, "=")
+            })
+        );
         if (reader.Read())
         {
             owner_id = reader.GetInt32("user_id");
@@ -176,17 +196,23 @@ public static class Products
             price = reader.GetInt32("price");
             return true;
         }
-        conn.Close();
         return false;
     }
 
-    public static int[] GetProductsByOwner(int id)
+    public static int[] GetProductsByOwner(int id, int count, int page)
     {
         List<int> products = new();
 
-        using MySqlConnection conn = GetConnection();
-        MySqlCommand cmd = new($"select id from products where user_id = '{id}'", conn);
-        MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "id",
+            where: new(new IndividualWhereClause[]{
+                new("user_id", id, "=")
+            }),
+            orderby: new("posted"),
+            limit: count,
+            offset: count * page
+        );
         if (reader.HasRows)
         {
             while (reader.Read())
@@ -200,20 +226,20 @@ public static class Products
     public static int[] GetProductsFromQuery(string query, int count, int page, params int[] tags)
     {
         Dictionary<int, int> products = new();
-        StringBuilder tagBuilder = new();
+        IndividualWhereClause[] clauses = new IndividualWhereClause[tags.Length];
         for (int i = 0; i < tags.Length; i++)
         {
-            if (i != 0)
-            {
-                tagBuilder.Append(" AND ");
-            }
-            tagBuilder.Append($"where tags contains {tags[i]}");
+            clauses[i] = new("tags", tags[i], "CONTAINS");
         }
 
         string[] keywords = query.ToLower().Split(' ');
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select * from `products` {tagBuilder} offset {page * count} rows;", conn);
-        MySqlDataReader reader = cmd.ExecuteReader();
+
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "*",
+            offset: count * page,
+            where: new(clauses)
+        );
         if (reader.HasRows)
         {
             while (reader.Read())

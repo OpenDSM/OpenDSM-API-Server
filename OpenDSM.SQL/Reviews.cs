@@ -1,17 +1,24 @@
-﻿using MySql.Data.MySqlClient;
-using CLMath;
+﻿using CLMath;
+using MySql.Data.MySqlClient;
 namespace OpenDSM.SQL;
 
 public static class Reviews
 {
-
+    private static readonly string table = "review";
     #region Public Methods
 
     public static bool CreateReview(int product_id, byte rating, string summery, string body, int user_id)
     {
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"insert into `review` (`product_id`, `rating`, `summery`, `body`, `user_id`) values ('{product_id}', '{rating}', '{summery}', '{CLConverter.EncodeBase64(body)}', '{user_id}')", conn);
-        return cmd.ExecuteNonQuery() > 0;
+        return Insert(
+            table: table,
+            items: new KeyValuePair<string, dynamic>[]{
+                new("product_id", product_id),
+                new("rating", rating),
+                new("summery", summery),
+                new("body", CLConverter.EncodeBase64(body)),
+                new("user_id", user_id)
+            }
+        );
     }
 
     public static bool GetReviewByID(long id, out int product_id, out byte rating, out string summery, out string body, out DateTime posted, out int user_id)
@@ -23,10 +30,13 @@ public static class Reviews
         body = "";
         posted = DateTime.Now;
 
-
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select * from `review` where `id`='{id}'", conn);
-        using MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "*",
+            where: new(new IndividualWhereClause[]{
+                new("id", id, "=")
+            })
+        );
         if (reader.Read())
         {
             rating = reader.GetByte("rating");
@@ -44,10 +54,16 @@ public static class Reviews
     public static int[] GetReviewsByProductID(int product_id, int count, int page)
     {
         List<int> reviews = new();
-
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select `id` from `review` where `product_id`='{product_id}' order by posted", conn);
-        using MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "id",
+            where: new(new IndividualWhereClause[]{
+                new("product_id", product_id, "=")
+            }),
+            orderby: new("posted"),
+            limit: count,
+            offset: count * page
+        );
         if (reader.HasRows)
         {
             while (reader.Read())

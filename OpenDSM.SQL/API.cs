@@ -5,11 +5,14 @@ namespace OpenDSM.SQL;
 public record APIKey(int user, string key, int total_calls, DateTime created, DateTime last_used);
 public static class API
 {
+    private static readonly string table = "api_keys";
     public static int GetNumberOfAPIKeysAllocated()
     {
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select count(*) from api_keys", conn);
-        using MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "count(*)",
+            where: null
+        );
         if (reader.HasRows)
         {
             return reader.GetInt32(0);
@@ -24,31 +27,57 @@ public static class API
         {
             return GenerateAPIKey(user);
         }
-        bool exists = false;
-        using (MySqlConnection conn = GetConnection())
+        bool exists = Select(
+            table: table,
+            column: "user_id",
+            where: new(new IndividualWhereClause[]{
+                new("user_id", user, "=")
+            }),
+            limit: 1
+        ).HasRows;
+        // string sql = $"insert into api_keys (`user_id`, `key`) values ('{user}', '{key}')";
+        // if (exists)
+        // {
+        //     sql = $"update api_keys set `key`='{key}' where `user_id`='{user}' limit 1";
+        // }
+        // using MySqlCommand cmd = new(sql, conn);
+        // cmd.ExecuteNonQuery();
+        if (exists)
         {
-            using MySqlCommand cmd = new($"select user_id from api_keys where `user_id`='{user}' limit 1", conn);
-            using MySqlDataReader reader = cmd.ExecuteReader();
-            exists = reader.HasRows;
+            Update(
+                table: table,
+                items: new KeyValuePair<string, dynamic>[]{
+                    new("key", key)
+                },
+                limit: 1,
+                where: new(new IndividualWhereClause[]{
+                    new("user_id", user, "=")
+                })
+            );
         }
-        using (MySqlConnection conn = GetConnection())
+        else
         {
-            string sql = $"insert into api_keys (`user_id`, `key`) values ('{user}', '{key}')";
-            if (exists)
-            {
-                sql = $"update api_keys set `key`='{key}' where `user_id`='{user}' limit 1";
-            }
-            using MySqlCommand cmd = new(sql, conn);
-            cmd.ExecuteNonQuery();
+            Insert(
+                table: table,
+                items: new KeyValuePair<string, dynamic>[]{
+                    new("user_id", user),
+                    new("key", key),
+                }
+            );
         }
         return key;
     }
 
-    public static string GetUsersAPIKey(int user){
-
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select `key` from api_keys where `user_id`='{user}'", conn);
-        using MySqlDataReader reader = cmd.ExecuteReader();
+    public static string GetUsersAPIKey(int user)
+    {
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "key",
+            where: new(new IndividualWhereClause[]{
+                new("user_id", user, "=")
+            }),
+            limit: 1
+        );
         if (reader.HasRows && reader.Read())
         {
             return reader.GetString(0);
@@ -58,9 +87,14 @@ public static class API
 
     public static int GetUserWithAPIKey(string key)
     {
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select user_id from api_keys where `key`='{key}' limit 1", conn);
-        using MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "user_id",
+            where: new(new IndividualWhereClause[]{
+                new("key", key, "=")
+            }),
+            limit: 1
+        );
         if (reader.HasRows)
         {
             return reader.GetInt32(0);
@@ -70,9 +104,14 @@ public static class API
 
     public static APIKey GetAPIKey(string key)
     {
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select * from api_keys where `key`='{key}' limit 1", conn);
-        using MySqlDataReader reader = cmd.ExecuteReader();
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "*",
+            where: new(new IndividualWhereClause[]{
+                new("key", key, "=")
+            }),
+            limit: 1
+        );
         if (reader.Read())
         {
             return new(reader.GetInt32("user_id"), reader.GetString("key"), reader.GetInt32("total_calls"), reader.GetDateTime("created"), reader.GetDateTime("last_used"));
@@ -82,12 +121,18 @@ public static class API
 
     public static void IncrementCall(string key)
     {
-
-        using MySqlConnection conn = GetConnection();
-        string sql = $"update api_keys set `total_calls`='{GetAPIKey(key).total_calls + 1}', `last_used`='{DateTime.Now:yyyy-MM-dd HH:mm:ss}' where `key`='{key}' limit 1";
-        log.Info(sql);
-        using MySqlCommand cmd = new(sql, conn);
-        cmd.ExecuteNonQuery();
+        Update(
+            table: table,
+            items: new KeyValuePair<string, dynamic>[]
+            {
+                new("total_calls", GetAPIKey(key).total_calls + 1),
+                new("last_used", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
+            },
+            where: new(new IndividualWhereClause[]{
+                new("key", key, "=")
+            }),
+            limit: 1
+        );
     }
 
 

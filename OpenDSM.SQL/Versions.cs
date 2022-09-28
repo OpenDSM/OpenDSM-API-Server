@@ -7,21 +7,36 @@ namespace OpenDSM.SQL;
 
 public static class Versions
 {
-
     #region Public Methods
 
     public static void CreatePlatformVersion(Platform platform, string download_url, long version_id, long filesize)
     {
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"insert into `platforms` (`version_id`, `platform_id`, `download_url`, `filesize`) values ('{version_id}', '{(byte)platform}', '{download_url}', '{filesize}')", conn);
-        cmd.ExecuteNonQuery();
+        Insert(
+            table: "platform",
+            items: new KeyValuePair<string, dynamic>[]
+            {
+                new("version_id", version_id),
+                new("platform_id", (byte)platform),
+                new("download_url", download_url),
+                new("filesize", filesize)
+            }
+        );
     }
 
     public static void CreateVersion(long git_id, int product_id, string name, byte releaseType, string changelog, DateTime posted)
     {
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"INSERT INTO `versions` (`id`, `product_id`, `name`, `type`, `changelog`, `posted`) VALUES ('{git_id}','{product_id}', '{name}', '{releaseType}', '{CLConverter.EncodeBase64(changelog)}', '{posted:yyyy-MM-dd HH:mm:ss.fffffff}')", conn);
-        cmd.ExecuteNonQuery();
+        Insert(
+            table: "versions",
+            items: new KeyValuePair<string, dynamic>[]
+            {
+                new("id", git_id),
+                new("product_id", product_id),
+                new("name", name),
+                new("type", releaseType),
+                new("changelog", CLConverter.EncodeBase64(changelog)),
+                new("posted", posted.ToString("yyyy-MM-dd HH:mm:ss.fffffff"))
+            }
+        );
     }
 
     public static bool GetPlatformVersionByID(byte platform_type, long version_id, out string download_url, out int total_downloads, out int weekly_downloads, out long filesize)
@@ -30,10 +45,16 @@ public static class Versions
         total_downloads = weekly_downloads = 0;
         filesize = 0;
 
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"select * from `platforms` where `platform_id`='{platform_type}' and `version_id`='{version_id}'", conn);
+        using MySqlDataReader reader = Select(
+            table: "platforms",
+            column: "*",
+            where: new(new IndividualWhereClause[]
+            {
+                new("platform_id", platform_type, "="),
+                new("version_id", version_id, "=")
+            })
+        );
 
-        using MySqlDataReader reader = cmd.ExecuteReader();
         if (reader.Read())
         {
             download_url = reader.GetString("download_url");
@@ -53,11 +74,16 @@ public static class Versions
         releaseType = 0;
         posted = DateTime.Now;
 
-        using MySqlConnection conn = GetConnection();
-        using (MySqlCommand cmd = new($"select * from `versions` where `id`='{id}' and `product_id`='{product_id}'", conn))
+        using (MySqlDataReader reader = Select(
+            table: "versions",
+            column: "*",
+            where: new(new IndividualWhereClause[]
+            {
+                new("id", id, "="),
+                new("product_id", product_id, "="),
+            })
+        ))
         {
-            using MySqlDataReader reader = cmd.ExecuteReader();
-
             if (reader.Read())
             {
                 name = reader.GetString("name");
@@ -66,9 +92,15 @@ public static class Versions
                 changelog = CLConverter.DecodeBase64(reader.GetString("changelog"));
             }
         }
-        using (MySqlCommand cmd = new($"select `platform_id` from `platforms` where `version_id`='{id}'", conn))
+        using (MySqlDataReader reader = Select(
+            table: "platforms",
+            column: "platform_id",
+            where: new(new IndividualWhereClause[]
+            {
+                new("version_id", id, "=")
+            })
+        ))
         {
-            using MySqlDataReader reader = cmd.ExecuteReader();
             List<byte> platform_list = new();
             while (reader.Read())
             {
@@ -83,11 +115,19 @@ public static class Versions
     {
         try
         {
-            using MySqlConnection conn = GetConnection();
             List<long> versions = new();
-            using MySqlCommand cmd = new($"select id from versions where `product_id`='{product_id}' order by posted limit {count} offset {count * page}", conn);
 
-            using MySqlDataReader reader = cmd.ExecuteReader();
+            using MySqlDataReader reader = Select(
+                table: "versions",
+                column: "id",
+                where: new(new IndividualWhereClause[]
+                {
+                    new("product_id", product_id, "=")
+                }),
+                orderby: new("posted"),
+                limit: count,
+                offset: count * page
+            );
             while (reader.Read())
             {
                 versions.Add(reader.GetInt64(0));
@@ -96,7 +136,7 @@ public static class Versions
         }
         catch (Exception e)
         {
-            log.Error($"Unable to get list of versions for {product_id}", e.Message, e.StackTrace);
+            log.Error($"Unable to get list of versions for {product_id}", e.Message, e.StackTrace ?? "");
             return Array.Empty<long>();
         }
     }
@@ -108,17 +148,32 @@ public static class Versions
 
     public static bool RemoveVersion(int product_id, long version_id)
     {
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"delete from versions where id={version_id} and product_id={product_id}", conn);
-
-        return cmd.ExecuteNonQuery() > 0;
+        return Delete(
+            table: "versions",
+            where: new(new IndividualWhereClause[]
+            {
+                new("id", version_id, "="),
+                new("product_id", product_id, "=")
+            })
+        );
     }
 
     public static void UpdateVersion(long git_id, int product_id, string name, byte releaseType, string changelog)
     {
-        using MySqlConnection conn = GetConnection();
-        using MySqlCommand cmd = new($"update versions set name = '{name}', type = '{releaseType}', changelog = '{CLConverter.EncodeBase64(changelog)}' where id = {git_id} and product_id = {product_id}", conn);
-        cmd.ExecuteNonQuery();
+        Update(
+            table: "versions",
+            items: new KeyValuePair<string, dynamic>[]
+            {
+                new("name", name),
+                new("type", releaseType),
+                new("changelog", CLConverter.EncodeBase64(changelog)),
+            },
+            where: new(new IndividualWhereClause[]
+            {
+                new("id", git_id, "="),
+                new("product_id", product_id, "="),
+            })
+        );
     }
     public static bool VersionExists(long id, int product_id)
     {
