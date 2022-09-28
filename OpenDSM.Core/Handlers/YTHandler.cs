@@ -94,7 +94,7 @@ public static class YTHandler
 
     public static bool IsValidYoutubeKey(string key) => TryGetYoutubeDirectURL(key, out _);
 
-    public static bool TryGetYoutubeDirectURL(string id, out Uri url)
+    public static bool TryGetYoutubeDirectURL(string id, out Uri? url)
     {
         string urlString = GetYoutubeDirectURL(id);
         if (!string.IsNullOrEmpty(urlString))
