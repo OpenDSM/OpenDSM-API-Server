@@ -118,7 +118,7 @@ public static class ReviewListHandler
     /// <param name="product">The product object</param>
     /// <param name="id">The id of the review</param>
     /// <returns>The review object or null if none was found</returns>
-    public static ReviewModel GetProductReview(ProductModel product, long id)
+    public static ReviewModel? GetProductReview(ProductModel product, long id)
     {
         if (SQL.Reviews.GetReviewByID(id, out _, out byte rating, out string summery, out string body, out DateTime posted, out int user_id))
         {
