@@ -179,7 +179,7 @@ public static class Requests
             sql.Append($" LIMIT {limit}");
             if (offset > 0)
             {
-                sql.Append($" OFFSET {limit}");
+                sql.Append($" OFFSET {limit} ROWS");
             }
         }
 
