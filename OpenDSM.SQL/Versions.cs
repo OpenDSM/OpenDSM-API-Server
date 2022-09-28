@@ -1,6 +1,4 @@
-﻿using System.Text;
-using System.Xml.Linq;
-using CLMath;
+﻿using CLMath;
 using MySql.Data.MySqlClient;
 
 namespace OpenDSM.SQL;

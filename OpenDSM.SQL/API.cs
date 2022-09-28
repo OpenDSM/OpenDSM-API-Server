@@ -35,13 +35,6 @@ public static class API
             }),
             limit: 1
         ).HasRows;
-        // string sql = $"insert into api_keys (`user_id`, `key`) values ('{user}', '{key}')";
-        // if (exists)
-        // {
-        //     sql = $"update api_keys set `key`='{key}' where `user_id`='{user}' limit 1";
-        // }
-        // using MySqlCommand cmd = new(sql, conn);
-        // cmd.ExecuteNonQuery();
         if (exists)
         {
             Update(

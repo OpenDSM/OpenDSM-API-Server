@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Tracing;
-// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
-using System.Text;
+﻿// LFInteractive LLC. (c) 2021-2022 - All Rights Reserved
 using MySql.Data.MySqlClient;
 
 namespace OpenDSM.SQL;
