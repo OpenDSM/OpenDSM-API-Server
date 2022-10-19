@@ -20,15 +20,6 @@ public enum FailedReason
     EmailAlreadyTaken,
     AccountDisabled,
 }
-/*
- --- COLUMNS ---
-username    -> varchar(32)
-email       -> varchar(320)
-password    -> varchar(255)
-about       -> varchar(4000)
-last_online -> datetime
-joined_date -> datetime
- */
 internal static class UsersDB
 {
     private static readonly string table = "users";
