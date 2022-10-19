@@ -11,7 +11,6 @@ Array.from(document.cookie.split(';')).forEach(item => {
 })
 InitElements()
 function KickStars(stars) {
-
     let i = 0
     let kick = setInterval(() => {
         stars[i].classList.add("kick")
@@ -33,7 +32,6 @@ function KickStars(stars) {
     }, 50);
 }
 function InitElements() {
-
     $(".star-input").on('mousemove', e => {
         let half = e.originalEvent.layerX <= 20;
         let current = e.currentTarget;
@@ -118,7 +116,6 @@ function InitElements() {
         }
 
         KickStars(arr.slice(0, star+1))
-
     })
 
     $("toggle").on('click', e => $(e.target).attr('value', $(e.target).attr('value') == "false"));

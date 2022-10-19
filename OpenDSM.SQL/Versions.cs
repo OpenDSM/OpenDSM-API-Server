@@ -5,6 +5,7 @@ namespace OpenDSM.SQL;
 
 public static class Versions
 {
+
     #region Public Methods
 
     public static void CreatePlatformVersion(Platform platform, string download_url, long version_id, long filesize)

@@ -3,6 +3,7 @@ global using static OpenDSM.SQL.Connections;
 using ChaseLabs.CLConfiguration;
 using ChaseLabs.CLLogger;
 using ChaseLabs.CLLogger.Interfaces;
+using Google.Protobuf;
 using MySql.Data.MySqlClient;
 namespace OpenDSM.SQL;
 
@@ -15,30 +16,6 @@ public class Connections
     public static ILog log = LogManager.Init().SetDumpMethod(DumpType.NoDump).SetPattern("[DATABASE] (%TYPE%: %DATE%): %MESSAGE%");
 
     #endregion Public Fields
-
-    #region Internal Fields
-
-    internal string ConnectionString;
-
-    #endregion Internal Fields
-
-    #region Private Fields
-
-    private ConfigManager manager;
-
-    #endregion Private Fields
-
-    #region Private Constructors
-
-    private Connections()
-    {
-        log = LogManager.Init().SetDumpMethod(DumpType.NoDump).SetPattern("[DATABASE] (%TYPE%: %DATE%): %MESSAGE%");
-        manager = new("db", Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LFInteractive", "OpenDSM")).FullName);
-        ConnectionString = GetConnectionString();
-    }
-
-
-    #endregion Private Constructors
 
     #region Public Methods
 
@@ -105,6 +82,31 @@ public class Connections
 
     #endregion Public Methods
 
+    #region Internal Fields
+
+    internal string ConnectionString;
+
+    #endregion Internal Fields
+
+    #region Private Constructors
+
+    private Connections()
+    {
+        log = LogManager.Init().SetDumpMethod(DumpType.NoDump).SetPattern("[DATABASE] (%TYPE%: %DATE%): %MESSAGE%");
+        manager = new("db", Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LFInteractive", "OpenDSM")).FullName);
+        ConnectionString = GetConnectionString();
+        log.Debug(ConnectionString);
+
+    }
+
+    #endregion Private Constructors
+
+    #region Private Fields
+
+    private ConfigManager manager;
+
+    #endregion Private Fields
+
     #region Private Methods
 
     private string GetDatabasePassword()
@@ -162,4 +164,5 @@ public class Connections
     }
 
     #endregion Private Methods
+
 }

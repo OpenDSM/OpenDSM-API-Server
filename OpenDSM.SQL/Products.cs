@@ -17,7 +17,6 @@ public enum Platform
 
 public static class Products
 {
-    private static readonly string table = "products";
     #region Public Methods
 
     public static void AddPageView(int id)
@@ -137,7 +136,7 @@ public static class Products
         Dictionary<int, DateTime> products = new();
         using MySqlDataReader reader = Select(
             table: table,
-            columns: new[]{"id", "posted"},
+            columns: new[] { "id", "posted" },
             limit: count,
             offset: page * count,
             orderby: new("posted")
@@ -151,50 +150,6 @@ public static class Products
         }
 
         return products.Keys.ToArray();
-    }
-
-    public static bool TryGetProductFromID(int id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted)
-    {
-        gitRepoName = "";
-        name = "";
-        summery = "";
-        posted = DateTime.Now;
-        pageViews = 0;
-        useGitReadme = false;
-        subscription = false;
-        tags = Array.Empty<int>();
-        keywords = Array.Empty<string>();
-        price = 0;
-        yt_key = "";
-        owner_id = 0;
-
-        using MySqlDataReader reader = Select(
-            table: table,
-            column: "*",
-            where: new(new IndividualWhereClause[]{
-                new("id", id, "=")
-            })
-        );
-        if (reader.Read())
-        {
-            owner_id = reader.GetInt32("user_id");
-            name = reader.GetString("name");
-            posted = reader.GetDateTime("posted");
-            summery = reader.GetString("short_summery");
-            pageViews = reader.GetInt32("page_views");
-            useGitReadme = reader.GetBoolean("use_git_readme");
-            gitRepoName = reader.GetString("git_repo_name");
-            subscription = reader.GetBoolean("subscription");
-            tags = Array.ConvertAll(reader.GetString("tags").Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), tag => int.Parse(tag));
-            keywords = reader.GetString("keywords").Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            try
-            { yt_key = reader.GetString("youtube_key"); }
-            catch { yt_key = ""; }
-
-            price = reader.GetInt32("price");
-            return true;
-        }
-        return false;
     }
 
     public static int[] GetProductsByOwner(int id, int count, int page)
@@ -262,6 +217,55 @@ public static class Products
         return products.Keys.ToArray();
     }
 
+    public static bool TryGetProductFromID(int id, out string name, out string gitRepoName, out string summery, out bool useGitReadme, out bool subscription, out int[] tags, out string[] keywords, out int price, out string yt_key, out int owner_id, out int pageViews, out DateTime posted)
+    {
+        gitRepoName = "";
+        name = "";
+        summery = "";
+        posted = DateTime.Now;
+        pageViews = 0;
+        useGitReadme = false;
+        subscription = false;
+        tags = Array.Empty<int>();
+        keywords = Array.Empty<string>();
+        price = 0;
+        yt_key = "";
+        owner_id = 0;
+
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "*",
+            where: new(new IndividualWhereClause[]{
+                new("id", id, "=")
+            })
+        );
+        if (reader.Read())
+        {
+            owner_id = reader.GetInt32("user_id");
+            name = reader.GetString("name");
+            posted = reader.GetDateTime("posted");
+            summery = reader.GetString("short_summery");
+            pageViews = reader.GetInt32("page_views");
+            useGitReadme = reader.GetBoolean("use_git_readme");
+            gitRepoName = reader.GetString("git_repo_name");
+            subscription = reader.GetBoolean("subscription");
+            tags = Array.ConvertAll(reader.GetString("tags").Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), tag => int.Parse(tag));
+            keywords = reader.GetString("keywords").Split(";", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            try
+            { yt_key = reader.GetString("youtube_key"); }
+            catch { yt_key = ""; }
+
+            price = reader.GetInt32("price");
+            return true;
+        }
+        return false;
+    }
+
     #endregion Public Methods
 
+    #region Private Fields
+
+    private static readonly string table = "products";
+
+    #endregion Private Fields
 }

@@ -1393,8 +1393,8 @@ body.popup-active {
     display: flex;
     align-items: center;
     transition: transform 200ms;
-    text-decoration:none;
-    color:white;
+    text-decoration: none;
+    color: white;
 }
 
     .search-item > * {
@@ -1424,9 +1424,11 @@ body.popup-active {
     filter: blur(5px) brightness(.5) contrast(1.0);
     cursor: pointer;
 }
-.search-item .platforms{
+
+.search-item .platforms {
     font-size: 2rem;
 }
+
 .search-item:hover {
     transform: scale(1.02);
 }

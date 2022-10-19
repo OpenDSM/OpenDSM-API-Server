@@ -18,7 +18,6 @@
     document.cookie = `page_view=; path=/product/${id}`
 }).call();
 
-
 async function LoadReviews(rating = -1) {
     let section = $("section#reviews")[0]
     let url = `/product/${id}/element/Reviews?filter=${rating}`;
@@ -39,7 +38,6 @@ async function LoadReviews(rating = -1) {
                 b.style.filter = 'brightness(0.1)'
             }
         })
-
     } else {
         let bar = $(".reviews .bars > .ratings-bar")[0];
         let bars = Array.from(bar.parentElement.querySelectorAll(".ratings-bar"));
@@ -58,11 +56,9 @@ async function LoadReviews(rating = -1) {
                         b.style.filter = 'brightness(0.1)'
                     }
                 })
-
             }
             let current = e.currentTarget;
             let bars = Array.from(current.parentElement.querySelectorAll(".ratings-bar"));
-
 
             for (let i = 0; i < bars.length; i++) {
                 if (bars[i] == current) {
@@ -96,7 +92,6 @@ async function LoadReviews(rating = -1) {
                         b.style.filter = 'brightness(0.1)'
                     }
                 })
-
             }
         })
     })
@@ -141,8 +136,6 @@ async function LoadReviews(rating = -1) {
                 LoadReviews()
             }
         }
-
-
     })
 }
 async function LoadVersions() {

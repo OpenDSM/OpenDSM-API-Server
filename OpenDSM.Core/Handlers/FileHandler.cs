@@ -9,6 +9,7 @@ public static class FileHandler
 {
 
     #region Public Methods
+
     /// <summary>
     /// Converts Base64 string to image file with specified width and height is set by maintaining aspect ratio
     /// </summary>
@@ -54,6 +55,16 @@ public static class FileHandler
     }
 
     /// <summary>
+    /// Checks if the base64 string is valid.
+    /// </summary>
+    /// <param name="base64">The base64 string</param>
+    /// <returns></returns>
+    public static bool IsValidBase64(string base64)
+    {
+        return Convert.TryFromBase64String(base64, Encoding.UTF8.GetBytes(base64), out _);
+    }
+
+    /// <summary>
     /// Attempts to create image from base64 string
     /// </summary>
     /// <param name="base64">The base64 string</param>
@@ -83,16 +94,5 @@ public static class FileHandler
         return false;
     }
 
-    /// <summary>
-    /// Checks if the base64 string is valid.
-    /// </summary>
-    /// <param name="base64">The base64 string</param>
-    /// <returns></returns>
-    public static bool IsValidBase64(string base64)
-    {
-        return Convert.TryFromBase64String(base64, Encoding.UTF8.GetBytes(base64), out _);
-    }
-
     #endregion Public Methods
-
 }

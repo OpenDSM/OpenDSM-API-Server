@@ -14,26 +14,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ChaseLabs.Configuration" Version="0.2.0" />
+    <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.3" />
     <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
     <PackageReference Include="UAParser" Version="3.1.47" />
     <PackageReference Include="Hashids.net" Version="1.6.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OpenDSM.Authentication\OpenDSM.Authentication.csproj" />
     <ProjectReference Include="..\OpenDSM.Core\OpenDSM.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Views\Popup\changelog.cshtml" />
-    <None Include="Views\Popup\download.cshtml" />
-    <None Include="Views\Popup\image-cropper.cshtml" />
-    <None Include="Views\Popup\purchase.cshtml" />
-    <None Include="Views\Popup\subscription.cshtml" />
-    <None Include="Views\Popup\verify-account.cshtml" />
-    <None Include="Views\Popup\video.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Views\Popup\delete-version.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Views\Popup\delete-version.cshtml" />
   </ItemGroup>
 </Project>

@@ -5,20 +5,8 @@ namespace OpenDSM.SQL;
 public record APIKey(int user, string key, int total_calls, DateTime created, DateTime last_used);
 public static class API
 {
-    private static readonly string table = "api_keys";
-    public static int GetNumberOfAPIKeysAllocated()
-    {
-        using MySqlDataReader reader = Select(
-            table: table,
-            column: "count(*)",
-            where: null
-        );
-        if (reader.HasRows)
-        {
-            return reader.GetInt32(0);
-        }
-        return 0;
-    }
+    #region Public Methods
+
     public static string GenerateAPIKey(int user)
     {
         Guid guid = Guid.NewGuid();
@@ -61,6 +49,37 @@ public static class API
         return key;
     }
 
+    public static APIKey GetAPIKey(string key)
+    {
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "*",
+            where: new(new IndividualWhereClause[]{
+                new("key", key, "=")
+            }),
+            limit: 1
+        );
+        if (reader.Read())
+        {
+            return new(reader.GetInt32("user_id"), reader.GetString("key"), reader.GetInt32("total_calls"), reader.GetDateTime("created"), reader.GetDateTime("last_used"));
+        }
+        return new(-1, "", 0, DateTime.Now, DateTime.Now);
+    }
+
+    public static int GetNumberOfAPIKeysAllocated()
+    {
+        using MySqlDataReader reader = Select(
+            table: table,
+            column: "count(*)",
+            where: null
+        );
+        if (reader.HasRows)
+        {
+            return reader.GetInt32(0);
+        }
+        return 0;
+    }
+
     public static string GetUsersAPIKey(int user)
     {
         using MySqlDataReader reader = Select(
@@ -95,23 +114,6 @@ public static class API
         return -1;
     }
 
-    public static APIKey GetAPIKey(string key)
-    {
-        using MySqlDataReader reader = Select(
-            table: table,
-            column: "*",
-            where: new(new IndividualWhereClause[]{
-                new("key", key, "=")
-            }),
-            limit: 1
-        );
-        if (reader.Read())
-        {
-            return new(reader.GetInt32("user_id"), reader.GetString("key"), reader.GetInt32("total_calls"), reader.GetDateTime("created"), reader.GetDateTime("last_used"));
-        }
-        return new(-1, "", 0, DateTime.Now, DateTime.Now);
-    }
-
     public static void IncrementCall(string key)
     {
         Update(
@@ -128,5 +130,11 @@ public static class API
         );
     }
 
+    #endregion Public Methods
 
+    #region Private Fields
+
+    private static readonly string table = "api_keys";
+
+    #endregion Private Fields
 }

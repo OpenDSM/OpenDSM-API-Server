@@ -6,18 +6,48 @@ namespace OpenDSM.SQL;
 public record IndividualWhereClause(string Key, object Value, string @Operator, bool And = true);
 public record WhereClause(IndividualWhereClause[] Clause, bool Inverse = false);
 public record OrderByClause(string Column, bool Ascending = true);
+public record TableItem(string Column, string DataType, int Size = -1, dynamic Default = null);
 public sealed class Requests
 {
-    private readonly IReadOnlyCollection<string> mysql_keywords;
-    private static Requests instance = instance ??= new();
+    #region Public Methods
 
-    private Requests()
-    {
-        string file = Path.Combine(Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location)?.FullName ?? ".", "mysql_keywords.json");
-        using FileStream fs = new(file, FileMode.Open, FileAccess.Read, FileShare.Read);
-        using StreamReader reader = new(fs);
-        mysql_keywords = System.Text.Json.JsonSerializer.Deserialize<string[]>(reader.ReadToEnd()) ?? Array.Empty<string>();
-    }
+    /// <summary>
+    /// Builds and executes a delete query
+    /// </summary>
+    /// <param name="table">The table to execute query on</param>
+    /// <param name="where">Any conditions the query should abide by</param>
+    /// <param name="limit">The max number of columns to delete, leave -1 for unlimited</param>
+    /// <param name="orderby">The order the results should be in, or null for default</param>
+    /// <returns>If the action was successfull</returns>
+    public static bool Delete(string table, WhereClause? where, int limit = -1, OrderByClause? orderby = null)
+        => Build(
+        start: $"DELETE FROM",
+        table: table,
+        post_table: "",
+        items: null,
+        where: where,
+        limit: limit,
+        offset: -1,
+        orderby: orderby)
+        .ExecuteNonQuery() > 0;
+
+    /// <summary>
+    /// Builds and executes a insert query.
+    /// </summary>
+    /// <param name="table">The table to insert into</param>
+    /// <param name="items">The items to insert</param>
+    /// <returns>If the action was successfull or not</returns>
+    public static bool Insert(string table, KeyValuePair<string, dynamic>[] items)
+        => Build(
+        start: $"INSERT INTO",
+        table: table,
+        post_table: "",
+        items: items,
+        where: null,
+        limit: -1,
+        offset: -1,
+        orderby: null)
+        .ExecuteNonQuery() > 0;
 
     /// <summary>
     /// Builds and executes a select query.
@@ -45,7 +75,7 @@ public sealed class Requests
     public static MySqlDataReader Select(string table, string column, WhereClause? where = null, int limit = -1, int offset = -1, OrderByClause? orderby = null)
     {
         if (instance.mysql_keywords.Contains(column.ToUpper()))
-         column = $"`{column}`";
+            column = $"`{column}`";
         return Build(
         start: $"SELECT {column} FROM",
         table: table,
@@ -57,23 +87,7 @@ public sealed class Requests
         orderby: orderby)
         .ExecuteReader();
     }
-    /// <summary>
-    /// Builds and executes a insert query.
-    /// </summary>
-    /// <param name="table">The table to insert into</param>
-    /// <param name="items">The items to insert</param>
-    /// <returns>If the action was successfull or not</returns>
-    public static bool Insert(string table, KeyValuePair<string, dynamic>[] items)
-        => Build(
-        start: $"INSERT INTO",
-        table: table,
-        post_table: "",
-        items: items,
-        where: null,
-        limit: -1,
-        offset: -1,
-        orderby: null)
-        .ExecuteNonQuery() > 0;
+
     /// <summary>
     /// Builds and executes an update query.
     /// </summary>
@@ -94,26 +108,76 @@ public sealed class Requests
         orderby: null)
         .ExecuteNonQuery() > 0;
 
-    /// <summary>
-    /// Builds and executes a delete query
-    /// </summary>
-    /// <param name="table">The table to execute query on</param>
-    /// <param name="where">Any conditions the query should abide by</param>
-    /// <param name="limit">The max number of columns to delete, leave -1 for unlimited</param>
-    /// <param name="orderby">The order the results should be in, or null for default</param>
-    /// <returns>If the action was successfull</returns>
-    public static bool Delete(string table, WhereClause? where, int limit = -1, OrderByClause? orderby = null)
-        => Build(
-        start: $"DELETE FROM",
-        table: table,
-        post_table: "",
-        items: null,
-        where: where,
-        limit: limit,
-        offset: -1,
-        orderby: orderby)
-        .ExecuteNonQuery() > 0;
+    public static bool CreateTable(string table, IReadOnlyCollection<TableItem> items)
+    {
+        if (TableExists(table)) return false;
+        try
+        {
+            StringBuilder columns = new();
+            foreach (TableItem item in items)
+            {
+                columns.Append($"{item.Column} {item.DataType}");
+                if (item.Size < 0)
+                {
+                    columns.Append($"({item.Size})");
+                }
+                if (string.IsNullOrWhiteSpace(item.Default))
+                {
+                    if (item.Default.GetType().Equals(typeof(string)))
+                        columns.Append($"DEFAULT '{item.Default}'");
+                    else
+                        columns.Append($"DEFAULT {item.Default}");
+                }
+            }
+            Build(
+                start: "CREATE TABLE",
+                table: table,
+                post_table: columns.ToString(),
+                items: null,
+                where: null,
+                limit: -1,
+                offset: -1,
+                orderby: null
+           ).ExecuteNonQuery();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
+    public static bool TableExists(string table)
+    {
+        using MySqlConnection conn = new(Instance.ConnectionString);
+        conn.Open();
+        using MySqlCommand cmd = new($"select * from `{table}` limit 1", conn);
+        log.Debug(cmd.ExecuteNonQuery().ToString());
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
+    #endregion Public Methods
+
+    #region Private Constructors
+
+    private Requests()
+    {
+        string file = Path.Combine(Directory.GetParent(System.Reflection.Assembly.GetExecutingAssembly().Location)?.FullName ?? ".", "mysql_keywords.json");
+        using FileStream fs = new(file, FileMode.Open, FileAccess.Read, FileShare.Read);
+        using StreamReader reader = new(fs);
+        mysql_keywords = System.Text.Json.JsonSerializer.Deserialize<string[]>(reader.ReadToEnd()) ?? Array.Empty<string>();
+    }
+
+    #endregion Private Constructors
+
+    #region Private Fields
+
+    private static Requests instance = instance ??= new();
+    private readonly IReadOnlyCollection<string> mysql_keywords;
+
+    #endregion Private Fields
+
+    #region Private Methods
 
     /// <summary>
     /// Builds a MySQL command and parameterized any parameters to avoid sql injections
@@ -135,6 +199,9 @@ public sealed class Requests
         sql.Append($"{start} `{table}` ");
         if (!string.IsNullOrWhiteSpace(post_table))
             sql.Append($" {post_table} ");
+
+
+        /// BUILD INSERT ITEMS
         if (items != null)
         {
             StringBuilder keys = new();
@@ -158,6 +225,9 @@ public sealed class Requests
             if (items.Any())
                 sql.Append($"({keys}) VALUES ({values})");
         }
+
+
+        /// BUILD WHERE CLAUSE(s)
         if (where != null)
         {
             StringBuilder s_where = new();
@@ -184,6 +254,9 @@ public sealed class Requests
 
             sql.Append($" {s_where}");
         }
+
+
+        /// ORDER AND COUNT OF RETURNED VALUES
         if (orderby != null)
         {
             sql.Append($" ORDER BY `{orderby.Column}` {(orderby.Ascending ? "ASC" : "DESC")}");
@@ -197,11 +270,15 @@ public sealed class Requests
             }
         }
 
+
+        /// BUILD SQL QUERY
         MySqlConnection conn = new(Instance.ConnectionString);
         conn.Open();
         cmd.Connection = conn;
         cmd.CommandText = sql.ToString().Trim();
         return cmd;
     }
+
+    #endregion Private Methods
 
 }

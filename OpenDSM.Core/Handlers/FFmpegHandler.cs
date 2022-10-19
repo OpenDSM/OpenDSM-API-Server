@@ -20,30 +20,19 @@ public class FFmpegHandler
 
     #endregion Public Fields
 
-    #region Private Fields
-
-    private string ffmpeg_exe;
-
-    #endregion Private Fields
-
-    #region Protected Constructors
+    #region Public Methods
 
     /// <summary>
-    /// Initializes FFmpeg
+    /// Returns the width and height of the image file
     /// </summary>
-    protected FFmpegHandler()
+    /// <param name="file">The absolute path to the image file</param>
+    /// <returns>width, height</returns>
+    public (int width, int height) GetSize(string file)
     {
-        if (!Directory.GetFiles(FFMpegDirectory, "*ffmpeg*", SearchOption.AllDirectories).Any())
-        {
-            Xabe.FFmpeg.Downloader.FFmpegDownloader.GetLatestVersion(Xabe.FFmpeg.Downloader.FFmpegVersion.Official, FFMpegDirectory).Wait();
-        }
-        ffmpeg_exe = Directory.GetFiles(FFMpegDirectory, "*ffmpeg*", SearchOption.AllDirectories).First();
-        Xabe.FFmpeg.FFmpeg.SetExecutablesPath(FFMpegDirectory);
+        Xabe.FFmpeg.IMediaInfo info = Xabe.FFmpeg.FFmpeg.GetMediaInfo(file).Result;
+        var stream = info.VideoStreams.First();
+        return (stream.Width, stream.Height);
     }
-
-    #endregion Protected Constructors
-
-    #region Public Methods
 
     /// <summary>
     /// Creates an instance of the image with the desired dimensions and then overwrites the original.
@@ -80,18 +69,28 @@ public class FFmpegHandler
             }
         });
 
-    /// <summary>
-    /// Returns the width and height of the image file
-    /// </summary>
-    /// <param name="file">The absolute path to the image file</param>
-    /// <returns>width, height</returns>
-    public (int, int) GetSize(string file)
-    {
-        Xabe.FFmpeg.IMediaInfo info = Xabe.FFmpeg.FFmpeg.GetMediaInfo(file).Result;
-        var stream = info.VideoStreams.First();
-        return (stream.Width, stream.Height);
-    }
-
     #endregion Public Methods
 
+    #region Protected Constructors
+
+    /// <summary>
+    /// Initializes FFmpeg
+    /// </summary>
+    protected FFmpegHandler()
+    {
+        if (!Directory.GetFiles(FFMpegDirectory, "*ffmpeg*", SearchOption.AllDirectories).Any())
+        {
+            Xabe.FFmpeg.Downloader.FFmpegDownloader.GetLatestVersion(Xabe.FFmpeg.Downloader.FFmpegVersion.Official, FFMpegDirectory).Wait();
+        }
+        ffmpeg_exe = Directory.GetFiles(FFMpegDirectory, "*ffmpeg*", SearchOption.AllDirectories).First();
+        Xabe.FFmpeg.FFmpeg.SetExecutablesPath(FFMpegDirectory);
+    }
+
+    #endregion Protected Constructors
+
+    #region Private Fields
+
+    private string ffmpeg_exe;
+
+    #endregion Private Fields
 }
