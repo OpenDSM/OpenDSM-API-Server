@@ -17,4 +17,8 @@
     <ProjectReference Include="..\OpenDSM.SQL\OpenDSM.SQL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SQL\database\" />
+  </ItemGroup>
+
 </Project>
