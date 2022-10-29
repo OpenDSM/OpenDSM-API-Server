@@ -5,14 +5,16 @@ namespace OpenDSM.Authentication.Collections;
 
 public class UserLibraryCollection
 {
-    private ICollection<UserLibraryItemModel> _items;
-    internal UserLibraryCollection(int user_id)
-    {
-        _items = LibraryDB.GetLibraryItems(user_id);
-    }
+    #region Public Properties
 
     public IReadOnlyCollection<UserLibraryItemModel> Items => (IReadOnlyCollection<UserLibraryItemModel>)_items;
+
+    #endregion Public Properties
+
+    #region Public Methods
+
     public bool AddItem(int productId, float price) => AddItem(productId, price, out _);
+
     public bool AddItem(int productId, float price, out UserLibraryItemModel item)
     {
         try
@@ -38,4 +40,21 @@ public class UserLibraryCollection
         return false;
 
     }
+
+    #endregion Public Methods
+
+    #region Internal Constructors
+
+    internal UserLibraryCollection(int user_id)
+    {
+        _items = LibraryDB.GetLibraryItems(user_id);
+    }
+
+    #endregion Internal Constructors
+
+    #region Private Fields
+
+    private ICollection<UserLibraryItemModel> _items;
+
+    #endregion Private Fields
 }

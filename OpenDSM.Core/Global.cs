@@ -64,7 +64,6 @@ public static class Global
         }
     }
 
-
     #endregion Public Methods
 
 }

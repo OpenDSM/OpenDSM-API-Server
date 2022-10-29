@@ -1,5 +1,5 @@
+// LFInteractive LLC. - All Rights Reserved
 using Microsoft.AspNetCore.Mvc;
-using OpenDSM.Core.Models;
 
 namespace OpenDSM.Server.Controllers
 {

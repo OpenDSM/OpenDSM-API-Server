@@ -1,15 +1,16 @@
-﻿using MySql.Data.MySqlClient;
+﻿// LFInteractive LLC. - All Rights Reserved
+using MySql.Data.MySqlClient;
 using OpenDSM.Authentication.Collections;
 using OpenDSM.Authentication.Models;
 using OpenDSM.SQL;
-using System.Data.Common;
 using System.Net;
 
 namespace OpenDSM.Authentication.SQL;
 
 internal static class ClientsDB
 {
-    private static readonly string table = "auth_clients";
+    #region Public Methods
+
     public static IReadOnlyCollection<AuthorizedClient> GetClients(int user_id)
     {
         MySqlDataReader reader = Requests.Select(
@@ -35,6 +36,7 @@ internal static class ClientsDB
         }
         return (IReadOnlyCollection<AuthorizedClient>)clients;
     }
+
     public static void Update(UserModel user)
     {
         IReadOnlyCollection<AuthorizedClient> remote_collection = GetClients(user.Id);
@@ -86,4 +88,12 @@ internal static class ClientsDB
             }
         }
     }
+
+    #endregion Public Methods
+
+    #region Private Fields
+
+    private static readonly string table = "auth_clients";
+
+    #endregion Private Fields
 }

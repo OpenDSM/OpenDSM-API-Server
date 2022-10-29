@@ -6,13 +6,33 @@ namespace OpenDSM.Security;
 
 public class HashIds
 {
+    #region Public Fields
+
     public static HashIds Instance = Instance ??= new();
-    private readonly IHashids hash;
+
+    #endregion Public Fields
+
+    #region Public Methods
+
+    public string Get(int id) => hash.Encode(id);
+
+    public int Get(string key) => hash.DecodeSingle(key);
+
+    #endregion Public Methods
+
+    #region Private Constructors
+
     private HashIds()
     {
-        ConfigManager manager = new("sec", Core.Global.RootDirectory);
-        hash = new Hashids(manager.GetOrCreate("hash_key", Guid.NewGuid().ToString().Replace("-", "")).Value, 11);
+        Encryption enc = new("hash");
+        hash = new Hashids(enc.SALT, 11);
     }
-    public string Get(int id) => hash.Encode(id);
-    public int Get(string key) => hash.DecodeSingle(key);
+
+    #endregion Private Constructors
+
+    #region Private Fields
+
+    private readonly IHashids hash;
+
+    #endregion Private Fields
 }

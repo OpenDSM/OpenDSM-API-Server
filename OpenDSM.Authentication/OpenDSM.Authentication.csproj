@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SQL\database\**" />
+    <EmbeddedResource Remove="SQL\database\**" />
+    <None Remove="SQL\database\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ChaseLabs.Logger" Version="0.2.1.3" />
   </ItemGroup>
 
@@ -15,10 +21,6 @@
     <ProjectReference Include="..\OpenDSM.Git\OpenDSM.Git.csproj" />
     <ProjectReference Include="..\OpenDSM.Security\OpenDSM.Security.csproj" />
     <ProjectReference Include="..\OpenDSM.SQL\OpenDSM.SQL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="SQL\database\" />
   </ItemGroup>
 
 </Project>

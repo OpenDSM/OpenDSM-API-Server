@@ -9,7 +9,47 @@ public record OrderByClause(string Column, bool Ascending = true);
 public record TableItem(string Column, string DataType, int Size = -1, dynamic Default = null);
 public sealed class Requests
 {
+
     #region Public Methods
+
+    public static bool CreateTable(string table, IReadOnlyCollection<TableItem> items)
+    {
+        if (TableExists(table)) return false;
+        try
+        {
+            StringBuilder columns = new();
+            foreach (TableItem item in items)
+            {
+                columns.Append($"{item.Column} {item.DataType}");
+                if (item.Size < 0)
+                {
+                    columns.Append($"({item.Size})");
+                }
+                if (string.IsNullOrWhiteSpace(item.Default))
+                {
+                    if (item.Default.GetType().Equals(typeof(string)))
+                        columns.Append($"DEFAULT '{item.Default}'");
+                    else
+                        columns.Append($"DEFAULT {item.Default}");
+                }
+            }
+            Build(
+                start: "CREATE TABLE",
+                table: table,
+                post_table: columns.ToString(),
+                items: null,
+                where: null,
+                limit: -1,
+                offset: -1,
+                orderby: null
+           ).ExecuteNonQuery();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     /// <summary>
     /// Builds and executes a delete query
@@ -88,6 +128,15 @@ public sealed class Requests
         .ExecuteReader();
     }
 
+    public static bool TableExists(string table)
+    {
+        using MySqlConnection conn = new(Instance.ConnectionString);
+        conn.Open();
+        using MySqlCommand cmd = new($"select * from `{table}` limit 1", conn);
+        log.Debug(cmd.ExecuteNonQuery().ToString());
+        return cmd.ExecuteNonQuery() > 0;
+    }
+
     /// <summary>
     /// Builds and executes an update query.
     /// </summary>
@@ -107,54 +156,6 @@ public sealed class Requests
         offset: -1,
         orderby: null)
         .ExecuteNonQuery() > 0;
-
-    public static bool CreateTable(string table, IReadOnlyCollection<TableItem> items)
-    {
-        if (TableExists(table)) return false;
-        try
-        {
-            StringBuilder columns = new();
-            foreach (TableItem item in items)
-            {
-                columns.Append($"{item.Column} {item.DataType}");
-                if (item.Size < 0)
-                {
-                    columns.Append($"({item.Size})");
-                }
-                if (string.IsNullOrWhiteSpace(item.Default))
-                {
-                    if (item.Default.GetType().Equals(typeof(string)))
-                        columns.Append($"DEFAULT '{item.Default}'");
-                    else
-                        columns.Append($"DEFAULT {item.Default}");
-                }
-            }
-            Build(
-                start: "CREATE TABLE",
-                table: table,
-                post_table: columns.ToString(),
-                items: null,
-                where: null,
-                limit: -1,
-                offset: -1,
-                orderby: null
-           ).ExecuteNonQuery();
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    public static bool TableExists(string table)
-    {
-        using MySqlConnection conn = new(Instance.ConnectionString);
-        conn.Open();
-        using MySqlCommand cmd = new($"select * from `{table}` limit 1", conn);
-        log.Debug(cmd.ExecuteNonQuery().ToString());
-        return cmd.ExecuteNonQuery() > 0;
-    }
 
     #endregion Public Methods
 

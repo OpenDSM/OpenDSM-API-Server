@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OpenDSM.Core.Handlers;
-using OpenDSM.Core.Models;
+﻿// LFInteractive LLC. - All Rights Reserved
+using Microsoft.AspNetCore.Mvc;
 
 namespace OpenDSM.Server.Controllers;
 
@@ -8,6 +7,7 @@ namespace OpenDSM.Server.Controllers;
 [Route("/search")]
 public class SearchController : ControllerBase
 {
+
     #region Public Methods
 
     /// <summary>
@@ -55,4 +55,5 @@ public class SearchController : ControllerBase
     }
 
     #endregion Public Methods
+
 }

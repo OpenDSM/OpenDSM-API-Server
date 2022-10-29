@@ -2,9 +2,13 @@
 
 public struct GitRepository
 {
-    public long ID { get; init; }
-    public string Name { get; init; }
+    #region Public Properties
+
     public string About { get; init; }
-    public DateTime LastUpdated { get; init; }
     public DateTime Created { get; init; }
+    public long ID { get; init; }
+    public DateTime LastUpdated { get; init; }
+    public string Name { get; init; }
+
+    #endregion Public Properties
 }

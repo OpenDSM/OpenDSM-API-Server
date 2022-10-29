@@ -6,6 +6,7 @@ namespace OpenDSM.Authentication.Collections;
 
 public sealed class AuthorizedClientCollection
 {
+
     #region Public Fields
 
     public static readonly int MAX_AUTHORIZED_CLIENTS = 5;
@@ -14,22 +15,12 @@ public sealed class AuthorizedClientCollection
 
     #region Public Properties
 
-    private ICollection<AuthorizedClient> _clients { get; set; }
     public IReadOnlyCollection<AuthorizedClient> Clients => (IReadOnlyCollection<AuthorizedClient>)_clients;
 
     #endregion Public Properties
 
-    #region Internal Constructors
+    #region Public Methods
 
-    internal AuthorizedClientCollection(int user_id)
-    {
-        _clients = (ICollection<AuthorizedClient>)ClientsDB.GetClients(user_id);
-    }
-    ~AuthorizedClientCollection()
-    {
-        log.Debug("Deconstructing Authorized User Collection");
-        /// TODO: Add update database code here
-    }
     public void Add(string Name, IPAddress connection)
     {
         if (_clients.Any(c => c.ClientName.Equals(Name) && c.ClientConnectionAddress.Equals(connection.ToString())))
@@ -49,8 +40,33 @@ public sealed class AuthorizedClientCollection
         log.Debug("Updating Collection");
         /// TODO: Add update database code here
     }
+
     public bool Contains(string name, IPAddress connection) => _clients.Any(i => i.ClientName.Equals(name) && i.ClientConnectionAddress == connection);
+
+    #endregion Public Methods
+
+    #region Internal Constructors
+
+    internal AuthorizedClientCollection(int user_id)
+    {
+        _clients = (ICollection<AuthorizedClient>)ClientsDB.GetClients(user_id);
+    }
 
     #endregion Internal Constructors
 
+    #region Private Destructors
+
+    ~AuthorizedClientCollection()
+    {
+        log.Debug("Deconstructing Authorized User Collection");
+        /// TODO: Add update database code here
+    }
+
+    #endregion Private Destructors
+
+    #region Private Properties
+
+    private ICollection<AuthorizedClient> _clients { get; set; }
+
+    #endregion Private Properties
 }

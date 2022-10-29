@@ -2,7 +2,11 @@
 
 public struct GitUserModel
 {
-    public string Username { get; init; }
-    public string Token { get; init; }
+    #region Public Properties
+
     public IReadOnlyCollection<GitRepository> Repositories => Connections.GetRepositories(this).Result;
+    public string Token { get; init; }
+    public string Username { get; init; }
+
+    #endregion Public Properties
 }

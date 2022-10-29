@@ -5,7 +5,7 @@ namespace OpenDSM.Git.SQL;
 
 public static class GitDB
 {
-    private static readonly string table = "git_users";
+    #region Public Methods
 
     public static bool CreateGitUser(GitUserModel user) =>
         Requests.Insert(
@@ -38,4 +38,12 @@ public static class GitDB
         }
         return null;
     }
+
+    #endregion Public Methods
+
+    #region Private Fields
+
+    private static readonly string table = "git_users";
+
+    #endregion Private Fields
 }

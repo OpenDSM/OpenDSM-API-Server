@@ -95,4 +95,5 @@ public static class FileHandler
     }
 
     #endregion Public Methods
+
 }

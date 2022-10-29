@@ -3,6 +3,7 @@ using ChaseLabs.CLConfiguration;
 namespace OpenDSM.Core.Handlers;
 public sealed class ConfigHandler
 {
+
     #region Public Fields
 
     public static ConfigHandler Instance = Instance ??= new();
@@ -29,4 +30,5 @@ public sealed class ConfigHandler
     private ConfigManager manager;
 
     #endregion Private Fields
+
 }

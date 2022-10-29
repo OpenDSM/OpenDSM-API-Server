@@ -29,6 +29,7 @@ public record User(int id, string username, string email, string token, AccountT
 
 public static class Authorization
 {
+
     #region Public Methods
 
     /// <summary>
@@ -333,4 +334,5 @@ public static class Authorization
     private static readonly string table = "users";
 
     #endregion Private Fields
+
 }

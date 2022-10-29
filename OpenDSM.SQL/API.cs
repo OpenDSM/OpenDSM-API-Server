@@ -5,6 +5,7 @@ namespace OpenDSM.SQL;
 public record APIKey(int user, string key, int total_calls, DateTime created, DateTime last_used);
 public static class API
 {
+
     #region Public Methods
 
     public static string GenerateAPIKey(int user)
@@ -137,4 +138,5 @@ public static class API
     private static readonly string table = "api_keys";
 
     #endregion Private Fields
+
 }

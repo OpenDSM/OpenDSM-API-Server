@@ -9,40 +9,38 @@ namespace OpenDSM.Authentication.Models;
 
 public sealed class UserModel
 {
+
     #region Public Properties
-    public int Id { get; init; }
-    public string Email { get; init; }
-    public string Username { get; init; }
-    public bool IsDeveloperAccount { get; private set; }
+
     public string About { get; init; }
-    public string ProfileImage { get; init; }
-    public string BannerImage { get; init; }
-    public bool HasProfileImage { get; init; }
-    public bool HasBannerImage { get; init; }
-    public UserLibraryCollection OwnedProducts { get; init; }
-    public AuthorizedClientCollection Clients { get; init; }
     public APIKeyModel? API_Key { get; init; }
+    public string BannerImage { get; init; }
+    public AuthorizedClientCollection Clients { get; init; }
+    public string Email { get; init; }
     public GitUserModel? GitUser { get; init; }
+    public bool HasBannerImage { get; init; }
+    public bool HasProfileImage { get; init; }
+    public int Id { get; init; }
+    public bool IsDeveloperAccount { get; private set; }
+    public UserLibraryCollection OwnedProducts { get; init; }
+    public string ProfileImage { get; init; }
+    public string Username { get; init; }
 
+    #endregion Public Properties
 
-    internal UserModel(int id, string username, string email, string about)
+    #region Public Methods
+
+    public bool ActivateDeveloperAccount(GitUserModel user)
     {
-        Id = id;
-
-        ProfileImage = Path.Combine(Core.Global.GetUsersProfileDirectory(Id), "images", "profile.png");
-        BannerImage = Path.Combine(Core.Global.GetUsersProfileDirectory(Id), "images", "banner.jpg");
-        HasProfileImage = File.Exists(ProfileImage);
-        HasBannerImage = File.Exists(BannerImage);
-
-        Username = username;
-        Email = email;
-        About = about;
-        OwnedProducts = new(Id);
-        Clients = new(Id);
-        API_Key = new(this);
-
-        GitUser = GitDB.GetGitUser(Id);
-        IsDeveloperAccount = GitUser != null;
+        if (Git.Connections.IsValidCredentials(user))
+        {
+            if (GitDB.CreateGitUser(user))
+            {
+                IsDeveloperAccount = true;
+                return true;
+            }
+        }
+        return false;
     }
 
     public object ToObject()
@@ -77,19 +75,29 @@ public sealed class UserModel
         FileHandler.CreateImageFromBase64(base64, Path.Combine(Core.Global.GetUsersProfileDirectory(Id), "images"), profile ? "profile.png" : "banner.jpg");
     }
 
-    public bool ActivateDeveloperAccount(GitUserModel user)
+    #endregion Public Methods
+
+    #region Internal Constructors
+
+    internal UserModel(int id, string username, string email, string about)
     {
-        if (Git.Connections.IsValidCredentials(user))
-        {
-            if (GitDB.CreateGitUser(user))
-            {
-                IsDeveloperAccount = true;
-                return true;
-            }
-        }
-        return false;
+        Id = id;
+
+        ProfileImage = Path.Combine(Core.Global.GetUsersProfileDirectory(Id), "images", "profile.png");
+        BannerImage = Path.Combine(Core.Global.GetUsersProfileDirectory(Id), "images", "banner.jpg");
+        HasProfileImage = File.Exists(ProfileImage);
+        HasBannerImage = File.Exists(BannerImage);
+
+        Username = username;
+        Email = email;
+        About = about;
+        OwnedProducts = new(Id);
+        Clients = new(Id);
+        API_Key = new(this);
+
+        GitUser = GitDB.GetGitUser(Id);
+        IsDeveloperAccount = GitUser != null;
     }
 
-    #endregion Public Properties
-
+    #endregion Internal Constructors
 }

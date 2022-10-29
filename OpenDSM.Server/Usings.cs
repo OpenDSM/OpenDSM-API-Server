@@ -8,6 +8,8 @@ namespace OpenDSM.Server;
 
 internal static class Usings
 {
+    #region Public Methods
+
     public static bool IsLoggedIn(HttpRequest request, out UserModel user)
     {
         if (request.Cookies["auth_token"] != null)
@@ -44,4 +46,6 @@ internal static class Usings
         user = null;
         return false;
     }
+
+    #endregion Public Methods
 }

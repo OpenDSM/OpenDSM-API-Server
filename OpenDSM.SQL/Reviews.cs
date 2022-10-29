@@ -4,6 +4,7 @@ namespace OpenDSM.SQL;
 
 public static class Reviews
 {
+
     #region Public Methods
 
     public static bool CreateReview(int product_id, byte rating, string summery, string body, int user_id)
@@ -82,4 +83,5 @@ public static class Reviews
     private static readonly string table = "review";
 
     #endregion Private Fields
+
 }

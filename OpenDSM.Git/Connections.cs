@@ -6,22 +6,8 @@ namespace OpenDSM.Git;
 public record GitRelease(int id, string name, ProductReleaseType release_type);
 public static class Connections
 {
-    /// <summary>
-    /// Gets a list of all release ids
-    /// </summary>
-    /// <param name="repository_name"></param>
-    /// <param name="user"></param>
-    /// <returns></returns>
-    public static async Task<IReadOnlyCollection<int>> GetReleases(string repository_name, GitUserModel user)
-    {
-        List<int> ids = new();
-        if (TryGetClient(user.Username, user.Token, out GitHubClient client))
-        {
-            IReadOnlyCollection<Release> releases = await client.Repository.Release.GetAll(user.Username, repository_name);
-            Parallel.ForEach(releases, release => ids.Add(release.Id));
-        }
-        return ids;
-    }
+    #region Public Methods
+
     public static async Task<GitRelease?> GetRelease(long repository_id, int release_id, GitUserModel user)
     {
         if (TryGetClient(user.Username, user.Token, out GitHubClient client))
@@ -47,6 +33,23 @@ public static class Connections
         }
         return null;
     }
+
+    /// <summary>
+    /// Gets a list of all release ids
+    /// </summary>
+    /// <param name="repository_name"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public static async Task<IReadOnlyCollection<int>> GetReleases(string repository_name, GitUserModel user)
+    {
+        List<int> ids = new();
+        if (TryGetClient(user.Username, user.Token, out GitHubClient client))
+        {
+            IReadOnlyCollection<Release> releases = await client.Repository.Release.GetAll(user.Username, repository_name);
+            Parallel.ForEach(releases, release => ids.Add(release.Id));
+        }
+        return ids;
+    }
     /// <summary>
     /// Gets a list of users repositories
     /// </summary>
@@ -69,6 +72,12 @@ public static class Connections
         }
         return repos;
     }
+
+    public static bool IsValidCredentials(GitUserModel user) => TryGetClient(user.Username, user.Token, out _);
+
+    #endregion Public Methods
+
+    #region Private Methods
 
     /// <summary>
     /// Attempts to get a valid client based on username and token
@@ -94,5 +103,6 @@ public static class Connections
         client = null;
         return false;
     }
-    public static bool IsValidCredentials(GitUserModel user) => TryGetClient(user.Username, user.Token, out _);
+
+    #endregion Private Methods
 }

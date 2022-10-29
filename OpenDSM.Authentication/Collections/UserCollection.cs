@@ -7,7 +7,11 @@ namespace OpenDSM.Authentication.Collections;
 
 public static class UserCollection
 {
+    #region Public Methods
+
     public static bool CreateUser(string email, string username, string password, out UserModel? user, out FailedReason reason) => (user = UsersDB.CreateUser(username, email, password, out reason)) != null;
+    public static bool GetById(int user_id, out UserModel? user) => (user = SQL.UsersDB.GetUser(user_id)) == null;
+
     public static bool Login(string username, string password, string client_name, IPAddress connection_address, out UserModel? user)
     {
         try
@@ -37,5 +41,5 @@ public static class UserCollection
         return false;
     }
 
-    public static bool GetById(int user_id, out UserModel? user) => (user = SQL.UsersDB.GetUser(user_id)) == null;
+    #endregion Public Methods
 }

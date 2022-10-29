@@ -17,6 +17,7 @@ public enum Platform
 
 public static class Products
 {
+
     #region Public Methods
 
     public static void AddPageView(int id)
@@ -268,4 +269,5 @@ public static class Products
     private static readonly string table = "products";
 
     #endregion Private Fields
+
 }

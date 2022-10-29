@@ -10,6 +10,7 @@ namespace OpenDSM.Server.Controllers;
 [Route("/products/{product_id}/releases")]
 public class ReleaseController : ControllerBase
 {
+
     #region Public Methods
 
     /// <summary>
@@ -264,4 +265,5 @@ public class ReleaseController : ControllerBase
     }
 
     #endregion Public Methods
+
 }
