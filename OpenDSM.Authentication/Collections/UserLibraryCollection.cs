@@ -40,6 +40,7 @@ public class UserLibraryCollection
         return false;
 
     }
+    public bool HasProduct(int product_id) => Items.Any(i => i.ProductID == product_id);
 
     #endregion Public Methods
 
