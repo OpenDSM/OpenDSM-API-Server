@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenDSM.Core\OpenDSM.Core.csproj" />
+    <ProjectReference Include="..\OpenDSM.SQL\OpenDSM.SQL.csproj" />
+  </ItemGroup>
+
+</Project>

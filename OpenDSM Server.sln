@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDSM.Authentication", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDSM.Git", "OpenDSM.Git\OpenDSM.Git.csproj", "{5FCE4D1F-DE25-4CD4-8013-02B3A6AAF16E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDSM.Security", "OpenDSM.Security\OpenDSM.Security.csproj", "{720D096C-EDFE-4F3D-98E2-090D0006721E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDSM.Security", "OpenDSM.Security\OpenDSM.Security.csproj", "{720D096C-EDFE-4F3D-98E2-090D0006721E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDSM.Products", "OpenDSM.Products\OpenDSM.Products.csproj", "{A824D575-2971-4046-B1E4-3F3DDB6542DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{720D096C-EDFE-4F3D-98E2-090D0006721E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{720D096C-EDFE-4F3D-98E2-090D0006721E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{720D096C-EDFE-4F3D-98E2-090D0006721E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A824D575-2971-4046-B1E4-3F3DDB6542DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A824D575-2971-4046-B1E4-3F3DDB6542DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A824D575-2971-4046-B1E4-3F3DDB6542DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A824D575-2971-4046-B1E4-3F3DDB6542DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
